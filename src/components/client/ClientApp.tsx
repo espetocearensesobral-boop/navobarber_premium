@@ -639,6 +639,10 @@ export const ClientApp: React.FC = () => {
           setIsGuest(false);
           setCurrentUser(user);
           localStorage.setItem('barberx_user', JSON.stringify(user));
+          if (user.role === 'admin') {
+            window.location.href = '/admin';
+            return;
+          }
           if (pendingAction) {
             const action = pendingAction;
             setPendingAction(null);
