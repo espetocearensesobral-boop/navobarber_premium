@@ -36,26 +36,32 @@ export const AdminLayout: React.FC = () => {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [adminName, setAdminName] = useState('Admin');
 
+  // ✅ PROTEÇÃO DE AUTENTICAÇÃO
   React.useEffect(() => {
-    // Verifica se o usuário logado é admin
-    const userStr = localStorage.getItem('barberx_user');
-    
-    if (!userStr) {
-      window.location.href = '/'; // Redireciona para home
-      return;
-    }
-    
-    try {
-      const user = JSON.parse(userStr);
-      if (user.role !== 'admin') {
-        window.location.href = '/'; // Não é admin
-      } else {
-        setIsAuthorized(true);
-        setAdminName(user.name || 'Admin');
+    const checkAuth = () => {
+      // Verifica se o usuário logado é admin
+      const token = localStorage.getItem('token');
+      const userStr = localStorage.getItem('barberx_user');
+      
+      if (!userStr) {
+        window.location.href = '/'; // Redireciona para home
+        return;
       }
-    } catch {
-      window.location.href = '/';
-    }
+      
+      try {
+        const user = JSON.parse(userStr);
+        if (user.role !== 'admin') {
+          window.location.href = '/'; // Não é admin
+        } else {
+          setIsAuthorized(true);
+          setAdminName(user.name || 'Admin');
+        }
+      } catch {
+        window.location.href = '/';
+      }
+    };
+    
+    checkAuth();
   }, []);
 
   if (!isAuthorized) {
