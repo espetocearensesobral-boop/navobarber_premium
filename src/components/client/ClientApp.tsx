@@ -317,59 +317,61 @@ export const ClientApp: React.FC = () => {
       {/* Web App View */}
       <div className="w-full max-w-3xl lg:max-w-4xl bg-surface-base flex flex-col flex-1 relative overflow-hidden shadow-2xl mx-auto">
 
-        {/* Client App Header */}
-        <header className="px-4 sm:px-6 py-2.5 sm:py-4 flex justify-between items-center bg-transparent z-10 shrink-0">
-          <div className="flex items-center gap-3">
-            {isGuest ? (
-              <button 
-                onClick={() => {
-                  setLoginModalView('login');
-                  setIsLoginModalOpen(true);
-                }}
-                className="flex items-center gap-3 text-left focus:outline-none focus:ring-2 focus:ring-gold-base rounded-xl px-2 py-1 -ml-2 transition-all hover:bg-border-subtle"
-              >
-                <div className="w-10 h-10 rounded-full bg-surface-card flex items-center justify-center border border-border-subtle">
-                  <User className="w-5 h-5 text-content-muted" />
-                </div>
-                <div>
-                  <h1 className="text-sm font-semibold text-content-base">Olá, Visitante</h1>
-                  <p className="text-[10px] text-content-muted">Acesse seus benefícios</p>
-                </div>
-              </button>
-            ) : (
-              <button 
-                onClick={() => setIsProfileModalOpen(true)}
-                className="relative rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-base active:scale-95 transition-transform flex items-center gap-3 px-2 py-1 -ml-2 hover:bg-border-subtle"
-              >
-                <img
-                  src={currentUser.avatar_url || currentUser.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=75&w=150'}
-                  alt={currentUser.name}
-                  className="w-10 h-10 rounded-full object-cover border border-content-base"
-                />
-                <div className="text-left">
-                  <h1 className="text-sm font-semibold text-content-base">Olá, {currentUser.name}</h1>
-                  <span className="text-[10px] font-bold bg-gradient-to-r from-content-base to-content-base bg-clip-text text-transparent flex items-center space-x-1">
-                    <Sparkles className="w-3 h-3 text-gold-base" />
-                    <span>{currentUser.loyalty_points || 0} Pts • {currentUser.loyalty_tier || 'Bronze'}</span>
-                  </span>
-                </div>
-              </button>
-            )}
-          </div>
+        {/* Client App Header (hidden on home/landing page) */}
+        {activeTab !== 'home' && (
+          <header className="px-4 sm:px-6 py-2.5 sm:py-4 flex justify-between items-center bg-transparent z-10 shrink-0">
+            <div className="flex items-center gap-3">
+              {isGuest ? (
+                <button 
+                  onClick={() => {
+                    setLoginModalView('login');
+                    setIsLoginModalOpen(true);
+                  }}
+                  className="flex items-center gap-3 text-left focus:outline-none focus:ring-2 focus:ring-gold-base rounded-xl px-2 py-1 -ml-2 transition-all hover:bg-border-subtle"
+                >
+                  <div className="w-10 h-10 rounded-full bg-surface-card flex items-center justify-center border border-border-subtle">
+                    <User className="w-5 h-5 text-content-muted" />
+                  </div>
+                  <div>
+                    <h1 className="text-sm font-semibold text-content-base">Olá, Visitante</h1>
+                    <p className="text-[10px] text-content-muted">Acesse seus benefícios</p>
+                  </div>
+                </button>
+              ) : (
+                <button 
+                  onClick={() => setIsProfileModalOpen(true)}
+                  className="relative rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-base active:scale-95 transition-transform flex items-center gap-3 px-2 py-1 -ml-2 hover:bg-border-subtle"
+                >
+                  <img
+                    src={currentUser.avatar_url || currentUser.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=75&w=150'}
+                    alt={currentUser.name}
+                    className="w-10 h-10 rounded-full object-cover border border-content-base"
+                  />
+                  <div className="text-left">
+                    <h1 className="text-sm font-semibold text-content-base">Olá, {currentUser.name}</h1>
+                    <span className="text-[10px] font-bold bg-gradient-to-r from-content-base to-content-base bg-clip-text text-transparent flex items-center space-x-1">
+                      <Sparkles className="w-3 h-3 text-gold-base" />
+                      <span>{currentUser.loyalty_points || 0} Pts • {currentUser.loyalty_tier || 'Bronze'}</span>
+                    </span>
+                  </div>
+                </button>
+              )}
+            </div>
 
-          <div className="flex items-center gap-2">
-            {/* Install PWA Button in Header */}
-            <button
-              onClick={() => setIsPwaModalOpen(true)}
-              title="Instalar App"
-              aria-label="Instalar App"
-              className="p-2 rounded-xl text-content-base hover:text-content-base transition-all active:scale-95 flex items-center justify-center shrink-0"
-            >
-              <Download className="w-5 h-5 text-gold-base" />
-            </button>
+            <div className="flex items-center gap-2">
+              {/* Install PWA Button in Header */}
+              <button
+                onClick={() => setIsPwaModalOpen(true)}
+                title="Instalar App"
+                aria-label="Instalar App"
+                className="p-2 rounded-xl text-content-base hover:text-content-base transition-all active:scale-95 flex items-center justify-center shrink-0"
+              >
+                <Download className="w-5 h-5 text-gold-base" />
+              </button>
 
-          </div>
-        </header>
+            </div>
+          </header>
+        )}
 
         {/* Floating Toast Notification */}
         <AnimatePresence>

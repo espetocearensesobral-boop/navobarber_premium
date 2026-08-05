@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   Clock, 
   MapPin, 
@@ -23,12 +23,56 @@ interface LandingPageProps {
 export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeCategory, setActiveCategory] = useState<'todos' | 'cabelo' | 'barba'>('todos');
+  const [activeSection, setActiveSection] = useState<number>(0);
 
-  const scrollToTop = () => {
+  const sectionLabels = [
+    'Início',
+    'Diferenciais',
+    'Serviços',
+    'Galeria',
+    'Depoimentos',
+    'Localização',
+    'Agendar'
+  ];
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const sections = container.querySelectorAll('section');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.4) {
+            const index = Array.from(sections).indexOf(entry.target as HTMLElement);
+            if (index !== -1) {
+              setActiveSection(index);
+            }
+          }
+        });
+      },
+      {
+        root: container,
+        threshold: [0.4, 0.6],
+      }
+    );
+
+    sections.forEach((s) => observer.observe(s));
+    return () => observer.disconnect();
+  }, []);
+
+  const scrollToSection = (index: number) => {
     hapticLight();
     if (containerRef.current) {
-      containerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      const sections = containerRef.current.querySelectorAll('section');
+      if (sections[index]) {
+        sections[index].scrollIntoView({ behavior: 'smooth' });
+      }
     }
+  };
+
+  const scrollToTop = () => {
+    scrollToSection(0);
   };
 
   const services = [
@@ -112,7 +156,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking }) => {
   };
 
   return (
-    <div ref={containerRef} className="w-full h-[100dvh] overflow-y-auto snap-y snap-mandatory scroll-smooth bg-white text-neutral-900 font-sans antialiased relative selection:bg-[#C8A96A]/20 selection:text-neutral-900 no-scrollbar">
+    <div ref={containerRef} className="w-full h-[100dvh] overflow-y-scroll snap-y snap-mandatory bg-white text-neutral-900 font-sans antialiased relative selection:bg-[#C8A96A]/20 selection:text-neutral-900 no-scrollbar">
       {/* SECTION 0: HERO */}
       <section className="relative w-full h-[100dvh] min-h-[100dvh] snap-start snap-always shrink-0 bg-neutral-950 text-white overflow-hidden flex flex-col justify-center">
         {/* Background Image */}
@@ -126,7 +170,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking }) => {
         </div>
 
         {/* HERO CONTENT */}
-        <div className="relative z-10 px-6 sm:px-8 md:px-12 lg:px-16 max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full py-8 md:py-16 flex flex-col items-start justify-center flex-1">
+        <div className="relative z-10 px-6 sm:px-8 md:px-12 lg:px-16 max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full py-8 md:py-16 flex flex-col items-start justify-center flex-1 my-auto">
           {/* RATING */}
           <div className="flex items-center gap-2 text-xs sm:text-sm md:text-base text-white/90 font-medium mb-3 md:mb-6">
             <div className="flex text-amber-400 gap-1">
@@ -159,8 +203,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking }) => {
       </section>
 
       {/* SECTION 1: POR QUE A NOBRE */}
-      <section className="w-full h-[100dvh] min-h-[100dvh] snap-start snap-always shrink-0 flex flex-col justify-center px-5 sm:px-8 md:px-12 lg:px-16 py-6 sm:py-8 md:py-12 bg-white overflow-hidden">
-        <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full flex flex-col justify-between h-full py-4 sm:py-6 md:py-8">
+      <section className="w-full h-[100dvh] min-h-[100dvh] snap-start snap-always shrink-0 flex flex-col justify-center px-4 sm:px-6 md:px-12 lg:px-16 py-4 sm:py-6 md:py-8 bg-white overflow-hidden">
+        <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full max-h-full overflow-y-auto no-scrollbar flex flex-col justify-between h-full py-2 sm:py-4 my-auto">
           <div className="shrink-0">
             <span className="text-[#C8A96A] text-[11px] sm:text-xs md:text-sm font-bold tracking-widest uppercase block mb-1.5 md:mb-2">
               POR QUE A NOBRE
@@ -190,13 +234,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking }) => {
       </section>
 
       {/* SECTION 2: SERVIÇOS */}
-      <section className="w-full h-[100dvh] min-h-[100dvh] snap-start snap-always shrink-0 flex flex-col justify-center px-5 sm:px-8 md:px-12 lg:px-16 py-6 sm:py-8 md:py-12 bg-white overflow-hidden">
-        <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full flex flex-col justify-between h-full py-4 sm:py-6 md:py-8">
+      <section className="w-full h-[100dvh] min-h-[100dvh] snap-start snap-always shrink-0 flex flex-col justify-center px-4 sm:px-6 md:px-12 lg:px-16 py-4 sm:py-6 md:py-8 bg-white overflow-hidden">
+        <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full max-h-full overflow-y-auto no-scrollbar flex flex-col justify-between h-full py-2 sm:py-4 my-auto">
           <div className="shrink-0">
             <span className="text-[#C8A96A] text-[11px] sm:text-xs md:text-sm font-bold tracking-widest uppercase block mb-1.5 md:mb-2">
               SERVIÇOS
             </span>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-neutral-900 tracking-tight mb-3 md:mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-neutral-900 tracking-tight mb-2 md:mb-4">
               Escolha seu serviço
             </h2>
 
@@ -267,7 +311,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking }) => {
 
       {/* SECTION 3: GALERIA */}
       <section className="w-full h-[100dvh] min-h-[100dvh] snap-start snap-always shrink-0 flex flex-col justify-center px-4 sm:px-6 md:px-10 lg:px-16 py-4 sm:py-6 md:py-8 bg-white overflow-hidden">
-        <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full flex flex-col justify-between h-full">
+        <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full max-h-full overflow-y-auto no-scrollbar flex flex-col justify-between h-full my-auto py-2">
           {/* Header */}
           <div className="flex justify-between items-end mb-2.5 sm:mb-4 shrink-0">
             <div>
@@ -382,8 +426,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking }) => {
       </section>
 
       {/* SECTION 4: DEPOIMENTOS */}
-      <section className="w-full h-[100dvh] min-h-[100dvh] snap-start snap-always shrink-0 flex flex-col justify-center px-5 sm:px-8 md:px-12 lg:px-16 py-6 sm:py-8 md:py-12 bg-white overflow-hidden">
-        <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full flex flex-col justify-between h-full py-4 sm:py-6 md:py-8">
+      <section className="w-full h-[100dvh] min-h-[100dvh] snap-start snap-always shrink-0 flex flex-col justify-center px-4 sm:px-6 md:px-12 lg:px-16 py-4 sm:py-6 md:py-8 bg-white overflow-hidden">
+        <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full max-h-full overflow-y-auto no-scrollbar flex flex-col justify-between h-full py-2 sm:py-4 my-auto">
           <div className="shrink-0 mb-2 md:mb-4">
             <span className="text-[#C8A96A] text-[11px] sm:text-xs md:text-sm font-bold tracking-widest uppercase block mb-1.5 md:mb-2">
               DEPOIMENTOS
@@ -429,8 +473,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking }) => {
       </section>
 
       {/* SECTION 5: LOCALIZAÇÃO */}
-      <section className="w-full h-[100dvh] min-h-[100dvh] snap-start snap-always shrink-0 flex flex-col justify-center px-5 sm:px-8 md:px-12 lg:px-16 py-6 sm:py-8 md:py-12 bg-white overflow-hidden">
-        <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full flex flex-col justify-between h-full py-4 sm:py-6 md:py-8">
+      <section className="w-full h-[100dvh] min-h-[100dvh] snap-start snap-always shrink-0 flex flex-col justify-center px-4 sm:px-6 md:px-12 lg:px-16 py-4 sm:py-6 md:py-8 bg-white overflow-hidden">
+        <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full max-h-full overflow-y-auto no-scrollbar flex flex-col justify-between h-full py-2 sm:py-4 my-auto">
           <div className="shrink-0">
             <span className="text-[#C8A96A] text-[11px] sm:text-xs md:text-sm font-bold tracking-widest uppercase block mb-1.5 md:mb-2">
               LOCALIZAÇÃO
@@ -480,8 +524,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking }) => {
       </section>
 
       {/* SECTION 6: PRONTO PARA O SEU NOVO VISUAL? (DARK CARD) */}
-      <section className="w-full h-[100dvh] min-h-[100dvh] snap-start snap-always shrink-0 flex flex-col justify-between px-5 sm:px-8 md:px-12 lg:px-16 py-6 md:py-10 bg-white overflow-hidden relative">
-        <div className="w-full flex-1 flex flex-col justify-center items-center">
+      <section className="w-full h-[100dvh] min-h-[100dvh] snap-start snap-always shrink-0 flex flex-col justify-between px-4 sm:px-6 md:px-12 lg:px-16 py-4 sm:py-6 md:py-8 bg-white overflow-hidden relative">
+        <div className="w-full flex-1 flex flex-col justify-center items-center max-h-full overflow-y-auto no-scrollbar my-auto py-2">
           <div className="max-w-md md:max-w-3xl lg:max-w-4xl w-full bg-neutral-900 text-white rounded-3xl p-6 sm:p-8 md:p-12 lg:p-16 relative overflow-hidden shadow-xl md:text-center md:flex md:flex-col md:items-center">
             <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-[#C8A96A]/20 border border-[#C8A96A]/30 flex items-center justify-center text-[#C8A96A] mb-5 md:mb-6">
               <Scissors className="w-6 h-6 md:w-8 md:h-8 stroke-[2.2]" />
@@ -516,6 +560,33 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking }) => {
           </button>
         </div>
       </section>
+
+      {/* FLOATING SCROLL INDICATORS (DOTS LATERAIS REELS/FULLPAGE) */}
+      <div className="fixed right-3 sm:right-5 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-30 bg-neutral-900/60 backdrop-blur-md p-1.5 sm:p-2 rounded-full border border-white/10 shadow-xl pointer-events-auto">
+        {sectionLabels.map((label, i) => (
+          <button
+            key={i}
+            onClick={() => scrollToSection(i)}
+            title={label}
+            aria-label={`Ir para a seção ${label}`}
+            className={`group relative flex items-center justify-center transition-all duration-300 ${
+              activeSection === i ? 'w-3 h-3 sm:w-3.5 sm:h-3.5' : 'w-2 h-2 sm:w-2.5 sm:h-2.5'
+            }`}
+          >
+            <span
+              className={`w-full h-full rounded-full transition-all duration-300 ${
+                activeSection === i
+                  ? 'bg-[#C8A96A] scale-125 ring-2 ring-[#C8A96A]/40 shadow-sm'
+                  : 'bg-neutral-400/50 group-hover:bg-neutral-200'
+              }`}
+            />
+            {/* Tooltip on hover */}
+            <span className="absolute right-7 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-neutral-900 text-white text-[10px] sm:text-xs font-semibold px-2 py-1 rounded-md shadow-lg whitespace-nowrap pointer-events-none border border-neutral-800">
+              {label}
+            </span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 };
