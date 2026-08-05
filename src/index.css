@@ -1,0 +1,201 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,500&family=Inter:wght@400;500;600;700;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-surface-base: var(--color-surface-base);
+  --color-surface-card: var(--color-surface-card);
+  --color-gold-base: var(--color-gold-base);
+  --color-gold-deep: var(--color-gold-deep);
+  --color-content-base: var(--color-content-base);
+  
+  --color-border-subtle: var(--color-border-subtle);
+  --color-content-muted: var(--color-content-muted);
+  
+  --color-status-success: var(--color-status-success);
+  --color-status-warning: var(--color-status-warning);
+  --color-status-error: var(--color-status-error);
+  --color-status-info: var(--color-status-info);
+
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+:root {
+  /* 4-Color Core Palette */
+  --color-surface-base: #000000;
+  --color-surface-card: #121212;
+  --color-gold-base: #C9A96E;
+  --color-gold-deep: #C9A96E;
+  --color-content-base: #F2EFE7;
+
+  /* Derived from Core */
+  --color-border-subtle: rgba(242, 239, 231, 0.1);
+  --color-content-muted: rgba(242, 239, 231, 0.65);
+
+  /* Status (Derived from Core) */
+  --color-status-success: #10B981;
+  --color-status-warning: #F59E0B;
+  --color-status-error: #EF4444;
+  --color-status-info: #3B82F6;
+
+  /* Typography */
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Radii */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+}
+
+
+
+body {
+  background-color: var(--color-surface-base);
+  color: var(--color-content-base);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Global Focus Ring (Accessibility) */
+button, a, input, select, textarea {
+  @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-base focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base transition-shadow;
+}
+
+::selection {
+  background-color: var(--color-gold-base);
+  color: var(--color-surface-base);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-surface-base);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-subtle);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gold-base);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.font-serif { font-family: var(--font-serif); }
+.font-sans { font-family: var(--font-sans); }
+.font-display { font-family: var(--font-display); }
+.font-body { font-family: var(--font-body); }
+
+/* Typography Helpers */
+.text-display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.text-display-lg {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+.text-section {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* Gradients using the Core Palette */
+.gradient-surface {
+  background: linear-gradient(180deg, var(--color-surface-card), var(--color-surface-base));
+}
+
+.geometric-grid-bg {
+  background-color: var(--color-surface-base);
+  background-image: radial-gradient(rgba(201, 169, 110, 0.1) 0.5px, transparent 0.5px);
+  background-size: 24px 24px;
+}
+
+.geometric-card {
+  background-color: var(--color-surface-card);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  transition: all 0.2s ease-in-out;
+}
+.geometric-card-active {
+  background-color: var(--color-surface-card);
+  border: 1px solid var(--color-gold-base);
+  border-radius: var(--radius-lg);
+}
+
+/* System Corners */
+.rounded-card { border-radius: 16px !important; }
+.rounded-btn { border-radius: 9999px !important; }
+.rounded-input { border-radius: 12px !important; }
+.rounded-badge { border-radius: 8px !important; }
+.rounded-modal { border-radius: 24px !important; }
+
+.shadow-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+.border-accent {
+  border: 1px solid rgba(201, 169, 110, 0.25);
+}
+.transition-sharp {
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --color-surface-base: #F5F1E8;
+  --color-surface-card: #FFFDF8;
+  --color-gold-base: #C9A96E;
+  --color-gold-deep: #8B6332;
+  --color-content-base: #1C1917;
+  --color-content-muted: rgba(28, 25, 23, 0.65);
+  --color-border-subtle: rgba(28, 25, 23, 0.12);
+
+  --color-status-success: #047857;
+  --color-status-warning: #B45309;
+  --color-status-error: #B91C1C;
+  --color-status-info: #1D4ED8;
+}
+
+/* Texturas adaptadas */
+:root[data-theme="light"] .geometric-grid-bg {
+  background-image: radial-gradient(rgba(139, 99, 50, 0.14) 0.5px, transparent 0.5px);
+}
+:root[data-theme="light"] .gradient-surface {
+  background: linear-gradient(180deg, var(--color-surface-card), var(--color-surface-base));
+}
+:root[data-theme="light"] .shadow-card {
+  box-shadow: 0 2px 8px rgba(28,25,23,0.08), 0 1px 2px rgba(28,25,23,0.06);
+}
+:root[data-theme="light"] ::selection {
+  background-color: var(--color-gold-base);
+  color: var(--color-surface-card);
+}
+:root[data-theme="light"] ::-webkit-scrollbar-track { background: var(--color-surface-base); }
+:root[data-theme="light"] ::-webkit-scrollbar-thumb { background: rgba(28,25,23,0.2); }
+:root[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: var(--color-gold-deep); }
