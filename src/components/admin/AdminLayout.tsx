@@ -33,6 +33,36 @@ export type AdminTab =
 export const AdminLayout: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AdminTab>('agenda');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+
+  React.useEffect(() => {
+    // Verifica se o usuário logado é admin
+    const userStr = localStorage.getItem('barberx_user');
+    
+    if (!userStr) {
+      window.location.href = '/'; // Redireciona para home
+      return;
+    }
+    
+    try {
+      const user = JSON.parse(userStr);
+      if (user.role !== 'admin') {
+        window.location.href = '/'; // Não é admin
+      } else {
+        setIsAuthorized(true);
+      }
+    } catch {
+      window.location.href = '/';
+    }
+  }, []);
+
+  if (!isAuthorized) {
+    return (
+      <div className="flex h-full items-center justify-center bg-surface-base">
+        <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   // Bottom Navigation Bar items for mobile
   const bottomBarTabs = [
