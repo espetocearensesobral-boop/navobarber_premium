@@ -6,7 +6,7 @@ import { ProfessionalsManagement } from './ProfessionalsManagement';
 import { ClientsManagement } from './ClientsManagement';
 import { WaitingQueue } from './WaitingQueue';
 import { SettingsManagement } from './SettingsManagement';
-import {
+import { 
   LayoutDashboard,
   Calendar,
   Clock,
@@ -18,7 +18,7 @@ import {
   X,
   ChevronRight,
   TrendingUp,
-  Sparkles
+  LogOut
 } from 'lucide-react';
 
 export type AdminTab = 
@@ -32,8 +32,9 @@ export type AdminTab =
 
 export const AdminLayout: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AdminTab>('agenda');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
+  const [adminName, setAdminName] = useState('Admin');
 
   React.useEffect(() => {
     // Verifica se o usuário logado é admin
@@ -50,6 +51,7 @@ export const AdminLayout: React.FC = () => {
         window.location.href = '/'; // Não é admin
       } else {
         setIsAuthorized(true);
+        setAdminName(user.name || 'Admin');
       }
     } catch {
       window.location.href = '/';
@@ -59,251 +61,259 @@ export const AdminLayout: React.FC = () => {
   if (!isAuthorized) {
     return (
       <div className="flex h-full items-center justify-center bg-surface-base">
-        <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-gold-base/20 border-t-gold-base rounded-full animate-spin"></div>
       </div>
     );
   }
 
-  // Bottom Navigation Bar items for mobile
-  const bottomBarTabs = [
-    { id: 'agenda' as AdminTab, label: 'Agenda', icon: Calendar },
-    { id: 'queue' as AdminTab, label: 'Fila', icon: Clock },
-    { id: 'dashboard' as AdminTab, label: 'Stats', icon: TrendingUp },
-    { id: 'profissionais' as AdminTab, label: 'Time', icon: Users },
+  const navItems = [
+    { 
+      id: 'dashboard' as AdminTab, 
+      label: 'Dashboard', 
+      icon: TrendingUp,
+      description: 'Métricas e análises'
+    },
+    { 
+      id: 'agenda' as AdminTab, 
+      label: 'Agenda', 
+      icon: Calendar,
+      description: 'Gerenciar horários'
+    },
+    { 
+      id: 'queue' as AdminTab, 
+      label: 'Fila de Espera', 
+      icon: Clock,
+      description: 'Clientes aguardando'
+    },
+    { 
+      id: 'servicos' as AdminTab, 
+      label: 'Serviços', 
+      icon: Scissors,
+      description: 'Catálogo de serviços'
+    },
+    { 
+      id: 'profissionais' as AdminTab, 
+      label: 'Profissionais', 
+      icon: Users,
+      description: 'Equipe de barbeiros'
+    },
+    { 
+      id: 'clientes' as AdminTab, 
+      label: 'Clientes', 
+      icon: UserCheck,
+      description: 'Base de clientes'
+    },
+    { 
+      id: 'settings' as AdminTab, 
+      label: 'Configurações', 
+      icon: Settings,
+      description: 'Preferências do sistema'
+    },
   ];
 
-  // All menu items organized into sections for sidebar
-  const sidebarSections = [
-    {
-      title: 'Atendimento & Fila',
-      items: [
-        { id: 'agenda' as AdminTab, label: 'Agenda & Horários', icon: Calendar },
-        { id: 'queue' as AdminTab, label: 'Fila de Espera', icon: Clock, badge: 'Ao vivo' },
-      ]
-    },
-    {
-      title: 'Gestão & Equipe',
-      items: [
-        { id: 'dashboard' as AdminTab, label: 'Dashboard / Métricas', icon: LayoutDashboard },
-        { id: 'profissionais' as AdminTab, label: 'Barbeiros / Equipe', icon: Users },
-        { id: 'servicos' as AdminTab, label: 'Catálogo de Serviços', icon: Scissors },
-        { id: 'clientes' as AdminTab, label: 'Gestão de Clientes', icon: UserCheck },
-      ]
-    },
-    {
-      title: 'Sistema',
-      items: [
-        { id: 'settings' as AdminTab, label: 'Configurações', icon: Settings },
-      ]
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'dashboard':
+        return <NavoHomeView onNavigateToAgenda={() => setActiveTab('agenda')} />;
+      case 'agenda':
+        return <ScheduleGrid />;
+      case 'queue':
+        return <WaitingQueue />;
+      case 'servicos':
+        return <ServicesManagement />;
+      case 'profissionais':
+        return <ProfessionalsManagement />;
+      case 'clientes':
+        return <ClientsManagement />;
+      case 'settings':
+        return <SettingsManagement />;
+      default:
+        return null;
     }
-  ];
+  };
 
-  const activeTabLabel = sidebarSections.flatMap(s => s.items).find(i => i.id === activeTab)?.label || 'Painel Admin';
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('barberx_user');
+    window.location.href = '/';
+  };
 
   return (
-    <div className="min-h-screen bg-surface-base text-content-base font-sans antialiased flex flex-col md:flex-row max-w-full overflow-x-hidden">
-      {/* Sidebar for Desktop */}
-      <aside className="hidden md:flex md:w-64 md:flex-col shrink-0 bg-surface-card border-r border-border-subtle min-h-screen sticky top-0 h-screen overflow-y-auto">
-        {/* Brand Header */}
-        <div className="p-5 border-b border-border-subtle flex items-center justify-between">
+    <div className="min-h-screen bg-surface-base flex text-content-base font-sans antialiased overflow-hidden">
+      {/* Sidebar - Desktop */}
+      <aside className="hidden lg:flex lg:w-64 lg:flex-col shrink-0 lg:bg-surface-card lg:border-r lg:border-border-subtle lg:fixed lg:inset-y-0">
+        {/* Logo */}
+        <div className="flex items-center h-16 px-6 border-b border-border-subtle">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gold-base text-surface-base font-black text-lg flex items-center justify-center tracking-tighter shadow-md">
-              n
+            <div className="w-8 h-8 bg-gold-base text-surface-base rounded-lg flex items-center justify-center shadow">
+              <Scissors className="w-4 h-4" />
             </div>
             <div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-base font-black tracking-wider text-gold-hover">navo</span>
-                <span className="text-[9px] uppercase tracking-widest text-content-muted font-bold bg-surface-card px-1.5 py-0.5 rounded-full border border-border-subtle">Pro</span>
-              </div>
-              <span className="text-[10px] text-content-muted font-medium block">Painel administrativo</span>
+              <h1 className="text-base font-black text-gold-hover tracking-tight">BarberX</h1>
+              <p className="text-[10px] text-content-muted font-bold uppercase tracking-widest">Admin Panel</p>
             </div>
           </div>
         </div>
 
-        {/* Shop Status Badge */}
-        <div className="p-3 mx-3 my-3 bg-surface-base border border-border-subtle rounded-xl flex items-center gap-2.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-status-success animate-pulse shrink-0" />
-          <div className="min-w-0 flex-1">
-            <div className="text-xs font-bold text-content-base truncate">BarberX Premium</div>
-            <div className="text-[10px] text-content-muted">Unidade Principal</div>
-          </div>
-        </div>
-
-        {/* Sidebar Nav Sections */}
-        <nav className="flex-1 px-3 py-2 space-y-5">
-          {sidebarSections.map((section, idx) => (
-            <div key={idx} className="space-y-1">
-              <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-content-muted mb-1">
-                {section.title}
-              </div>
-              {section.items.map(item => {
-                const Icon = item.icon;
-                const isActive = activeTab === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => setActiveTab(item.id)}
-                    className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
-                      isActive
-                        ? 'bg-gold-base/10 text-gold-hover shadow-sm border border-gold-base/30'
-                        : 'text-content-muted hover:text-content-base hover:bg-surface-base'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <Icon className={`w-4 h-4 ${isActive ? 'text-gold-hover' : 'text-content-muted'}`} />
-                      <span>{item.label}</span>
-                    </div>
-                    {item.badge && (
-                      <span className="text-[9px] bg-status-success/20 text-status-success px-2 py-0.5 rounded-full font-bold">
-                        {item.badge}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          ))}
+        {/* Navigation */}
+        <nav className="flex-1 px-3 py-6 space-y-1.5 overflow-y-auto no-scrollbar">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
+            
+            return (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold transition-all duration-200 group ${
+                  isActive
+                    ? 'bg-gold-base/10 text-gold-hover border border-gold-base/20 shadow-sm'
+                    : 'text-content-muted hover:text-content-base hover:bg-white/5'
+                }`}
+              >
+                <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-gold-hover' : 'text-content-muted group-hover:text-content-base'}`} />
+                <div className="flex-1 text-left min-w-0">
+                  <div className="truncate">{item.label}</div>
+                  <div className={`text-[11px] mt-0.5 truncate ${isActive ? 'text-gold-hover/70' : 'text-content-muted/70'}`}>
+                    {item.description}
+                  </div>
+                </div>
+                {isActive && (
+                  <ChevronRight className="w-4 h-4 text-gold-hover shrink-0" />
+                )}
+              </button>
+            );
+          })}
         </nav>
 
-        {/* Footer info */}
-        <div className="p-4 border-t border-border-subtle text-[11px] text-content-muted text-center">
-          BarberX Admin v2.5
+        {/* User Profile */}
+        <div className="p-4 border-t border-border-subtle">
+          <div className="flex items-center gap-3 px-3 py-3 rounded-xl bg-white/5 border border-border-subtle/50">
+            <div className="w-9 h-9 rounded-full bg-gold-base flex items-center justify-center text-surface-base font-black text-sm uppercase shrink-0">
+              {adminName.substring(0, 2)}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-content-base truncate">{adminName}</p>
+              <p className="text-[10px] font-semibold text-content-muted uppercase tracking-wider">Admin</p>
+            </div>
+            <button 
+              onClick={handleLogout}
+              className="p-2 rounded-lg hover:bg-white/10 text-content-muted hover:text-gold-hover transition-colors"
+              title="Sair"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </aside>
 
-      {/* Mobile Top Header */}
-      <header className="md:hidden sticky top-0 z-40 bg-surface-card/95 backdrop-blur-md border-b border-border-subtle px-4 py-2.5 flex justify-between items-center shadow-sm">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-7 h-7 rounded-lg bg-gold-base text-surface-base font-black text-xs flex items-center justify-center shrink-0 shadow">
-            n
-          </div>
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs font-black text-gold-hover tracking-wider">BarberX</span>
-              <span className="text-content-muted text-[10px]">•</span>
-              <span className="text-xs text-content-base font-semibold truncate">{activeTabLabel}</span>
+      {/* Mobile Header */}
+      <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-surface-card/95 backdrop-blur-md border-b border-border-subtle z-40">
+        <div className="flex items-center justify-between h-full px-4">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="p-2 rounded-xl border border-border-subtle hover:bg-white/5 transition-colors text-gold-hover"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+          
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 bg-gold-base rounded-lg flex items-center justify-center text-surface-base shadow">
+              <Scissors className="w-3.5 h-3.5" />
             </div>
+            <h1 className="text-base font-black tracking-tight text-gold-hover">BarberX</h1>
           </div>
-        </div>
 
-        <button
-          onClick={() => setIsSidebarOpen(true)}
-          className="p-2 rounded-xl bg-surface-base text-gold-hover border border-border-subtle flex items-center gap-1.5 text-xs font-bold active:scale-95 transition-all shrink-0"
-        >
-          <Menu className="w-4 h-4" />
-          <span>Menu</span>
-        </button>
+          <div className="w-9" /> {/* Spacer */}
+        </div>
       </header>
 
-      {/* Main Content Viewport */}
-      <div className="flex-1 min-w-0 w-full max-w-full pb-24 md:pb-8 overflow-x-hidden">
-        <main className="max-w-7xl mx-auto px-3 sm:px-6 pt-4 sm:pt-6 w-full min-w-0">
-          {activeTab === 'dashboard' && (
-            <NavoHomeView onNavigateToAgenda={() => setActiveTab('agenda')} />
-          )}
-          {activeTab === 'agenda' && <ScheduleGrid />}
-          {activeTab === 'queue' && <WaitingQueue />}
-          {activeTab === 'servicos' && <ServicesManagement />}
-          {activeTab === 'profissionais' && <ProfessionalsManagement />}
-          {activeTab === 'clientes' && <ClientsManagement />}
-          {activeTab === 'settings' && <SettingsManagement />}
-        </main>
-      </div>
-
-      {/* Mobile Bottom Navigation Bar */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-surface-card/95 border-t border-border-subtle px-2 py-2 flex justify-around items-center backdrop-blur-xl shadow-2xl">
-        {bottomBarTabs.map(tab => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex flex-col items-center justify-center gap-0.5 py-1.5 px-3 rounded-xl transition-all ${
-                isActive
-                  ? 'bg-gold-base/15 text-gold-hover border border-gold-base/30 shadow-sm font-bold scale-105'
-                  : 'text-content-muted hover:text-content-base'
-              }`}
-            >
-              <Icon className={`w-4.5 h-4.5 ${isActive ? 'text-gold-hover' : 'text-content-muted'}`} />
-              <span className={`text-[9px] ${isActive ? 'font-black text-gold-hover' : 'font-medium text-content-muted'}`}>
-                {tab.label}
-              </span>
-            </button>
-          );
-        })}
-
-        {/* Sidebar Drawer Trigger Button */}
-        <button
-          onClick={() => setIsSidebarOpen(true)}
-          className="flex flex-col items-center justify-center gap-0.5 py-1.5 px-3 rounded-xl text-content-muted hover:text-content-base transition-all"
-        >
-          <Menu className="w-4.5 h-4.5" />
-          <span className="text-[9px] font-medium text-content-muted">Mais</span>
-        </button>
-      </nav>
-
-      {/* Mobile Full Sidebar Drawer Overlay */}
-      {isSidebarOpen && (
-        <div className="md:hidden fixed inset-0 z-50 bg-surface-base/80 backdrop-blur-sm flex justify-end">
-          <div className="w-3/4 max-w-[280px] bg-surface-card h-full border-l border-border-subtle flex flex-col p-4 overflow-y-auto animate-fade-in space-y-5">
-            <div className="flex justify-between items-center pb-3 border-b border-border-subtle">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-gold-base text-surface-base font-black text-sm flex items-center justify-center">
-                  n
+      {/* Mobile Sidebar */}
+      {sidebarOpen && (
+        <div className="lg:hidden fixed inset-0 z-50 flex">
+          <div 
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+            onClick={() => setSidebarOpen(false)}
+          />
+          
+          <aside className="relative w-[280px] max-w-[80vw] bg-surface-card flex flex-col animate-slide-in shadow-2xl border-r border-border-subtle">
+            {/* Header */}
+            <div className="flex items-center justify-between h-16 px-5 border-b border-border-subtle">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-gold-base rounded-lg flex items-center justify-center text-surface-base shadow">
+                  <Scissors className="w-4 h-4" />
                 </div>
-                <span className="text-sm font-bold text-content-base">Menu BarberX</span>
+                <h1 className="text-base font-black text-gold-hover">BarberX</h1>
               </div>
-              <button 
-                onClick={() => setIsSidebarOpen(false)}
-                className="p-1.5 rounded-lg text-content-muted hover:text-content-base hover:bg-surface-base"
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="p-2 rounded-xl text-content-muted hover:text-content-base hover:bg-white/5 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="space-y-5 flex-1">
-              {sidebarSections.map((section, idx) => (
-                <div key={idx} className="space-y-1">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-content-muted mb-2 px-2">
-                    {section.title}
-                  </div>
-                  {section.items.map(item => {
-                    const Icon = item.icon;
-                    const isActive = activeTab === item.id;
-                    return (
-                      <button
-                        key={item.id}
-                        onClick={() => {
-                          setActiveTab(item.id);
-                          setIsSidebarOpen(false);
-                        }}
-                        className={`w-full flex items-center justify-between p-3 rounded-2xl text-xs font-bold transition-all ${
-                          isActive
-                            ? 'bg-gold-base/10 text-gold-hover border border-gold-base/30'
-                            : 'text-content-muted hover:text-content-base bg-surface-base'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <Icon className={`w-4.5 h-4.5 ${isActive ? 'text-gold-hover' : 'text-content-muted'}`} />
-                          <span>{item.label}</span>
-                        </div>
-                        <ChevronRight className="w-4 h-4 text-content-muted" />
-                      </button>
-                    );
-                  })}
-                </div>
-              ))}
+            {/* Navigation */}
+            <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto no-scrollbar">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeTab === item.id;
+                
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      setActiveTab(item.id);
+                      setSidebarOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                      isActive
+                        ? 'bg-gold-base/10 text-gold-hover border border-gold-base/20'
+                        : 'text-content-muted hover:text-content-base hover:bg-white/5'
+                    }`}
+                  >
+                    <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-gold-hover' : 'text-content-muted'}`} />
+                    <div className="flex-1 text-left min-w-0">
+                      <div className="truncate">{item.label}</div>
+                    </div>
+                  </button>
+                );
+              })}
+            </nav>
+            
+            {/* Mobile Footer */}
+            <div className="p-4 border-t border-border-subtle">
+              <button 
+                onClick={handleLogout}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/5 text-content-muted hover:text-status-error hover:bg-status-error/10 transition-colors font-semibold"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Sair do sistema</span>
+              </button>
             </div>
-
-            <div className="pt-4 border-t border-border-subtle text-center">
-              <span className="text-[11px] text-content-muted">BarberX Premium Admin</span>
-            </div>
-          </div>
+          </aside>
         </div>
       )}
+
+      {/* Main Content */}
+      <main className="flex-1 lg:ml-64 pt-16 lg:pt-0 h-[100dvh] overflow-y-auto no-scrollbar relative w-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10 pb-24 w-full">
+          {/* Page Header */}
+          <div className="mb-6 lg:mb-10">
+            <h2 className="text-2xl font-black text-content-base mb-1 tracking-tight">
+              {navItems.find(item => item.id === activeTab)?.label}
+            </h2>
+            <p className="text-sm font-medium text-content-muted">
+              {navItems.find(item => item.id === activeTab)?.description}
+            </p>
+          </div>
+
+          {/* Content */}
+          <div className="animate-fade-in w-full">
+            {renderContent()}
+          </div>
+        </div>
+      </main>
     </div>
   );
 };
-
-
