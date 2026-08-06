@@ -539,24 +539,21 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
           </div>
 
           {/* ACTIONS */}
-          <div className="w-full mt-3 flex flex-col gap-1.5">
-            <div className="grid grid-cols-2 gap-1.5">
+          <div className="w-full mt-3 flex flex-col gap-2">
+            {/* Circular Quick Action Buttons (Single Row) */}
+            <div className="flex items-center justify-center gap-3 my-1">
               <button
                 type="button"
                 onClick={handleDownloadPDF}
                 disabled={isDownloading}
-                className="flex items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-[#e8e0d4] hover:bg-[#ddd5c8] text-[#5a5248] font-semibold text-[13px] transition-all cursor-pointer disabled:opacity-50"
+                title="Baixar PDF"
+                aria-label="Baixar PDF"
+                className="w-11 h-11 rounded-full bg-[#e8e0d4] hover:bg-[#ddd5c8] text-[#5a5248] flex items-center justify-center transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95 disabled:opacity-50"
               >
                 {isDownloading ? (
-                  <>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    <span>Gerando...</span>
-                  </>
+                  <Loader2 className="w-5 h-5 animate-spin" />
                 ) : (
-                  <>
-                    <Download className="w-3.5 h-3.5" />
-                    <span>Baixar PDF</span>
-                  </>
+                  <Download className="w-5 h-5" />
                 )}
               </button>
 
@@ -564,32 +561,33 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
                 href={getMapsUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-[#e8e0d4] hover:bg-[#ddd5c8] text-[#5a5248] font-semibold text-[13px] transition-all"
+                title="Ver Localização"
+                aria-label="Ver Localização"
+                className="w-11 h-11 rounded-full bg-[#e8e0d4] hover:bg-[#ddd5c8] text-[#5a5248] flex items-center justify-center transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
               >
-                <MapPin className="w-3.5 h-3.5" />
-                <span>Localização</span>
+                <MapPin className="w-5 h-5" />
               </a>
-            </div>
 
-            <div className="grid grid-cols-2 gap-1.5">
               <a
                 href={getGoogleCalendarUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-[#e8e0d4] hover:bg-[#ddd5c8] text-[#5a5248] font-semibold text-[13px] transition-all"
+                title="Adicionar ao Google Agenda"
+                aria-label="Adicionar ao Google Agenda"
+                className="w-11 h-11 rounded-full bg-[#e8e0d4] hover:bg-[#ddd5c8] text-[#5a5248] flex items-center justify-center transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
               >
-                <Calendar className="w-3.5 h-3.5" />
-                <span>Google Agenda</span>
+                <Calendar className="w-5 h-5" />
               </a>
 
               <a
                 href={getWhatsAppUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-[#25d366] hover:bg-[#1ebd5a] text-white font-semibold text-[13px] transition-all"
+                title="Enviar via WhatsApp"
+                aria-label="Enviar via WhatsApp"
+                className="w-11 h-11 rounded-full bg-[#25d366] hover:bg-[#1ebd5a] text-white flex items-center justify-center transition-all cursor-pointer shadow-md hover:scale-105 active:scale-95"
               >
-                <MessageCircle className="w-3.5 h-3.5" />
-                <span>WhatsApp</span>
+                <MessageCircle className="w-5 h-5" />
               </a>
             </div>
 
@@ -608,7 +606,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
             )}
 
             {!isCancelled && currentApt.status !== 'completed' ? (
-              <>
+              <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={() => {
@@ -616,21 +614,21 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
                     setRescheduleTimeSlot(currentApt?.time_slot || currentApt?.timeSlot || '');
                     setShowRescheduleModal(true);
                   }}
-                  className="w-full flex items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-[#2d2a26] hover:bg-[#1a1815] text-white font-semibold text-[13px] transition-all cursor-pointer"
+                  className="w-full flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl bg-[#2d2a26] hover:bg-[#1a1815] text-white font-semibold text-xs sm:text-[13px] transition-all cursor-pointer"
                 >
-                  <Calendar className="w-3.5 h-3.5" />
-                  <span>Reagendar Horário</span>
+                  <Calendar className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate">Reagendar</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setShowCancelModal(true)}
-                  className="w-full flex items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-[#fef2f2] hover:bg-[#fee2e2] border border-[#fecaca] text-[#dc2626] font-semibold text-[13px] transition-all cursor-pointer"
+                  className="w-full flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl bg-[#fef2f2] hover:bg-[#fee2e2] border border-[#fecaca] text-[#dc2626] font-semibold text-xs sm:text-[13px] transition-all cursor-pointer"
                 >
-                  <XCircle className="w-3.5 h-3.5" />
-                  <span>Cancelar Agendamento</span>
+                  <XCircle className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate">Cancelar</span>
                 </button>
-              </>
+              </div>
             ) : (
               <div className="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[#fef2f2] border border-[#fecaca] text-[#dc2626] font-semibold text-[13px]">
                 <XCircle className="w-3.5 h-3.5" />
