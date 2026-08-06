@@ -16,12 +16,17 @@ import {
   AlertTriangle,
   XCircle,
   Loader2,
-  Phone
+  Phone,
+  CalendarX
 } from 'lucide-react';
 import { toPng } from 'html-to-image';
 import { Star } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import { createAppointmentInSupabase, cancelAppointmentInSupabase } from '../../services/supabaseDataService';
+import { useToast } from '../ui/Toast';
+import { ConfirmDialog } from '../ui/ConfirmDialog';
+import { SuccessOverlay } from '../ui/SuccessOverlay';
+import { LoadingButton } from '../ui/LoadingButton';
 
 interface AppointmentDetailsModalProps {
   isOpen: boolean;
@@ -66,6 +71,10 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
     { time: '17:00' }, { time: '17:30' }, { time: '18:00' }, { time: '18:30' },
     { time: '19:00' }
   ];
+
+  const { showToast } = useToast();
+  const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
+  const [successOverlayMessage, setSuccessOverlayMessage] = useState({ title: '', subtitle: '' });
 
   useEffect(() => {
     let isMounted = true;
@@ -123,9 +132,28 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
         onAppointmentUpdated(updatedApt);
       }
       setShowRescheduleModal(false);
-    } catch (err) {
+      setSuccessOverlayMessage({
+        title: 'Agendamento atualizado!',
+        subtitle: `Novo horário: ${formatDateDisplay(rescheduleDate)} às ${rescheduleTimeSlot}`
+      });
+      setShowSuccessOverlay(true);
+
+      setTimeout(() => {
+        showToast(
+          'success',
+          'Agendamento atualizado!',
+          `Novo horário: ${formatDateDisplay(rescheduleDate)} às ${rescheduleTimeSlot}`
+        );
+      }, 2600);
+
+      if (navigator.vibrate) navigator.vibrate([50]);
+    } catch (err: any) {
       console.warn('Erro ao reagendar:', err);
-      alert('Erro ao reagendar. Tente novamente.');
+      showToast(
+        'error',
+        'Não foi possível reagendar',
+        err.message || 'Verifique a disponibilidade do horário'
+      );
     } finally {
       setIsRescheduling(false);
     }
@@ -235,14 +263,29 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
           onAppointmentUpdated(res.appointment);
         }
         setShowCancelModal(false);
-        setCancelToast(true);
-        setTimeout(() => setCancelToast(false), 5000);
+        setSuccessOverlayMessage({
+          title: 'Cancelado com sucesso!',
+          subtitle: 'O horário foi liberado para outros clientes'
+        });
+        setShowSuccessOverlay(true);
+
+        setTimeout(() => {
+          showToast(
+            'success',
+            'Agendamento cancelado',
+            'Você receberá uma confirmação por WhatsApp'
+          );
+        }, 2600);
+
+        if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
       } else {
         setCancelError(res.error || 'Falha ao cancelar o agendamento.');
+        showToast('error', 'Não foi possível cancelar', res.error || 'Falha ao cancelar o agendamento.');
       }
     } catch (err: any) {
       console.warn('Erro ao cancelar agendamento:', err);
       setCancelError('Ocorreu um erro ao cancelar. Tente novamente.');
+      showToast('error', 'Não foi possível cancelar', 'Ocorreu um erro ao cancelar. Tente novamente.');
     } finally {
       setIsCancelling(false);
     }
@@ -319,14 +362,6 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
           </div>
 
           <div className="overflow-y-auto overflow-x-hidden p-4 space-y-4">
-            {/* Success Toast when cancelled */}
-            {cancelToast && (
-              <div className="bg-red-500/10 border border-red-500/30 p-3 rounded-xl flex items-center space-x-2.5 text-xs text-red-300 animate-in fade-in slide-in-from-top-2">
-                <XCircle className="w-4 h-4 text-red-400 shrink-0" />
-                <span className="font-semibold">Agendamento cancelado com sucesso.</span>
-              </div>
-            )}
-
             {/* Receipt Content Card (Exportable to PDF) */}
             <div
               ref={receiptRef}
@@ -528,14 +563,28 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
                 </button>
               )}
               {!isCancelled && currentApt.status !== 'completed' ? (
-                <button
-                  type="button"
-                  onClick={() => setShowCancelModal(true)}
-                  className="w-full py-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-bold flex items-center justify-center space-x-2 transition-all mt-1"
-                >
-                  <XCircle className="w-4 h-4" />
-                  <span>Cancelar Agendamento</span>
-                </button>
+                <div className="space-y-2 mt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRescheduleDate(currentApt?.date || '');
+                      setRescheduleTimeSlot(currentApt?.time_slot || currentApt?.timeSlot || '');
+                      setShowRescheduleModal(true);
+                    }}
+                    className="w-full py-3 rounded-xl bg-gold-base/10 border border-gold-base/30 hover:bg-gold-base/20 text-content-base text-xs font-bold flex items-center justify-center space-x-2 transition-all"
+                  >
+                    <Calendar className="w-4 h-4" />
+                    <span>Reagendar Horário</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowCancelModal(true)}
+                    className="w-full py-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-bold flex items-center justify-center space-x-2 transition-all"
+                  >
+                    <XCircle className="w-4 h-4" />
+                    <span>Cancelar Agendamento</span>
+                  </button>
+                </div>
               ) : (
                 <div className="w-full py-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold text-center flex items-center justify-center space-x-2">
                   <XCircle className="w-4 h-4" />
@@ -548,92 +597,25 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
       </div>
 
       {/* Confirmation Modal for Cancellation */}
-      {showCancelModal && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-surface-base/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full sm:w-[380px] bg-surface-card rounded-2xl border border-red-500/30 shadow-2xl p-5 text-center space-y-4 animate-in zoom-in-95 duration-200">
-            <div className="w-12 h-12 rounded-full bg-red-500/20 border border-red-500/30 flex items-center justify-center mx-auto text-red-400">
-              <AlertTriangle className="w-6 h-6" />
-            </div>
+      <ConfirmDialog
+        isOpen={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        onConfirm={handleConfirmCancel}
+        isLoading={isCancelling}
+        variant="danger"
+        icon={<AlertTriangle className="w-6 h-6" />}
+        title="Cancelar agendamento?"
+        description={`Tem certeza de que deseja cancelar este agendamento? Esta ação desmarcará seu horário e liberará a vaga para outros clientes.`}
+        confirmText="Sim, Cancelar"
+        cancelText="Manter Agendamento"
+      />
 
-            <div className="space-y-1">
-              <h3 className="text-base font-serif text-content-base font-semibold">Cancelar Agendamento?</h3>
-              <p className="text-xs text-content-base">
-                Tem certeza de que deseja cancelar este agendamento?
-              </p>
-            </div>
-
-            {/* Summary inside confirmation modal */}
-            <div className="bg-border-subtle p-3 rounded-xl border border-border-subtle text-left text-xs space-y-1.5">
-              <div className="flex justify-between">
-                <span className="text-content-muted">Profissional:</span>
-                <span className="font-bold text-content-base">{currentApt.professional_name}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-content-muted">Data e Hora:</span>
-                <span className="font-bold text-content-base">{currentApt.date} às {currentApt.time_slot}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-content-muted">Serviço:</span>
-                <span className="font-bold text-content-base truncate max-w-[180px]">
-                  {(currentApt.services || []).map(s => s.title).join(', ')}
-                </span>
-              </div>
-            </div>
-
-            <div className="bg-red-500/10 p-2.5 rounded-lg text-[11px] text-red-300 text-left border border-red-500/20">
-              ⚠️ Esta ação desmarcará seu horário e liberará a vaga para outros clientes.
-            </div>
-
-            {cancelError && (
-              <div className="bg-red-500/20 p-2.5 rounded-lg text-xs text-red-200 text-left border border-red-500/40">
-                ❌ {cancelError}
-              </div>
-            )}
-            
-            <div className="space-y-2 pt-1 text-xs">
-              <button
-                type="button"
-                onClick={() => {
-                  setRescheduleDate(currentApt?.date || '');
-                  setRescheduleTimeSlot(currentApt?.time_slot || currentApt?.timeSlot || '');
-                  setShowCancelModal(false);
-                  setShowRescheduleModal(true);
-                }}
-                disabled={isCancelling}
-                className="w-full py-3 rounded-xl bg-gold-base/10 border border-gold-base/30 hover:bg-gold-base/20 text-content-base font-bold flex items-center justify-center space-x-1.5 transition-all disabled:opacity-50"
-              >
-                <Calendar className="w-4 h-4" />
-                <span>Reagendar</span>
-              </button>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowCancelModal(false)}
-                  disabled={isCancelling}
-                  className="py-3 rounded-xl bg-surface-card hover:bg-neutral-700 text-content-base font-bold transition-all disabled:opacity-50"
-                >
-                  Manter Agendamento
-                </button>
-                <button
-                  type="button"
-                  onClick={handleConfirmCancel}
-                  disabled={isCancelling}
-                  className="py-3 rounded-xl bg-red-600 hover:bg-red-700 text-content-base font-bold transition-all flex items-center justify-center space-x-1.5 disabled:opacity-50"
-                >
-                  {isCancelling ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Cancelando...</span>
-                    </>
-                  ) : (
-                    <span>Sim, Cancelar</span>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <SuccessOverlay
+        isVisible={showSuccessOverlay}
+        title={successOverlayMessage.title}
+        subtitle={successOverlayMessage.subtitle}
+        onClose={() => setShowSuccessOverlay(false)}
+      />
 
       {/* Reschedule Modal */}
       {showRescheduleModal && (
@@ -717,21 +699,15 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
               >
                 Voltar
               </button>
-              <button
-                type="button"
+              <LoadingButton
                 onClick={handleConfirmReschedule}
+                isLoading={isRescheduling}
                 disabled={isRescheduling || !rescheduleDate || !rescheduleTimeSlot}
                 className="py-3 rounded-xl bg-content-base hover:bg-gold-base text-surface-base font-bold transition-all flex items-center justify-center space-x-1.5 disabled:opacity-50"
+                loadingText="Salvando..."
               >
-                {isRescheduling ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Salvando...</span>
-                  </>
-                ) : (
-                  <span>Confirmar</span>
-                )}
-              </button>
+                Confirmar
+              </LoadingButton>
             </div>
           </div>
         </div>
