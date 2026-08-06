@@ -137,7 +137,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
         title: 'Agendamento atualizado!',
         subtitle: `Novo horário: ${formatDateDisplay(rescheduleDate)} às ${rescheduleTimeSlot}`
       });
-      setSuccessOverlayAction('stay_open');
+      setSuccessOverlayAction('close_modal');
       setShowSuccessOverlay(true);
 
       setTimeout(() => {
