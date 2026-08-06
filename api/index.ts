@@ -143,6 +143,30 @@ function matchPhoneNumbers(phone1: string, phone2: string): boolean {
 const app = express();
 app.set("trust proxy", 1);
 
+app.use((req, res, next) => {
+  const allowedOrigins = [
+    'https://navopremium.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:5173',
+  ];
+  
+  const origin = req.headers.origin;
+  
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Max-Age', '86400');
+  }
+  
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  
+  next();
+});
+
 const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex');
 if (!process.env.JWT_SECRET) {
   console.warn("WARNING: JWT_SECRET environment variable is not defined. Using auto-generated secure key in memory.");
@@ -194,12 +218,16 @@ app.use(cookieParser());
 
 // Auth Middleware
 const requireAuth = (req: any, res: any, next: any) => {
-  let token = req.cookies.token;
+  let token = req.cookies?.token;
   if (!token) {
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
       token = authHeader.split(' ')[1];
     }
+  }
+
+  if (!token && req.query.auth_token) {
+    token = req.query.auth_token;
   }
 
   if (!token) {
@@ -223,12 +251,16 @@ const requireAdmin = (req: any, res: any, next: any) => {
 };
 
 const optionalAuth = (req: any, res: any, next: any) => {
-  let token = req.cookies.token;
+  let token = req.cookies?.token;
   if (!token) {
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
       token = authHeader.split(' ')[1];
     }
+  }
+
+  if (!token && req.query.auth_token) {
+    token = req.query.auth_token;
   }
 
   if (token) {
@@ -1276,8 +1308,9 @@ app.get("/api/auth/me", requireAuth, async (req: any, res) => {
 app.post("/api/auth/logout", (req, res) => {
   res.clearCookie('token', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    secure: true,
+    sameSite: 'lax',
+    path: '/',
   });
   res.json({ success: true });
 });
@@ -1319,8 +1352,9 @@ app.post("/api/auth/login", authLimiter, async (req, res) => {
     
     res.cookie('token', token, { 
       httpOnly: true, 
-      secure: process.env.NODE_ENV === 'production', 
-      sameSite: 'strict', 
+      secure: true, 
+      sameSite: 'lax', 
+      path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
@@ -1434,8 +1468,9 @@ app.post("/api/profiles", authLimiter, async (req, res) => {
     
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: true,
+      sameSite: 'lax',
+      path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
