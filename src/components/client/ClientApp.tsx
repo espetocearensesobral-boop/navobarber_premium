@@ -402,7 +402,7 @@ export const ClientApp: React.FC = () => {
         {/* Main Content Area with Swipe Gesture */}
         <main
           id="main-content"
-          className="flex-1 min-h-0 overflow-y-auto no-scrollbar outline-none flex flex-col snap-y snap-mandatory"
+          className={`flex-1 min-h-0 ${activeTab === 'home' ? 'overflow-hidden' : 'overflow-y-auto no-scrollbar'} outline-none flex flex-col`}
           tabIndex={-1}
         >
           {/* Loading transition indicator when changing tab or step */}
@@ -425,6 +425,7 @@ export const ClientApp: React.FC = () => {
               {activeTab === 'home' && (
                 <LandingPage
                   onGoToBooking={() => handleTabChange('booking')}
+                  onGoToAppointments={() => handleTabChange('appointments')}
                 />
               )}
 
@@ -542,47 +543,49 @@ export const ClientApp: React.FC = () => {
         </main>
 
         {/* Bottom Navigation */}
-        <div className="bg-surface-base border-t border-border-subtle px-2 py-1.5 flex justify-around items-center pb-safe shrink-0 z-30">
-          {[
-            { id: 'home' as const, label: 'Início', icon: Home },
-            { id: 'booking' as const, label: 'Agendar', icon: Calendar },
-            { id: 'appointments' as const, label: 'Meus Cortes', icon: Clock },
-            { id: 'more' as const, label: 'Mais', icon: Menu },
-          ].map((tab) => {
-            const isActive = activeTab === tab.id || (tab.id === 'more' && (activeTab === 'subscriptions' || activeTab === 'loyalty'));
-            const Icon = tab.icon;
-            const upcomingBadgeCount = userCreatedAppointments.length || (isGuest ? 0 : 1);
-            
-            return (
-              <button
-                key={tab.id}
-                onClick={() => handleTabChange(tab.id)}
-                className={`relative flex-1 flex flex-col items-center justify-center gap-1 py-1.5 sm:py-2 rounded-lg transition-all duration-200 select-none ${
-                  isActive 
-                    ? 'text-gold-base font-bold' 
-                    : 'text-content-muted hover:text-content-base font-medium'
-                }`}
-              >
-                {/* Pill indicador superior */}
-                {isActive && (
-                  <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-gold-base rounded-full shadow-[0_0_8px_rgba(201,169,110,0.8)]" />
-                )}
-                
-                {/* Badge de notificação (só em Meus Cortes) */}
-                {tab.id === 'appointments' && upcomingBadgeCount > 0 && !isActive && (
-                  <div className="absolute top-1 right-3 sm:right-6 w-3.5 h-3.5 bg-gold-base text-surface-base font-black text-[8px] rounded-full flex items-center justify-center shadow-md">
-                    {upcomingBadgeCount}
-                  </div>
-                )}
-                
-                <Icon className="w-5 h-5 relative z-10" strokeWidth={isActive ? 2.5 : 2} />
-                <span className={`text-[10px] relative z-10 ${isActive ? 'font-black' : 'font-medium'}`}>
-                  {tab.label}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+        {activeTab !== 'home' && (
+          <div className="bg-surface-base border-t border-border-subtle px-2 py-1.5 flex justify-around items-center pb-safe shrink-0 z-30">
+            {[
+              { id: 'home' as const, label: 'Início', icon: Home },
+              { id: 'booking' as const, label: 'Agendar', icon: Calendar },
+              { id: 'appointments' as const, label: 'Meus Cortes', icon: Clock },
+              { id: 'more' as const, label: 'Mais', icon: Menu },
+            ].map((tab) => {
+              const isActive = activeTab === tab.id || (tab.id === 'more' && (activeTab === 'subscriptions' || activeTab === 'loyalty'));
+              const Icon = tab.icon;
+              const upcomingBadgeCount = userCreatedAppointments.length || (isGuest ? 0 : 1);
+              
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => handleTabChange(tab.id)}
+                  className={`relative flex-1 flex flex-col items-center justify-center gap-1 py-1.5 sm:py-2 rounded-lg transition-all duration-200 select-none ${
+                    isActive 
+                      ? 'text-gold-base font-bold' 
+                      : 'text-content-muted hover:text-content-base font-medium'
+                  }`}
+                >
+                  {/* Pill indicador superior */}
+                  {isActive && (
+                    <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-gold-base rounded-full shadow-[0_0_8px_rgba(201,169,110,0.8)]" />
+                  )}
+                  
+                  {/* Badge de notificação (só em Meus Cortes) */}
+                  {tab.id === 'appointments' && upcomingBadgeCount > 0 && !isActive && (
+                    <div className="absolute top-1 right-3 sm:right-6 w-3.5 h-3.5 bg-gold-base text-surface-base font-black text-[8px] rounded-full flex items-center justify-center shadow-md">
+                      {upcomingBadgeCount}
+                    </div>
+                  )}
+                  
+                  <Icon className="w-5 h-5 relative z-10" strokeWidth={isActive ? 2.5 : 2} />
+                  <span className={`text-[10px] relative z-10 ${isActive ? 'font-black' : 'font-medium'}`}>
+                    {tab.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <ClientMoreDrawer

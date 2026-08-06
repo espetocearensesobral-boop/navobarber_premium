@@ -12,54 +12,28 @@ import {
   Car, 
   MessageCircle, 
   Navigation,
-  ArrowUp
+  ArrowUp,
+  ArrowRight,
+  List,
+  Menu,
+  X
 } from 'lucide-react';
 import { hapticMedium, hapticLight } from '../../lib/haptics';
 
 interface LandingPageProps {
   onGoToBooking: () => void;
+  onGoToAppointments?: () => void;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToAppointments }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeCategory, setActiveCategory] = useState<'todos' | 'cabelo' | 'barba'>('todos');
-  const [activeSection, setActiveSection] = useState<number>(0);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const sectionLabels = [
-    'Início',
-    'Diferenciais',
-    'Serviços',
-    'Galeria',
-    'Depoimentos',
-    'Localização',
-    'Agendar'
-  ];
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const sections = container.querySelectorAll('section');
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.intersectionRatio >= 0.4) {
-            const index = Array.from(sections).indexOf(entry.target as HTMLElement);
-            if (index !== -1) {
-              setActiveSection(index);
-            }
-          }
-        });
-      },
-      {
-        root: container,
-        threshold: [0.4, 0.6],
-      }
-    );
-
-    sections.forEach((s) => observer.observe(s));
-    return () => observer.disconnect();
-  }, []);
+  const toggleMenu = () => {
+    hapticLight();
+    setIsMenuOpen(prev => !prev);
+  };
 
   const scrollToSection = (index: number) => {
     hapticLight();
@@ -156,74 +130,152 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking }) => {
   };
 
   return (
-    <div ref={containerRef} className="w-full h-[100dvh] overflow-y-scroll snap-y snap-mandatory bg-white text-neutral-900 font-sans antialiased relative selection:bg-[#C8A96A]/20 selection:text-neutral-900 no-scrollbar">
+    <div ref={containerRef} className="w-full h-full min-h-0 overflow-y-scroll snap-y snap-mandatory bg-white text-neutral-900 font-sans antialiased relative selection:bg-[#C8A96A]/20 selection:text-neutral-900 no-scrollbar">
+      {/* MENU OVERLAY */}
+      <div className={`fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex flex-col items-center justify-center gap-8 transition-opacity duration-300 ${isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+        <button 
+          onClick={toggleMenu} 
+          className="absolute top-5 right-5 w-11 h-11 rounded-full bg-white/8 border border-white/10 text-white text-xl flex items-center justify-center active:scale-95 transition-transform"
+          aria-label="Fechar menu"
+        >
+          ✕
+        </button>
+        <a href="#servicos" onClick={(e) => { e.preventDefault(); toggleMenu(); onGoToBooking(); }} className="text-white text-2xl font-semibold opacity-80 hover:opacity-100 transition-opacity">Serviços</a>
+        <a href="#diferenciais" onClick={(e) => { e.preventDefault(); toggleMenu(); scrollToSection(1); }} className="text-white text-2xl font-semibold opacity-80 hover:opacity-100 transition-opacity">Diferenciais</a>
+        <a href="#galeria" onClick={(e) => { e.preventDefault(); toggleMenu(); scrollToSection(2); }} className="text-white text-2xl font-semibold opacity-80 hover:opacity-100 transition-opacity">Galeria</a>
+        <a href="#contato" onClick={(e) => { e.preventDefault(); toggleMenu(); scrollToSection(4); }} className="text-white text-2xl font-semibold opacity-80 hover:opacity-100 transition-opacity">Contato</a>
+        <button 
+          onClick={() => { 
+            toggleMenu(); 
+            if (onGoToAppointments) onGoToAppointments(); 
+          }} 
+          className="text-[#d4a853] text-2xl font-semibold hover:opacity-100 transition-opacity flex items-center gap-2 cursor-pointer mt-2"
+        >
+          Meus Cortes
+        </button>
+      </div>
+
       {/* SECTION 0: HERO */}
-      <section className="relative w-full h-[100dvh] min-h-[100dvh] snap-start snap-always shrink-0 bg-neutral-950 text-white overflow-hidden flex flex-col justify-center">
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=1200&auto=format&fit=crop" 
-            alt="Nobre Barbearia" 
-            className="w-full h-full object-cover object-center filter brightness-[0.45] contrast-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-neutral-950/90" />
-        </div>
+      <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 bg-[#0a0a0a] text-[#f5f5f5] overflow-hidden flex flex-col justify-between box-border">
+        {/* Background Image with Gradient Overlay */}
+        <div 
+          className="absolute inset-0 z-0 bg-cover bg-center"
+          style={{
+            backgroundImage: `linear-gradient(180deg, rgba(10,10,10,0.25) 0%, rgba(10,10,10,0.7) 45%, #0a0a0a 85%), url('https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=800&q=80')`
+          }}
+        />
+
+        {/* HEADER */}
+        <header className="relative z-20 flex items-center justify-between p-5 shrink-0">
+          <div className="font-extrabold text-lg tracking-tight text-white">
+            BARBER<span className="text-[#d4a853]">SHOP</span>
+          </div>
+          <button 
+            onClick={toggleMenu} 
+            className="w-10 h-10 rounded-full bg-white/8 border border-white/10 text-white flex items-center justify-center backdrop-blur-md active:scale-95 transition-transform"
+            aria-label="Menu"
+          >
+            <Menu className="w-5 h-5 text-white" />
+          </button>
+        </header>
 
         {/* HERO CONTENT */}
-        <div className="relative z-10 px-6 sm:px-8 md:px-12 lg:px-16 max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full py-8 md:py-16 flex flex-col items-start justify-center flex-1 my-auto">
-          {/* RATING */}
-          <div className="flex items-center gap-2 text-xs sm:text-sm md:text-base text-white/90 font-medium mb-3 md:mb-6">
-            <div className="flex text-amber-400 gap-1">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 fill-current" />
-              ))}
-            </div>
+        <div className="relative z-10 p-5 pb-6 flex flex-col justify-end items-start my-auto min-h-0 w-full max-w-md md:max-w-2xl mx-auto">
+          {/* RATING BADGE */}
+          <div className="inline-flex items-center gap-2 bg-[#d4a853]/12 border border-[#d4a853]/25 px-3.5 py-1.5 rounded-full text-xs font-semibold text-[#d4a853] mb-4 backdrop-blur-xs">
+            <span className="tracking-widest text-[0.7rem] font-bold">★★★★★</span>
             <span>4.9 · 1.2k avaliações</span>
           </div>
 
-          {/* HEADLINE */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.1] mb-4 md:mb-6">
-            Seu melhor visual<br />começa aqui.
+          {/* TITLE */}
+          <h1 className="text-[clamp(1.85rem,4.5vh,2.8rem)] font-extrabold leading-[1.08] tracking-tight text-white mb-3">
+            Seu melhor <span className="text-[#d4a853]">visual</span><br />
+            começa aqui.
           </h1>
 
           {/* SUBTITLE */}
-          <p className="text-sm sm:text-base md:text-xl text-white/85 font-normal leading-relaxed max-w-xs sm:max-w-md md:max-w-2xl mb-8 md:mb-12">
-            Barbearia moderna com atendimento premium por horário marcado. Estilo, precisão e conforto.
+          <p className="text-[clamp(0.8rem,1.4vh,0.9375rem)] leading-relaxed text-[#a0a0a0] mb-5 max-w-xs sm:max-w-md">
+            Agende online, chegue na hora certa e saia renovado. Sem filas, sem espera, sem complicação.
           </p>
 
-          {/* CTA BUTTON */}
-          <button 
-            onClick={() => { hapticMedium(); onGoToBooking(); }}
-            className="w-full md:w-auto md:px-10 md:py-4 bg-white hover:bg-neutral-100 text-neutral-900 font-semibold text-sm md:text-base py-3.5 px-6 rounded-2xl flex items-center justify-center gap-2.5 shadow-xl hover:scale-102 active:scale-98 transition-all"
-          >
-            <CalendarCheck className="w-4 h-4 md:w-5 md:h-5 text-neutral-900" />
-            <span>Agendar Agora</span>
-          </button>
+          {/* CTA GROUP */}
+          <div className="flex flex-col gap-2.5 mb-5 w-full">
+            <button 
+              onClick={() => { hapticMedium(); onGoToBooking(); }}
+              className="w-full bg-[#d4a853] hover:bg-[#c49a4a] text-[#0a0a0a] font-bold text-base py-4 px-8 rounded-full flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(212,168,83,0.25)] active:scale-98 transition-all shrink-0 cursor-pointer"
+            >
+              <span>Agendar Meu Horário</span>
+              <ArrowRight className="w-4 h-4 text-[#0a0a0a]" />
+            </button>
+          </div>
+
+          {/* TRUST TAGS */}
+          <div className="flex flex-wrap gap-2 w-full">
+            <div className="flex items-center gap-1.5 bg-[#141414] border border-white/6 px-3 py-2 rounded-[10px] text-[0.78rem] text-[#a0a0a0]">
+              <span className="text-sm">🕐</span>
+              <span>Aberto até <strong className="text-white font-semibold">22h</strong></span>
+            </div>
+            <div className="flex items-center gap-1.5 bg-[#141414] border border-white/6 px-3 py-2 rounded-[10px] text-[0.78rem] text-[#a0a0a0]">
+              <span className="text-sm">📍</span>
+              <span><strong className="text-white font-semibold">Centro</strong> da cidade</span>
+            </div>
+          </div>
+        </div>
+
+        {/* INFO BAR */}
+        <div className="relative z-10 bg-[#141414] border-t border-white/6 px-5 py-4 grid grid-cols-3 gap-3 w-full shrink-0">
+          <div className="text-center">
+            <div className="text-[0.625rem] font-bold uppercase tracking-widest text-[#a0a0a0] mb-1">
+              STATUS
+            </div>
+            <div className="text-[0.8125rem] font-semibold text-[#4ade80] flex items-center justify-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#4ade80] animate-pulse inline-block" />
+              Aberto agora
+            </div>
+          </div>
+
+          <div className="text-center border-x border-white/6 px-1">
+            <div className="text-[0.625rem] font-bold uppercase tracking-widest text-[#a0a0a0] mb-1">
+              PRÓXIMO HORÁRIO
+            </div>
+            <div className="text-[0.8125rem] font-semibold text-white">
+              14:30 hoje
+            </div>
+          </div>
+
+          <div className="text-center">
+            <div className="text-[0.625rem] font-bold uppercase tracking-widest text-[#a0a0a0] mb-1">
+              TEMPO MÉDIO
+            </div>
+            <div className="text-[0.8125rem] font-semibold text-white">
+              30 min
+            </div>
+          </div>
         </div>
       </section>
 
       {/* SECTION 1: POR QUE A NOBRE */}
-      <section className="w-full h-[100dvh] min-h-[100dvh] snap-start snap-always shrink-0 flex flex-col justify-center px-4 sm:px-6 md:px-12 lg:px-16 py-4 sm:py-6 md:py-8 bg-white overflow-hidden">
-        <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full max-h-full overflow-y-auto no-scrollbar flex flex-col justify-between h-full py-2 sm:py-4 my-auto">
-          <div className="shrink-0">
-            <span className="text-[#C8A96A] text-[11px] sm:text-xs md:text-sm font-bold tracking-widest uppercase block mb-1.5 md:mb-2">
+      <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
+        <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full h-full flex flex-col justify-between items-stretch min-h-0 my-auto">
+          <div className="shrink-0 mb-[clamp(0.25rem,0.8vh,0.75rem)]">
+            <span className="text-[#C8A96A] text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase block mb-0.5">
               POR QUE A NOBRE
             </span>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-neutral-900 tracking-tight">
+            <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-bold text-neutral-900 tracking-tight leading-tight">
               Feito para você relaxar
             </h2>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 lg:gap-8 my-auto flex-1 items-center py-2">
+          <div className="grid grid-cols-2 md:grid-cols-3 grid-rows-3 md:grid-rows-2 gap-[clamp(0.375rem,1vh,1rem)] flex-1 min-h-0 my-auto py-[clamp(0.25rem,0.5vh,0.5rem)] items-stretch">
             {differentials.map((item, idx) => {
               const Icon = item.icon;
               return (
                 <div 
                   key={idx}
-                  className="bg-white border border-neutral-200/80 rounded-2xl p-4 sm:p-5 md:p-6 lg:p-8 flex flex-col justify-between gap-3 sm:gap-4 md:gap-6 shadow-xs hover:border-[#C8A96A]/60 hover:shadow-md transition-all duration-300 group h-full min-h-[110px] sm:min-h-[130px] md:min-h-[160px]"
+                  className="bg-white border border-neutral-200/80 rounded-[clamp(0.625rem,1.4vh,1.125rem)] p-[clamp(0.375rem,1.2vh,1rem)] flex flex-col items-center sm:items-start justify-center gap-[clamp(0.125rem,0.5vh,0.5rem)] text-center sm:text-left shadow-xs hover:border-[#C8A96A]/60 hover:shadow-md transition-all duration-300 group h-full min-h-0"
                 >
-                  <Icon className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-[#C8A96A] stroke-[1.75] group-hover:scale-110 transition-transform" />
-                  <span className="text-xs sm:text-sm md:text-base font-semibold text-neutral-900 leading-snug">
+                  <Icon className="w-[clamp(1rem,2.4vh,1.75rem)] h-[clamp(1rem,2.4vh,1.75rem)] text-[#C8A96A] stroke-[1.75] group-hover:scale-110 transition-transform shrink-0" />
+                  <span className="text-[clamp(0.625rem,1.25vh,0.925rem)] font-semibold text-neutral-900 leading-tight line-clamp-2">
                     {item.label}
                   </span>
                 </div>
@@ -233,189 +285,113 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking }) => {
         </div>
       </section>
 
-      {/* SECTION 2: SERVIÇOS */}
-      <section className="w-full h-[100dvh] min-h-[100dvh] snap-start snap-always shrink-0 flex flex-col justify-center px-4 sm:px-6 md:px-12 lg:px-16 py-4 sm:py-6 md:py-8 bg-white overflow-hidden">
-        <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full max-h-full overflow-y-auto no-scrollbar flex flex-col justify-between h-full py-2 sm:py-4 my-auto">
-          <div className="shrink-0">
-            <span className="text-[#C8A96A] text-[11px] sm:text-xs md:text-sm font-bold tracking-widest uppercase block mb-1.5 md:mb-2">
-              SERVIÇOS
-            </span>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-neutral-900 tracking-tight mb-2 md:mb-4">
-              Escolha seu serviço
-            </h2>
-
-            {/* TABS */}
-            <div className="flex bg-neutral-100 p-1 rounded-2xl md:max-w-md md:mx-auto w-full">
-              {(['todos', 'cabelo', 'barba'] as const).map(cat => (
-                <button
-                  key={cat}
-                  onClick={() => { hapticLight(); setActiveCategory(cat); }}
-                  className={`flex-1 py-2 text-xs md:text-sm font-medium rounded-xl capitalize transition-all ${
-                    activeCategory === cat
-                      ? 'bg-white text-neutral-900 shadow-xs font-semibold'
-                      : 'text-neutral-500 hover:text-neutral-900'
-                  }`}
-                >
-                  {cat === 'todos' ? 'Todos' : cat === 'cabelo' ? 'Cabelo' : 'Barba'}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* SERVICE CARDS */}
-          <div className="space-y-3 sm:space-y-4 md:space-y-0 md:grid md:grid-cols-3 md:gap-6 lg:gap-8 my-auto flex-1 items-center py-2">
-            {filteredServices.map(service => (
-              <div 
-                key={service.id}
-                className="bg-white border border-neutral-200/80 rounded-2xl p-3.5 sm:p-4 md:p-5 lg:p-6 flex md:flex-col gap-3.5 sm:gap-4 md:gap-5 shadow-xs hover:border-[#C8A96A]/60 hover:shadow-lg transition-all duration-300 md:h-full justify-between"
-              >
-                <img 
-                  src={service.image} 
-                  alt={service.title}
-                  className="w-20 h-20 sm:w-24 sm:h-24 md:w-full md:h-44 lg:h-52 rounded-xl object-cover shrink-0"
-                />
-
-                <div className="flex flex-col justify-between flex-1 min-w-0">
-                  <div>
-                    <div className="flex justify-between items-start gap-2">
-                      <h3 className="text-xs sm:text-sm md:text-base lg:text-lg font-bold text-neutral-900 truncate">
-                        {service.title}
-                      </h3>
-                      <span className="text-xs sm:text-sm md:text-base lg:text-lg font-bold text-[#C8A96A] shrink-0">
-                        R$ {service.price}
-                      </span>
-                    </div>
-
-                    <p className="text-[11px] sm:text-xs md:text-sm text-neutral-500 mt-1 line-clamp-2">
-                      {service.description}
-                    </p>
-
-                    <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-neutral-400 mt-2">
-                      <Clock className="w-3.5 h-3.5" />
-                      <span>{service.duration}</span>
-                    </div>
-                  </div>
-
-                  <button 
-                    onClick={() => { hapticMedium(); onGoToBooking(); }}
-                    className="mt-3 w-full bg-neutral-900 hover:bg-neutral-800 text-white font-medium text-xs sm:text-sm md:text-base py-2.5 rounded-xl transition-all active:scale-98"
-                  >
-                    Agendar
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* SECTION 3: GALERIA */}
-      <section className="w-full h-[100dvh] min-h-[100dvh] snap-start snap-always shrink-0 flex flex-col justify-center px-4 sm:px-6 md:px-10 lg:px-16 py-4 sm:py-6 md:py-8 bg-white overflow-hidden">
-        <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full max-h-full overflow-y-auto no-scrollbar flex flex-col justify-between h-full my-auto py-2">
+      <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
+        <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full h-full flex flex-col justify-between items-stretch min-h-0 my-auto">
           {/* Header */}
-          <div className="flex justify-between items-end mb-2.5 sm:mb-4 shrink-0">
+          <div className="flex justify-between items-end mb-[clamp(0.25rem,0.8vh,0.75rem)] shrink-0">
             <div>
-              <span className="text-[#C8A96A] text-[11px] sm:text-xs md:text-sm font-bold tracking-widest uppercase block mb-1">
+              <span className="text-[#C8A96A] text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase block mb-0.5">
                 GALERIA
               </span>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-neutral-900 tracking-tight">
+              <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-bold text-neutral-900 tracking-tight leading-tight">
                 Cortes reais
               </h2>
             </div>
             <button 
               onClick={() => { hapticLight(); onGoToBooking(); }}
-              className="text-xs sm:text-sm md:text-base font-semibold text-neutral-500 hover:text-neutral-900 transition-colors"
+              className="text-[clamp(0.65rem,1.3vh,0.875rem)] font-semibold text-neutral-500 hover:text-neutral-900 transition-colors"
             >
               Ver tudo
             </button>
           </div>
 
-          {/* Bento Grid Composition - Asymmetric premium gallery */}
-          <div className="grid grid-cols-12 grid-rows-6 gap-2 sm:gap-3 md:gap-4 flex-1 w-full h-full min-h-0">
-            {/* 1. Foto Vertical Grande (Destaque) - Esquerda (Cols 1-5, Rows 1-4) */}
-            <div className="col-span-5 row-span-4 rounded-xl sm:rounded-2xl overflow-hidden relative group bg-neutral-900 shadow-xs border border-neutral-200/50">
+          {/* Bento Grid Composition - Strictly sized within available space */}
+          <div className="grid grid-cols-12 grid-rows-6 gap-[clamp(0.25rem,0.8vh,0.75rem)] flex-1 min-h-0 w-full h-full">
+            {/* 1. Foto Vertical Grande (Destaque) */}
+            <div className="col-span-5 row-span-4 rounded-[clamp(0.5rem,1vh,0.875rem)] overflow-hidden relative group bg-neutral-900 shadow-xs border border-neutral-200/50 min-h-0 h-full">
               <img 
                 src={galleryImages[0].src} 
                 alt={galleryImages[0].title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent flex flex-col justify-end p-2.5 sm:p-4">
-                <span className="bg-[#C8A96A] text-neutral-950 text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-md w-max mb-1 uppercase tracking-wider">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent flex flex-col justify-end p-[clamp(0.375rem,0.8vh,0.75rem)]">
+                <span className="bg-[#C8A96A] text-neutral-950 text-[clamp(0.5rem,0.9vh,0.65rem)] font-bold px-1 py-0.5 rounded w-max mb-0.5 uppercase tracking-wider">
                   Destaque
                 </span>
-                <h3 className="text-white font-bold text-xs sm:text-base md:text-lg lg:text-xl leading-snug">
+                <h3 className="text-white font-bold text-[clamp(0.65rem,1.3vh,0.95rem)] leading-snug line-clamp-2">
                   {galleryImages[0].title}
                 </h3>
               </div>
             </div>
 
-            {/* 2. Fotos Menores - Centro/Direita (Cols 6-12, Rows 1-2) */}
-            <div className="col-span-7 row-span-2 grid grid-cols-2 gap-2 sm:gap-3">
-              <div className="rounded-xl sm:rounded-2xl overflow-hidden relative group bg-neutral-900 shadow-xs border border-neutral-200/50">
+            {/* 2. Fotos Menores - Centro/Direita */}
+            <div className="col-span-7 row-span-2 grid grid-cols-2 gap-[clamp(0.25rem,0.8vh,0.75rem)] min-h-0 h-full">
+              <div className="rounded-[clamp(0.5rem,1vh,0.875rem)] overflow-hidden relative group bg-neutral-900 shadow-xs border border-neutral-200/50 min-h-0 h-full">
                 <img 
                   src={galleryImages[1].src} 
                   alt={galleryImages[1].title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent flex items-end p-2 sm:p-3">
-                  <span className="text-white font-semibold text-[11px] sm:text-xs md:text-sm line-clamp-1">{galleryImages[1].title}</span>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent flex items-end p-[clamp(0.25rem,0.6vh,0.5rem)]">
+                  <span className="text-white font-semibold text-[clamp(0.55rem,1vh,0.75rem)] line-clamp-1">{galleryImages[1].title}</span>
                 </div>
               </div>
-              <div className="rounded-xl sm:rounded-2xl overflow-hidden relative group bg-neutral-900 shadow-xs border border-neutral-200/50">
+              <div className="rounded-[clamp(0.5rem,1vh,0.875rem)] overflow-hidden relative group bg-neutral-900 shadow-xs border border-neutral-200/50 min-h-0 h-full">
                 <img 
                   src={galleryImages[3].src} 
                   alt={galleryImages[3].title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent flex items-end p-2 sm:p-3">
-                  <span className="text-white font-semibold text-[11px] sm:text-xs md:text-sm line-clamp-1">{galleryImages[3].title}</span>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent flex items-end p-[clamp(0.25rem,0.6vh,0.5rem)]">
+                  <span className="text-white font-semibold text-[clamp(0.55rem,1vh,0.75rem)] line-clamp-1">{galleryImages[3].title}</span>
                 </div>
               </div>
             </div>
 
-            {/* 3. Card Informativo / Promocional Integrado ao Grid (Cols 6-12, Rows 3-4) */}
-            <div className="col-span-7 row-span-2 bg-gradient-to-br from-neutral-900 via-neutral-950 to-neutral-900 text-white rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-5 flex flex-col justify-between border border-neutral-800 shadow-xs relative overflow-hidden group">
-              <div className="absolute -right-4 -bottom-4 w-28 h-28 bg-[#C8A96A]/15 rounded-full blur-2xl group-hover:bg-[#C8A96A]/25 transition-all duration-500 pointer-events-none" />
+            {/* 3. Card Informativo / Promocional */}
+            <div className="col-span-7 row-span-2 bg-gradient-to-br from-neutral-900 via-neutral-950 to-neutral-900 text-white rounded-[clamp(0.5rem,1vh,0.875rem)] p-[clamp(0.375rem,0.8vh,0.75rem)] flex flex-col justify-between border border-neutral-800 shadow-xs relative overflow-hidden group min-h-0 h-full">
+              <div className="absolute -right-4 -bottom-4 w-20 h-20 bg-[#C8A96A]/15 rounded-full blur-xl group-hover:bg-[#C8A96A]/25 transition-all duration-500 pointer-events-none" />
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5 text-[#C8A96A]">
-                  <Scissors className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />
-                  <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider">Acabamento Mestre</span>
+                <div className="flex items-center gap-1 text-[#C8A96A]">
+                  <Scissors className="w-[clamp(0.65rem,1.1vh,0.85rem)] h-[clamp(0.65rem,1.1vh,0.85rem)] stroke-[2.5]" />
+                  <span className="text-[clamp(0.5rem,0.9vh,0.65rem)] font-bold uppercase tracking-wider">Acabamento Mestre</span>
                 </div>
                 <div className="flex text-amber-400 gap-0.5">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-current" />
+                    <Star key={i} className="w-[clamp(0.45rem,0.8vh,0.65rem)] h-[clamp(0.45rem,0.8vh,0.65rem)] fill-current" />
                   ))}
                 </div>
               </div>
               <div>
-                <h4 className="text-xs sm:text-sm md:text-base font-bold text-white mb-0.5 leading-tight">
+                <h4 className="text-[clamp(0.65rem,1.2vh,0.875rem)] font-bold text-white leading-tight">
                   Detalhes que fazem toda a diferença.
                 </h4>
-                <p className="text-[10px] sm:text-xs text-neutral-400 font-normal line-clamp-1 sm:line-clamp-2">
+                <p className="text-[clamp(0.5rem,0.9vh,0.65rem)] text-neutral-400 font-normal line-clamp-1">
                   Cortes precisos, barba bem desenhada e produtos de excelência.
                 </p>
               </div>
             </div>
 
-            {/* 4. Foto Horizontal Grande na Base (Cols 1-12, Rows 5-6) */}
-            <div className="col-span-12 row-span-2 rounded-xl sm:rounded-2xl overflow-hidden relative group bg-neutral-900 shadow-xs border border-neutral-200/50">
+            {/* 4. Foto Horizontal Grande na Base */}
+            <div className="col-span-12 row-span-2 rounded-[clamp(0.5rem,1vh,0.875rem)] overflow-hidden relative group bg-neutral-900 shadow-xs border border-neutral-200/50 min-h-0 h-full">
               <img 
                 src={galleryImages[2].src} 
                 alt={galleryImages[2].title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent flex items-end justify-between p-3 sm:p-4">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent flex items-end justify-between p-[clamp(0.375rem,0.8vh,0.75rem)]">
                 <div>
-                  <span className="text-white font-bold text-xs sm:text-base md:text-lg block leading-tight">
+                  <span className="text-white font-bold text-[clamp(0.65rem,1.3vh,0.95rem)] block leading-tight">
                     {galleryImages[2].title}
                   </span>
-                  <span className="text-neutral-300 text-[10px] sm:text-xs line-clamp-1">
+                  <span className="text-neutral-300 text-[clamp(0.5rem,0.9vh,0.65rem)] line-clamp-1">
                     Ambiente climatizado e estrutura de alto padrão para você relaxar.
                   </span>
                 </div>
                 <button 
                   onClick={() => { hapticMedium(); onGoToBooking(); }}
-                  className="bg-white/95 hover:bg-white text-neutral-900 font-bold text-xs px-3 sm:px-4 py-1.5 rounded-xl transition-all active:scale-95 shrink-0 shadow-md ml-2"
+                  className="bg-white/95 hover:bg-white text-neutral-900 font-bold text-[clamp(0.55rem,1vh,0.7rem)] px-[clamp(0.5rem,1vw,0.75rem)] py-[clamp(0.2rem,0.5vh,0.3rem)] rounded-lg transition-all active:scale-95 shrink-0 shadow-md ml-2"
                 >
                   Agendar
                 </button>
@@ -425,44 +401,44 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking }) => {
         </div>
       </section>
 
-      {/* SECTION 4: DEPOIMENTOS */}
-      <section className="w-full h-[100dvh] min-h-[100dvh] snap-start snap-always shrink-0 flex flex-col justify-center px-4 sm:px-6 md:px-12 lg:px-16 py-4 sm:py-6 md:py-8 bg-white overflow-hidden">
-        <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full max-h-full overflow-y-auto no-scrollbar flex flex-col justify-between h-full py-2 sm:py-4 my-auto">
-          <div className="shrink-0 mb-2 md:mb-4">
-            <span className="text-[#C8A96A] text-[11px] sm:text-xs md:text-sm font-bold tracking-widest uppercase block mb-1.5 md:mb-2">
+      {/* SECTION 4: DEPOIMENTOS - VERTICAL LAYOUT */}
+      <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
+        <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full h-full flex flex-col justify-between items-stretch min-h-0 my-auto">
+          <div className="shrink-0 mb-[clamp(0.25rem,0.8vh,0.75rem)]">
+            <span className="text-[#C8A96A] text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase block mb-0.5">
               DEPOIMENTOS
             </span>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-neutral-900 tracking-tight">
+            <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-bold text-neutral-900 tracking-tight leading-tight">
               Quem já passou por aqui
             </h2>
           </div>
 
-          <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-none -mx-5 px-5 md:mx-0 md:px-0 md:grid md:grid-cols-2 md:gap-8 md:overflow-visible my-auto flex-1 items-center py-2">
+          <div className="flex flex-col gap-[clamp(0.375rem,1vh,1rem)] flex-1 min-h-0 justify-center items-stretch my-auto py-[clamp(0.25rem,0.5vh,0.5rem)] w-full">
             {testimonials.map((item, idx) => (
               <div 
                 key={idx}
-                className="bg-white border border-neutral-200/80 rounded-2xl md:rounded-3xl p-5 sm:p-6 md:p-8 lg:p-10 min-w-[280px] max-w-[300px] md:min-w-0 md:max-w-none shrink-0 md:shrink flex flex-col justify-between gap-4 sm:gap-6 shadow-xs hover:border-[#C8A96A]/50 hover:shadow-md transition-all md:h-full"
+                className="w-full bg-white border border-neutral-200/80 rounded-[clamp(0.625rem,1.4vh,1.125rem)] p-[clamp(0.5rem,1.2vh,1rem)] flex flex-col justify-between gap-[clamp(0.25rem,0.8vh,0.625rem)] shadow-xs hover:border-[#C8A96A]/50 hover:shadow-md transition-all flex-1 min-h-0"
               >
                 <div>
-                  <div className="flex items-center gap-3.5 mb-4 sm:mb-6">
+                  <div className="flex items-center gap-[clamp(0.375rem,1vw,0.75rem)] mb-[clamp(0.25rem,0.8vh,0.625rem)]">
                     <img 
                       src={item.avatar} 
                       alt={item.name}
-                      className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full object-cover"
+                      className="w-[clamp(1.75rem,3.5vh,2.5rem)] h-[clamp(1.75rem,3.5vh,2.5rem)] rounded-full object-cover shrink-0"
                     />
                     <div>
-                      <h4 className="text-sm sm:text-base md:text-lg font-bold text-neutral-900">
+                      <h4 className="text-[clamp(0.7rem,1.4vh,1rem)] font-bold text-neutral-900">
                         {item.name}
                       </h4>
-                      <div className="flex text-amber-400 gap-1 mt-1">
+                      <div className="flex text-amber-400 gap-0.5 mt-0.5">
                         {[...Array(item.rating)].map((_, i) => (
-                          <Star key={i} className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" />
+                          <Star key={i} className="w-[clamp(0.6rem,1.1vh,0.8rem)] h-[clamp(0.6rem,1.1vh,0.8rem)] fill-current" />
                         ))}
                       </div>
                     </div>
                   </div>
 
-                  <p className="text-xs sm:text-sm md:text-base text-neutral-600 leading-relaxed font-normal italic">
+                  <p className="text-[clamp(0.625rem,1.25vh,0.875rem)] text-neutral-600 leading-relaxed font-normal italic line-clamp-3">
                     "{item.text}"
                   </p>
                 </div>
@@ -473,49 +449,49 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking }) => {
       </section>
 
       {/* SECTION 5: LOCALIZAÇÃO */}
-      <section className="w-full h-[100dvh] min-h-[100dvh] snap-start snap-always shrink-0 flex flex-col justify-center px-4 sm:px-6 md:px-12 lg:px-16 py-4 sm:py-6 md:py-8 bg-white overflow-hidden">
-        <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full max-h-full overflow-y-auto no-scrollbar flex flex-col justify-between h-full py-2 sm:py-4 my-auto">
-          <div className="shrink-0">
-            <span className="text-[#C8A96A] text-[11px] sm:text-xs md:text-sm font-bold tracking-widest uppercase block mb-1.5 md:mb-2">
+      <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
+        <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full h-full flex flex-col justify-between items-stretch min-h-0 my-auto">
+          <div className="shrink-0 mb-[clamp(0.25rem,0.8vh,0.75rem)]">
+            <span className="text-[#C8A96A] text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase block mb-0.5">
               LOCALIZAÇÃO
             </span>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-neutral-900 tracking-tight">
+            <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-bold text-neutral-900 tracking-tight leading-tight">
               Onde estamos
             </h2>
           </div>
 
-          <div className="bg-white border border-neutral-200/80 rounded-3xl p-5 sm:p-6 md:p-8 lg:p-10 shadow-xs space-y-5 md:space-y-0 md:grid md:grid-cols-2 md:gap-8 lg:gap-12 items-center my-auto flex-1 py-2">
+          <div className="bg-white border border-neutral-200/80 rounded-[clamp(0.625rem,1.4vh,1.125rem)] p-[clamp(0.5rem,1.2vh,1rem)] shadow-xs flex-1 min-h-0 my-auto flex flex-col md:grid md:grid-cols-2 gap-[clamp(0.5rem,1.2vh,1.25rem)] items-center justify-between">
             {/* Map Image Graphic */}
-            <div className="relative h-48 sm:h-56 md:h-72 lg:h-80 rounded-2xl overflow-hidden bg-neutral-100 border border-neutral-200">
+            <div className="relative w-full flex-1 min-h-[clamp(4.5rem,12vh,10rem)] rounded-[clamp(0.5rem,1vh,0.875rem)] overflow-hidden bg-neutral-100 border border-neutral-200 shrink-0 md:shrink">
               <img 
                 src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?q=80&w=800&auto=format&fit=crop" 
                 alt="Mapa Nobre" 
                 className="w-full h-full object-cover filter contrast-105"
               />
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-neutral-900 text-white flex items-center justify-center shadow-lg">
-                  <MapPin className="w-5 h-5 md:w-6 md:h-6 fill-current text-white" />
+                <div className="w-[clamp(1.75rem,3.5vh,2.5rem)] h-[clamp(1.75rem,3.5vh,2.5rem)] rounded-full bg-neutral-900 text-white flex items-center justify-center shadow-lg">
+                  <MapPin className="w-[clamp(0.875rem,1.8vh,1.25rem)] h-[clamp(0.875rem,1.8vh,1.25rem)] fill-current text-white" />
                 </div>
               </div>
             </div>
 
-            <div className="space-y-5 md:space-y-8 flex flex-col justify-center">
-              <div className="space-y-3 sm:space-y-4 text-xs sm:text-sm md:text-base text-neutral-700">
-                <div className="flex items-start gap-3">
-                  <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-[#C8A96A] shrink-0 mt-0.5" />
+            <div className="space-y-[clamp(0.375rem,1vh,0.875rem)] flex flex-col justify-between w-full min-h-0">
+              <div className="space-y-[clamp(0.25rem,0.8vh,0.625rem)] text-[clamp(0.625rem,1.25vh,0.875rem)] text-neutral-700">
+                <div className="flex items-start gap-2">
+                  <MapPin className="w-[clamp(0.75rem,1.4vh,1rem)] h-[clamp(0.75rem,1.4vh,1rem)] text-[#C8A96A] shrink-0 mt-0.5" />
                   <span className="font-medium">Rua Augusta, 1420 · Jardins, São Paulo</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-[#C8A96A] shrink-0" />
+                <div className="flex items-center gap-2">
+                  <Clock className="w-[clamp(0.75rem,1.4vh,1rem)] h-[clamp(0.75rem,1.4vh,1rem)] text-[#C8A96A] shrink-0" />
                   <span className="font-medium">Seg a Sáb · 09h às 21h</span>
                 </div>
               </div>
 
               <button 
                 onClick={handleOpenGoogleMaps}
-                className="w-full bg-white border border-neutral-300 text-neutral-900 font-semibold text-xs sm:text-sm md:text-base py-3.5 md:py-4 rounded-2xl flex items-center justify-center gap-2 hover:bg-neutral-50 active:scale-98 transition-all shadow-xs"
+                className="w-full bg-white border border-neutral-300 text-neutral-900 font-semibold text-[clamp(0.65rem,1.3vh,0.875rem)] py-[clamp(0.375rem,0.9vh,0.625rem)] rounded-xl flex items-center justify-center gap-2 hover:bg-neutral-50 active:scale-98 transition-all shadow-xs shrink-0"
               >
-                <Navigation className="w-4 h-4" />
+                <Navigation className="w-[clamp(0.75rem,1.4vh,1rem)] h-[clamp(0.75rem,1.4vh,1rem)]" />
                 <span>Como chegar</span>
               </button>
             </div>
@@ -524,69 +500,42 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking }) => {
       </section>
 
       {/* SECTION 6: PRONTO PARA O SEU NOVO VISUAL? (DARK CARD) */}
-      <section className="w-full h-[100dvh] min-h-[100dvh] snap-start snap-always shrink-0 flex flex-col justify-between px-4 sm:px-6 md:px-12 lg:px-16 py-4 sm:py-6 md:py-8 bg-white overflow-hidden relative">
-        <div className="w-full flex-1 flex flex-col justify-center items-center max-h-full overflow-y-auto no-scrollbar my-auto py-2">
-          <div className="max-w-md md:max-w-3xl lg:max-w-4xl w-full bg-neutral-900 text-white rounded-3xl p-6 sm:p-8 md:p-12 lg:p-16 relative overflow-hidden shadow-xl md:text-center md:flex md:flex-col md:items-center">
-            <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-[#C8A96A]/20 border border-[#C8A96A]/30 flex items-center justify-center text-[#C8A96A] mb-5 md:mb-6">
-              <Scissors className="w-6 h-6 md:w-8 md:h-8 stroke-[2.2]" />
+      <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
+        <div className="w-full flex-1 flex flex-col justify-center items-center max-h-full my-auto py-1 min-h-0">
+          <div className="max-w-md md:max-w-3xl lg:max-w-4xl w-full bg-neutral-900 text-white rounded-[clamp(0.875rem,2vh,1.5rem)] p-[clamp(0.875rem,2.2vh,2rem)] relative overflow-hidden shadow-xl text-center flex flex-col items-center justify-center my-auto min-h-0">
+            <div className="w-[clamp(2rem,4vh,3rem)] h-[clamp(2rem,4vh,3rem)] rounded-2xl bg-[#C8A96A]/20 border border-[#C8A96A]/30 flex items-center justify-center text-[#C8A96A] mb-[clamp(0.375rem,1vh,1rem)] shrink-0">
+              <Scissors className="w-[clamp(1rem,2.2vh,1.625rem)] h-[clamp(1rem,2.2vh,1.625rem)] stroke-[2.2]" />
             </div>
 
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 md:mb-4 tracking-tight">
+            <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-bold text-white mb-[clamp(0.2rem,0.6vh,0.5rem)] tracking-tight leading-tight">
               Pronto para o seu<br />novo visual?
             </h2>
 
-            <p className="text-xs sm:text-sm md:text-base lg:text-lg text-neutral-400 font-normal leading-relaxed mb-6 md:mb-8 md:max-w-lg">
+            <p className="text-[clamp(0.65rem,1.3vh,0.875rem)] text-neutral-400 font-normal leading-relaxed mb-[clamp(0.5rem,1.5vh,1.25rem)] max-w-xs sm:max-w-md md:max-w-lg">
               Garanta seu horário em segundos e viva a experiência Nobre.
             </p>
 
             <button 
               onClick={handleOpenWhatsApp}
-              className="w-full md:w-auto md:px-10 md:py-4 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-xs sm:text-sm md:text-base py-3.5 px-6 rounded-2xl flex items-center justify-center gap-2.5 shadow-lg hover:scale-102 active:scale-98 transition-all"
+              className="w-full sm:w-auto sm:px-[clamp(1.25rem,2.5vw,2rem)] py-[clamp(0.5rem,1.2vh,0.875rem)] bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-[clamp(0.7rem,1.4vh,0.925rem)] rounded-xl flex items-center justify-center gap-2 shadow-lg hover:scale-102 active:scale-98 transition-all shrink-0"
             >
-              <MessageCircle className="w-4 h-4 md:w-5 md:h-5 fill-current" />
+              <MessageCircle className="w-[clamp(0.875rem,1.8vh,1.125rem)] h-[clamp(0.875rem,1.8vh,1.125rem)] fill-current" />
               <span>Agendar pelo WhatsApp</span>
             </button>
           </div>
         </div>
 
         {/* MINIMALIST BACK TO TOP BUTTON IN THE BOTTOM WHITESPACE */}
-        <div className="flex justify-center pt-2 pb-1 shrink-0">
+        <div className="flex justify-center pt-0.5 pb-0.5 shrink-0">
           <button 
             onClick={scrollToTop}
-            className="group flex items-center gap-2 text-xs font-medium text-neutral-400 hover:text-neutral-900 transition-all duration-300 px-4 py-2 rounded-full border border-neutral-200/80 bg-neutral-50/80 hover:bg-neutral-100 active:scale-95 shadow-xs"
+            className="group flex items-center gap-2 text-[clamp(0.6rem,1.1vh,0.7rem)] font-medium text-neutral-400 hover:text-neutral-900 transition-all duration-300 px-3 py-[clamp(0.2rem,0.5vh,0.4rem)] rounded-full border border-neutral-200/80 bg-neutral-50/80 hover:bg-neutral-100 active:scale-95 shadow-xs"
           >
-            <ArrowUp className="w-3.5 h-3.5 text-neutral-400 group-hover:text-neutral-900 group-hover:-translate-y-0.5 transition-transform duration-300" />
+            <ArrowUp className="w-3 h-3 text-neutral-400 group-hover:text-neutral-900 group-hover:-translate-y-0.5 transition-transform duration-300" />
             <span>Voltar ao topo</span>
           </button>
         </div>
       </section>
-
-      {/* FLOATING SCROLL INDICATORS (DOTS LATERAIS REELS/FULLPAGE) */}
-      <div className="fixed right-3 sm:right-5 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-30 bg-neutral-900/60 backdrop-blur-md p-1.5 sm:p-2 rounded-full border border-white/10 shadow-xl pointer-events-auto">
-        {sectionLabels.map((label, i) => (
-          <button
-            key={i}
-            onClick={() => scrollToSection(i)}
-            title={label}
-            aria-label={`Ir para a seção ${label}`}
-            className={`group relative flex items-center justify-center transition-all duration-300 ${
-              activeSection === i ? 'w-3 h-3 sm:w-3.5 sm:h-3.5' : 'w-2 h-2 sm:w-2.5 sm:h-2.5'
-            }`}
-          >
-            <span
-              className={`w-full h-full rounded-full transition-all duration-300 ${
-                activeSection === i
-                  ? 'bg-[#C8A96A] scale-125 ring-2 ring-[#C8A96A]/40 shadow-sm'
-                  : 'bg-neutral-400/50 group-hover:bg-neutral-200'
-              }`}
-            />
-            {/* Tooltip on hover */}
-            <span className="absolute right-7 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-neutral-900 text-white text-[10px] sm:text-xs font-semibold px-2 py-1 rounded-md shadow-lg whitespace-nowrap pointer-events-none border border-neutral-800">
-              {label}
-            </span>
-          </button>
-        ))}
-      </div>
     </div>
   );
 };

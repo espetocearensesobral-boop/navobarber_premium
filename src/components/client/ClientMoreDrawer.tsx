@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { hapticLight, hapticMedium } from '../../lib/haptics';
 import { 
   User, 
@@ -12,9 +12,7 @@ import {
   ChevronRight, 
   Sparkles,
   X,
-  Sliders,
-  Scissors,
-  Download
+  Sliders
 } from 'lucide-react';
 
 interface ClientMoreDrawerProps {
@@ -27,7 +25,7 @@ interface ClientMoreDrawerProps {
   onOpenLoyalty: () => void;
   onOpenLogin: () => void;
   onLogout: () => void;
-  onOpenInstall: () => void;
+  onOpenInstall?: () => void;
 }
 
 export const ClientMoreDrawer: React.FC<ClientMoreDrawerProps> = ({
@@ -207,52 +205,11 @@ export const ClientMoreDrawer: React.FC<ClientMoreDrawerProps> = ({
             )}
           </button>
 
-          <button
-            onClick={() => {
-              hapticLight();
-              onClose();
-              onOpenInstall();
-            }}
-            className="w-full bg-surface-base/50 hover:bg-surface-base p-3.5 rounded-btn border border-border-subtle/60 flex items-center justify-between transition-all text-left"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-btn bg-gold-base/10 text-gold-base flex items-center justify-center">
-                <Download className="w-4 h-4" />
-              </div>
-              <div>
-                <div className="text-xs font-bold text-content-base">Instalar no Celular</div>
-                <div className="text-[10px] text-content-muted">Baixe o app oficial</div>
-              </div>
-            </div>
-            <ChevronRight className="w-4 h-4 text-content-muted" />
-          </button>
-
         </div>
 
         {/* Footer Logout/Login Action */}
         <div className="pt-2 border-t border-border-subtle">
           
-          {/* Design System Link */}
-          <button
-            onClick={() => {
-              window.location.href = '/design-system';
-            }}
-            className="w-full bg-surface-base/50 hover:bg-surface-base p-3.5 rounded-btn border border-border-subtle/60 flex items-center justify-between transition-all text-left"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-btn bg-gold-base/10 text-gold-base flex items-center justify-center">
-                <Sliders className="w-4 h-4" />
-              </div>
-              <div>
-                <div className="text-xs font-bold text-content-base">Design System</div>
-                <div className="text-[10px] text-content-muted">Visualizar Tokens e Componentes</div>
-              </div>
-            </div>
-            <ChevronRight className="w-4 h-4 text-content-muted" />
-          </button>
-
-          <div className="h-px bg-border-subtle w-full my-2"></div>
-
           {/* Theme Toggle */}
           <button
             onClick={() => {
