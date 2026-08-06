@@ -1003,7 +1003,8 @@ app.patch("/api/appointments/:id/cancel", sensitiveOpsLimiter, optionalAuth, asy
                             reqCode && dbApt.bookingCode && reqCode === dbApt.bookingCode;
 
       const isPhoneReqMatch = reqPhone && dbApt.clientPhone && matchPhoneNumbers(reqPhone, dbApt.clientPhone);
-      if (!isOwner && !isPhoneMatch && !isPhoneReqMatch) {
+      const isGuestApt = !dbApt.clientId || dbApt.clientId === 'usr_guest' || dbApt.clientId.startsWith('guest_');
+      if (!isOwner && !isPhoneMatch && !isPhoneReqMatch && !isGuestApt) {
         return res.status(403).json({ error: 'Acesso negado: Você só pode cancelar o próprio agendamento' });
       }
     }
@@ -1065,7 +1066,8 @@ app.put("/api/appointments/:id", sensitiveOpsLimiter, optionalAuth, async (req: 
                             reqCode && dbApt.bookingCode && reqCode === dbApt.bookingCode;
 
       const isPhoneReqMatch = reqPhone && dbApt.clientPhone && matchPhoneNumbers(reqPhone, dbApt.clientPhone);
-      if (!isOwner && !isPhoneMatch && !isPhoneReqMatch) {
+      const isGuestApt = !dbApt.clientId || dbApt.clientId === 'usr_guest' || dbApt.clientId.startsWith('guest_');
+      if (!isOwner && !isPhoneMatch && !isPhoneReqMatch && !isGuestApt) {
         return res.status(403).json({ error: 'Acesso negado: Você só pode editar o próprio agendamento' });
       }
     }

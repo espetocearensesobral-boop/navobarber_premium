@@ -115,7 +115,10 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
         body: JSON.stringify({
           date: rescheduleDate,
           timeSlot: rescheduleTimeSlot,
-          time_slot: rescheduleTimeSlot
+          time_slot: rescheduleTimeSlot,
+          clientPhone: currentApt.client_phone || (currentApt as any).clientPhone,
+          client_phone: currentApt.client_phone || (currentApt as any).clientPhone,
+          bookingCode: currentApt.booking_code || (currentApt as any).bookingCode
         })
       });
 
