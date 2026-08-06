@@ -615,7 +615,7 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
                     try {
                       await navigator.share({
                         title: modalService.title,
-                        text: `Confira ${modalService.title} no BarberX!`,
+                        text: `Confira ${modalService.title} na Navo Premium!`,
                         url: currentUrl,
                       });
                     } catch (e) {}

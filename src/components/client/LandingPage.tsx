@@ -97,7 +97,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
       category: 'cabelo',
       price: 95,
       duration: '75 min',
-      description: 'Experiência completa Nobre.',
+      description: 'Experiência completa Navo Premium.',
       image: 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=400&auto=format&fit=crop',
     }
   ];
@@ -179,7 +179,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
 
   const handleOpenWhatsApp = () => {
     hapticLight();
-    window.open('https://wa.me/5511999998888?text=Olá!%20Gostaria%20de%20agendar%20um%20horário%20na%20Nobre.', '_blank', 'noopener,noreferrer');
+    window.open('https://wa.me/5511999998888?text=Olá!%20Gostaria%20de%20agendar%20um%20horário%20na%20Navo%20Premium.', '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -255,8 +255,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
 
         {/* HEADER */}
         <header className="relative z-20 flex items-center justify-between p-5 shrink-0">
-          <div className="font-extrabold text-lg tracking-tight text-white">
-            BARBER<span className="text-[#d4a853]">SHOP</span>
+          <div className="font-extrabold text-lg tracking-tight text-white flex items-center gap-1">
+            <span>NAVO</span><span className="text-[#d4a853]">PREMIUM</span>
           </div>
           <button 
             onClick={toggleMenu} 
@@ -334,12 +334,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
         </div>
       </section>
 
-      {/* SECTION 1: POR QUE A NOBRE */}
+      {/* SECTION 1: POR QUE A NAVO */}
       <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
         <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full h-full flex flex-col justify-between items-stretch min-h-0 my-auto">
           <div className="shrink-0 mb-[clamp(0.25rem,0.8vh,0.75rem)]">
             <span className="text-[#C8A96A] text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase block mb-0.5">
-              POR QUE A NOBRE
+              POR QUE A NAVO
             </span>
             <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-extrabold text-neutral-900 tracking-tight leading-tight">
               Feito para você <span className="text-[#b89060]">relaxar</span>
@@ -571,7 +571,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             <div className="relative w-full flex-1 min-h-[clamp(4.5rem,12vh,10rem)] rounded-[clamp(0.5rem,1vh,0.875rem)] overflow-hidden bg-neutral-100 border border-neutral-200 shrink-0 md:shrink">
               <img 
                 src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?q=80&w=800&auto=format&fit=crop" 
-                alt="Mapa Nobre" 
+                alt="Mapa Navo Premium" 
                 className="w-full h-full object-cover filter contrast-105"
               />
               <div className="absolute inset-0 flex items-center justify-center">
@@ -589,7 +589,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="w-[clamp(0.75rem,1.4vh,1rem)] h-[clamp(0.75rem,1.4vh,1rem)] text-[#C8A96A] shrink-0" />
-                  <span className="font-medium">Seg a Sáb · 09h às 21h</span>
+                  <span className="font-medium">Seg a Sex: 09h às 22h · Sáb: 09h às 20h</span>
                 </div>
               </div>
 
@@ -618,19 +618,34 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             </h2>
 
             <p className="text-[clamp(0.65rem,1.3vh,0.875rem)] text-neutral-400 font-normal leading-relaxed mb-[clamp(0.5rem,1.5vh,1.25rem)] max-w-xs sm:max-w-md md:max-w-lg">
-              Garanta seu horário em segundos e viva a experiência Nobre.
+              Garanta seu horário em segundos e viva a experiência Navo Premium.
             </p>
 
-            <button 
-              onClick={() => {
-                trackEvent('cta_click', 'landing', 'agendar_whatsapp_footer');
-                handleOpenWhatsApp();
-              }}
-              className="w-full sm:w-auto sm:px-[clamp(1.25rem,2.5vw,2rem)] py-[clamp(0.5rem,1.2vh,0.875rem)] bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-[clamp(0.7rem,1.4vh,0.925rem)] rounded-xl flex items-center justify-center gap-2 shadow-lg hover:scale-102 active:scale-98 transition-all shrink-0"
-            >
-              <MessageCircle className="w-[clamp(0.875rem,1.8vh,1.125rem)] h-[clamp(0.875rem,1.8vh,1.125rem)] fill-current" />
-              <span>Agendar pelo WhatsApp</span>
-            </button>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
+              <button 
+                onClick={() => {
+                  hapticMedium();
+                  trackEvent('cta_click', 'landing', 'agendar_online_footer');
+                  onGoToBooking();
+                }}
+                className="w-full sm:w-auto px-6 py-[clamp(0.5rem,1.2vh,0.875rem)] bg-[#d4a853] hover:bg-[#c49a4a] text-[#0a0a0a] font-bold text-[clamp(0.7rem,1.4vh,0.925rem)] rounded-xl flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(212,168,83,0.3)] hover:scale-102 active:scale-98 transition-all shrink-0 cursor-pointer"
+              >
+                <CalendarCheck className="w-[clamp(0.875rem,1.8vh,1.125rem)] h-[clamp(0.875rem,1.8vh,1.125rem)]" />
+                <span>Agendar Online</span>
+              </button>
+
+              <button 
+                onClick={() => {
+                  trackEvent('cta_click', 'landing', 'agendar_whatsapp_footer');
+                  handleOpenWhatsApp();
+                }}
+                className="w-full sm:w-auto px-6 py-[clamp(0.5rem,1.2vh,0.875rem)] bg-[#25D366]/15 hover:bg-[#25D366]/25 border border-[#25D366]/40 text-[#25D366] font-bold text-[clamp(0.7rem,1.4vh,0.925rem)] rounded-xl flex items-center justify-center gap-2 hover:scale-102 active:scale-98 transition-all shrink-0 cursor-pointer"
+              >
+                <MessageCircle className="w-[clamp(0.875rem,1.8vh,1.125rem)] h-[clamp(0.875rem,1.8vh,1.125rem)] fill-current" />
+                <span>Atendimento WhatsApp</span>
+              </button>
+            </div>
+
             <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 mt-[clamp(0.5rem,1.5vh,1.25rem)] text-neutral-400 text-[clamp(0.6rem,1.2vh,0.75rem)]">
               <span className="flex items-center gap-1"><span className="text-[#25D366]">✓</span> Sem taxa de cancelamento</span>
               <span className="flex items-center gap-1"><span className="text-[#25D366]">✓</span> Confirmação instantânea</span>
@@ -652,7 +667,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
         {/* FOOTER */}
         <footer className="w-full bg-[#0a0a0a] border-t border-white/10 px-5 py-4 shrink-0 flex flex-col sm:flex-row justify-between items-center gap-2 mt-auto">
           <p className="text-[0.7rem] text-[#a0a0a0]">
-            © 2026 BarberX Premium. Todos os direitos reservados.
+            © 2026 Navo Premium. Todos os direitos reservados.
           </p>
           <p className="text-[0.7rem] text-[#a0a0a0]">
             Desenvolvido por <span className="text-[#d4a853] font-semibold">Navo</span>

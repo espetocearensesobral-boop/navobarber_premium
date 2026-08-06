@@ -137,7 +137,7 @@ export const ClientLoyalty: React.FC<{ currentUser: any }> = ({ currentUser }) =
           <div className="flex justify-between items-center py-2 border-b border-border-subtle">
             <div>
               <span className="text-content-base font-semibold block">Combo Executivo Concluído</span>
-              <span className="text-[10px] text-content-muted">28/07/2026 • BarberX Jardins</span>
+              <span className="text-[10px] text-content-muted">28/07/2026 • Navo Premium Jardins</span>
             </div>
             <span className="text-status-success font-bold">+95 pts</span>
           </div>
@@ -145,7 +145,7 @@ export const ClientLoyalty: React.FC<{ currentUser: any }> = ({ currentUser }) =
           <div className="flex justify-between items-center py-2 border-b border-border-subtle">
             <div>
               <span className="text-content-base font-semibold block">Barboterapia Terapêutica</span>
-              <span className="text-[10px] text-content-muted">14/07/2026 • BarberX Jardins</span>
+              <span className="text-[10px] text-content-muted">14/07/2026 • Navo Premium Jardins</span>
             </div>
             <span className="text-status-success font-bold">+50 pts</span>
           </div>

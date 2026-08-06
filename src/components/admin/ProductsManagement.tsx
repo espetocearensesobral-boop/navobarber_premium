@@ -16,7 +16,7 @@ export const ProductsManagement: React.FC = () => {
   const [formData, setFormData] = useState<Partial<ProductItem>>({
     name: '',
     category: 'Finalizadores',
-    brand: 'BarberX Pro',
+    brand: 'Navo Pro',
     price: 45,
     cost_price: 20,
     stock_quantity: 25,
@@ -41,7 +41,7 @@ export const ProductsManagement: React.FC = () => {
     setFormData({
       name: '',
       category: 'Finalizadores',
-      brand: 'BarberX Pro',
+      brand: 'Navo Pro',
       price: 45,
       cost_price: 20,
       stock_quantity: 25,

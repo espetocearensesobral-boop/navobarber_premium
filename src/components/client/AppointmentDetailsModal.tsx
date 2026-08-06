@@ -234,18 +234,18 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
 
   // Google Calendar URL Generator
   const getGoogleCalendarUrl = () => {
-    const title = encodeURIComponent(`BarberX - ${currentApt.services?.[0]?.title || 'Agendamento'}`);
+    const title = encodeURIComponent(`Navo Premium - ${currentApt.services?.[0]?.title || 'Agendamento'}`);
     const details = encodeURIComponent(
-      `Agendamento BarberX\nBarbeiro: ${currentApt.professional_name}\nServiços: ${(currentApt.services || []).map(s => s.title).join(', ')}\nLocal: BarberX Premium - Rua dos Barões, 1420 - Jardins`
+      `Agendamento Navo Premium\nBarbeiro: ${currentApt.professional_name}\nServiços: ${(currentApt.services || []).map(s => s.title).join(', ')}\nLocal: Navo Premium - Rua Augusta, 1420 - Jardins`
     );
-    const location = encodeURIComponent('BarberX Premium - Rua dos Barões, 1420 - Jardins');
+    const location = encodeURIComponent('Navo Premium - Rua Augusta, 1420 - Jardins');
     return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}`;
   };
 
   // WhatsApp Message Link Generator
   const getWhatsAppUrl = () => {
     const text = encodeURIComponent(
-      `💈 *BARBERX PREMIUM*\n\nOlá! Gostaria de falar sobre o meu agendamento:\n\n📋 *Voucher:* #${currentApt.id.replace('apt_', '').substring(0, 8)}\n📅 *Data:* ${currentApt.date}\n⏰ *Horário:* ${currentApt.time_slot}\n✂️ *Barbeiro:* ${currentApt.professional_name}`
+      `💈 *NAVO PREMIUM*\n\nOlá! Gostaria de falar sobre o meu agendamento:\n\n📋 *Voucher:* #${currentApt.id.replace('apt_', '').substring(0, 8)}\n📅 *Data:* ${currentApt.date}\n⏰ *Horário:* ${currentApt.time_slot}\n✂️ *Barbeiro:* ${currentApt.professional_name}`
     );
     return `https://api.whatsapp.com/send?text=${text}`;
   };
@@ -441,8 +441,8 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
                   <MapPin className="w-4 h-4 text-gold-base shrink-0 mt-0.5" />
                   <div>
                     <span className="block text-content-muted font-medium text-[11px]">Localização</span>
-                    <span className="block font-bold text-content-base">BarberX Premium</span>
-                    <span className="block text-[10px] text-content-muted">Rua dos Barões, 1420 - Jardins</span>
+                    <span className="block font-bold text-content-base">Navo Premium</span>
+                    <span className="block text-[10px] text-content-muted">Rua Augusta, 1420 - Jardins</span>
                   </div>
                 </div>
               </div>

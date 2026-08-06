@@ -155,7 +155,7 @@ export const AdminLayout: React.FC = () => {
               <Scissors className="w-4 h-4" />
             </div>
             <div>
-              <h1 className="text-base font-black text-gold-hover tracking-tight">BarberX</h1>
+              <h1 className="text-base font-black text-gold-hover tracking-tight">Navo Premium</h1>
               <p className="text-[10px] text-content-muted font-bold uppercase tracking-widest">Admin Panel</p>
             </div>
           </div>
@@ -227,7 +227,7 @@ export const AdminLayout: React.FC = () => {
             <div className="w-7 h-7 bg-gold-base rounded-lg flex items-center justify-center text-surface-base shadow">
               <Scissors className="w-3.5 h-3.5" />
             </div>
-            <h1 className="text-base font-black tracking-tight text-gold-hover">BarberX</h1>
+            <h1 className="text-base font-black tracking-tight text-gold-hover">Navo Premium</h1>
           </div>
 
           <div className="w-9" /> {/* Spacer */}
@@ -249,7 +249,7 @@ export const AdminLayout: React.FC = () => {
                 <div className="w-8 h-8 bg-gold-base rounded-lg flex items-center justify-center text-surface-base shadow">
                   <Scissors className="w-4 h-4" />
                 </div>
-                <h1 className="text-base font-black text-gold-hover">BarberX</h1>
+                <h1 className="text-base font-black text-gold-hover">Navo Premium</h1>
               </div>
               <button
                 onClick={() => setSidebarOpen(false)}
