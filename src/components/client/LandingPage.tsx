@@ -22,6 +22,21 @@ import {
 } from 'lucide-react';
 import { hapticMedium, hapticLight } from '../../lib/haptics';
 
+declare global {
+  interface Window {
+    gtag?: (...args: any[]) => void;
+  }
+}
+
+const trackEvent = (action: string, category: string, label: string) => {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', action, { 
+      event_category: category, 
+      event_label: label 
+    });
+  }
+};
+
 interface LandingPageProps {
   onGoToBooking: () => void;
   onGoToAppointments?: () => void;
@@ -264,7 +279,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
           {/* CTA GROUP */}
           <div className="flex flex-col gap-2.5 mb-5 w-full">
             <button 
-              onClick={() => { hapticMedium(); onGoToBooking(); }}
+              onClick={() => { 
+                hapticMedium(); 
+                trackEvent('cta_click', 'landing', 'agendar_horario_hero');
+                onGoToBooking(); 
+              }}
               className="w-full bg-[#d4a853] hover:bg-[#c49a4a] text-[#0a0a0a] font-bold text-base py-4 px-8 rounded-full flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(212,168,83,0.25)] active:scale-98 transition-all shrink-0 cursor-pointer"
             >
               <span>Agendar Meu Horário</span>
@@ -390,6 +409,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             {/* 1. Foto Vertical Grande (Destaque) */}
             <div className="col-span-5 row-span-4 rounded-[clamp(0.5rem,1vh,0.875rem)] overflow-hidden relative group bg-neutral-900 shadow-xs border border-neutral-200/50 min-h-0 h-full">
               <img 
+                loading="lazy"
                 src={galleryImages[0].src} 
                 alt={galleryImages[0].title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
@@ -408,6 +428,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             <div className="col-span-7 row-span-2 grid grid-cols-2 gap-[clamp(0.25rem,0.8vh,0.75rem)] min-h-0 h-full">
               <div className="rounded-[clamp(0.5rem,1vh,0.875rem)] overflow-hidden relative group bg-neutral-900 shadow-xs border border-neutral-200/50 min-h-0 h-full">
                 <img 
+                  loading="lazy"
                   src={galleryImages[1].src} 
                   alt={galleryImages[1].title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
@@ -418,6 +439,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
               </div>
               <div className="rounded-[clamp(0.5rem,1vh,0.875rem)] overflow-hidden relative group bg-neutral-900 shadow-xs border border-neutral-200/50 min-h-0 h-full">
                 <img 
+                  loading="lazy"
                   src={galleryImages[3].src} 
                   alt={galleryImages[3].title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
@@ -455,6 +477,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             {/* 4. Foto Horizontal Grande na Base */}
             <div className="col-span-12 row-span-2 rounded-[clamp(0.5rem,1vh,0.875rem)] overflow-hidden relative group bg-neutral-900 shadow-xs border border-neutral-200/50 min-h-0 h-full">
               <img 
+                loading="lazy"
                 src={galleryImages[2].src} 
                 alt={galleryImages[2].title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
@@ -600,7 +623,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             </p>
 
             <button 
-              onClick={handleOpenWhatsApp}
+              onClick={() => {
+                trackEvent('cta_click', 'landing', 'agendar_whatsapp_footer');
+                handleOpenWhatsApp();
+              }}
               className="w-full sm:w-auto sm:px-[clamp(1.25rem,2.5vw,2rem)] py-[clamp(0.5rem,1.2vh,0.875rem)] bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-[clamp(0.7rem,1.4vh,0.925rem)] rounded-xl flex items-center justify-center gap-2 shadow-lg hover:scale-102 active:scale-98 transition-all shrink-0"
             >
               <MessageCircle className="w-[clamp(0.875rem,1.8vh,1.125rem)] h-[clamp(0.875rem,1.8vh,1.125rem)] fill-current" />
