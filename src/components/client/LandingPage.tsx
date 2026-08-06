@@ -272,64 +272,55 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
           </h1>
 
           {/* SUBTITLE */}
-          <p className="text-[clamp(0.8rem,1.4vh,0.9375rem)] leading-relaxed text-[#a0a0a0] mb-5 max-w-xs sm:max-w-md">
+          <p className="text-[clamp(0.9rem,1.6vh,1.1rem)] leading-relaxed text-[#a0a0a0] mb-5 max-w-xs sm:max-w-md">
             Agende online, chegue na hora certa e saia renovado. Sem filas, sem espera, sem complicação.
           </p>
 
           {/* CTA GROUP */}
-          <div className="flex flex-col gap-2.5 mb-5 w-full">
+          <div className="flex flex-col gap-5 w-full items-center">
             <button 
               onClick={() => { 
                 hapticMedium(); 
                 trackEvent('cta_click', 'landing', 'agendar_horario_hero');
                 onGoToBooking(); 
               }}
-              className="w-full bg-[#d4a853] hover:bg-[#c49a4a] text-[#0a0a0a] font-bold text-base py-4 px-8 rounded-full flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(212,168,83,0.25)] active:scale-98 transition-all shrink-0 cursor-pointer"
+              className="w-full bg-[#d4a853] hover:bg-[#c49a4a] text-[#0a0a0a] font-bold text-base py-4 px-8 rounded-2xl flex items-center justify-center gap-2 shadow-[0_4px_30px_rgba(212,168,83,0.3)] active:scale-98 transition-all shrink-0 cursor-pointer"
             >
-              <span>Agendar Meu Horário</span>
-              <ArrowRight className="w-4 h-4 text-[#0a0a0a]" />
+              <span>Agendar meu horário</span>
+              <ArrowRight className="w-5 h-5 text-[#0a0a0a]" />
             </button>
-          </div>
 
-          {/* TRUST TAGS */}
-          <div className="flex justify-center w-full">
             <button 
               onClick={toggleHoursModal}
-              className="flex items-center gap-1.5 bg-[#141414] border border-white/6 px-4 py-2 rounded-full text-[0.8rem] text-[#a0a0a0] cursor-pointer hover:bg-[#1a1a1a] transition-colors active:scale-95 shadow-sm"
+              className="flex items-center gap-1.5 text-[0.8rem] text-[#a0a0a0] cursor-pointer hover:text-white transition-colors active:scale-95"
             >
-              <span className="text-sm">🕐</span>
-              <span>Aberto até <strong className="text-white font-semibold">22h</strong></span>
+              <div className="w-2 h-2 rounded-full bg-green-500"></div>
+              <span>Aberto até 22h</span>
             </button>
           </div>
         </div>
 
-        {/* INFO BAR */}
-        <div className="relative z-10 bg-[#141414] border-t border-white/6 px-5 py-4 grid grid-cols-3 gap-3 w-full shrink-0">
-          <div className="text-center">
-            <div className="text-[0.625rem] font-bold uppercase tracking-widest text-[#a0a0a0] mb-1">
-              STATUS
-            </div>
-            <div className="text-[0.8125rem] font-semibold text-[#4ade80] flex items-center justify-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#4ade80] animate-pulse inline-block" />
-              Aberto agora
-            </div>
-          </div>
+        {/* HERO FOOTER / TRUST TAGS */}
+        <div className="relative z-10 w-full max-w-md md:max-w-2xl mx-auto px-5 pb-6 shrink-0 mt-auto">
+          <div className="w-full h-px bg-white/10 mb-6"></div>
 
-          <div className="text-center border-x border-white/6 px-1">
-            <div className="text-[0.625rem] font-bold uppercase tracking-widest text-[#a0a0a0] mb-1">
-              PRÓXIMO HORÁRIO
+          <div className="flex justify-between items-center w-full px-2">
+            <div className="flex flex-col items-center gap-1">
+              <span className="text-[#a0a0a0] text-[0.65rem] font-bold tracking-widest uppercase">STATUS</span>
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                <span className="text-green-500 font-semibold text-sm">Aberto</span>
+              </div>
             </div>
-            <div className="text-[0.8125rem] font-semibold text-white">
-              14:30 hoje
+            
+            <div className="flex flex-col items-center gap-1">
+              <span className="text-[#a0a0a0] text-[0.65rem] font-bold tracking-widest uppercase">PRÓXIMO</span>
+              <span className="text-white font-bold text-sm">14:30</span>
             </div>
-          </div>
 
-          <div className="text-center">
-            <div className="text-[0.625rem] font-bold uppercase tracking-widest text-[#a0a0a0] mb-1">
-              TEMPO MÉDIO
-            </div>
-            <div className="text-[0.8125rem] font-semibold text-white">
-              30 min
+            <div className="flex flex-col items-center gap-1">
+              <span className="text-[#a0a0a0] text-[0.65rem] font-bold tracking-widest uppercase">TEMPO MÉDIO</span>
+              <span className="text-white font-bold text-sm">30 min</span>
             </div>
           </div>
         </div>
@@ -632,6 +623,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
               <MessageCircle className="w-[clamp(0.875rem,1.8vh,1.125rem)] h-[clamp(0.875rem,1.8vh,1.125rem)] fill-current" />
               <span>Agendar pelo WhatsApp</span>
             </button>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 mt-[clamp(0.5rem,1.5vh,1.25rem)] text-neutral-400 text-[clamp(0.6rem,1.2vh,0.75rem)]">
+              <span className="flex items-center gap-1"><span className="text-[#25D366]">✓</span> Sem taxa de cancelamento</span>
+              <span className="flex items-center gap-1"><span className="text-[#25D366]">✓</span> Confirmação instantânea</span>
+            </div>
           </div>
         </div>
 
