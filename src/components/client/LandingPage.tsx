@@ -291,11 +291,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             </button>
 
             <button 
-              onClick={toggleHoursModal}
-              className="flex items-center gap-1.5 text-[0.8rem] text-[#a0a0a0] cursor-pointer hover:text-white transition-colors active:scale-95"
+              onClick={() => onGoToAppointments && onGoToAppointments()}
+              className="flex items-center gap-1.5 text-[0.85rem] text-[#a0a0a0] cursor-pointer hover:text-white transition-colors active:scale-95 underline underline-offset-4 decoration-[#a0a0a0]/30 hover:decoration-white/50"
             >
-              <div className="w-2 h-2 rounded-full bg-green-500"></div>
-              <span>Aberto até 22h</span>
+              <span>Já possui agendamento? Clique aqui.</span>
             </button>
           </div>
         </div>
@@ -309,7 +308,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
               <span className="text-[#a0a0a0] text-[0.65rem] font-bold tracking-widest uppercase">STATUS</span>
               <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                <span className="text-green-500 font-semibold text-sm">Aberto</span>
+                <span className="text-green-500 font-semibold text-sm whitespace-nowrap">Aberto até 22h</span>
               </div>
             </div>
             
