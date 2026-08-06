@@ -16,7 +16,9 @@ import {
   ArrowRight,
   List,
   Menu,
-  X
+  X,
+  User,
+  Check
 } from 'lucide-react';
 import { hapticMedium, hapticLight } from '../../lib/haptics';
 
@@ -93,12 +95,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
   });
 
   const differentials = [
-    { icon: Award, label: 'Profissionais experientes' },
-    { icon: Snowflake, label: 'Ambiente climatizado' },
-    { icon: Coffee, label: 'Café cortesia' },
-    { icon: Wifi, label: 'Wi-Fi gratuito' },
-    { icon: Car, label: 'Estacionamento' },
-    { icon: Clock, label: 'Horário marcado' }
+    { icon: User, secondaryIcon: Scissors, label: 'Profissionais experientes', strokeColor: '#b89060', bgColor: '#f5eedc' },
+    { icon: Snowflake, label: 'Ambiente climatizado', strokeColor: '#80b6c6', bgColor: '#e3f4f8' },
+    { icon: Coffee, label: 'Café cortesia', strokeColor: '#9e795a', bgColor: '#f5efe9' },
+    { icon: Wifi, label: 'Wi-Fi gratuito', strokeColor: '#71a67a', bgColor: '#e6f5ea' },
+    { icon: Car, label: 'Estacionamento próprio', strokeColor: '#9a9bc4', bgColor: '#edeefc' },
+    { icon: Clock, secondaryIcon: Check, secondaryColor: '#4ade80', label: 'Horário marcado', strokeColor: '#c1877f', bgColor: '#faece9' }
   ];
 
   const galleryImages = [
@@ -291,21 +293,38 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             <span className="text-[#C8A96A] text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase block mb-0.5">
               POR QUE A NOBRE
             </span>
-            <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-bold text-neutral-900 tracking-tight leading-tight">
-              Feito para você relaxar
+            <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-extrabold text-neutral-900 tracking-tight leading-tight">
+              Feito para você <span className="text-[#b89060]">relaxar</span>
             </h2>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 grid-rows-3 md:grid-rows-2 gap-[clamp(0.375rem,1vh,1rem)] flex-1 min-h-0 my-auto py-[clamp(0.25rem,0.5vh,0.5rem)] items-stretch">
             {differentials.map((item, idx) => {
               const Icon = item.icon;
+              const SecondaryIcon = item.secondaryIcon;
               return (
                 <div 
                   key={idx}
-                  className="bg-white border border-neutral-200/80 rounded-[clamp(0.625rem,1.4vh,1.125rem)] p-[clamp(0.375rem,1.2vh,1rem)] flex flex-col items-center sm:items-start justify-center gap-[clamp(0.125rem,0.5vh,0.5rem)] text-center sm:text-left shadow-xs hover:border-[#C8A96A]/60 hover:shadow-md transition-all duration-300 group h-full min-h-0"
+                  className="bg-white border border-neutral-200/80 rounded-2xl p-[clamp(0.75rem,1.5vh,1.25rem)] flex flex-col items-center justify-center gap-[clamp(0.5rem,1.5vh,1rem)] text-center shadow-xs hover:shadow-md transition-all duration-300 group h-full min-h-0"
                 >
-                  <Icon className="w-[clamp(1rem,2.4vh,1.75rem)] h-[clamp(1rem,2.4vh,1.75rem)] text-[#C8A96A] stroke-[1.75] group-hover:scale-110 transition-transform shrink-0" />
-                  <span className="text-[clamp(0.625rem,1.25vh,0.925rem)] font-semibold text-neutral-900 leading-tight line-clamp-2">
+                  <div 
+                    className="w-[clamp(3.5rem,8vh,4.5rem)] h-[clamp(3.5rem,8vh,4.5rem)] rounded-full flex items-center justify-center relative shrink-0 transition-transform group-hover:scale-105"
+                    style={{ backgroundColor: item.bgColor }}
+                  >
+                    <Icon 
+                      className="w-[clamp(1.75rem,4vh,2.25rem)] h-[clamp(1.75rem,4vh,2.25rem)] stroke-[1.5]" 
+                      style={{ color: item.strokeColor }} 
+                    />
+                    {SecondaryIcon && (
+                      <div className="absolute bottom-1 right-1 bg-white rounded-full p-[2px] shadow-sm">
+                        <SecondaryIcon 
+                          className="w-[clamp(0.875rem,2vh,1.125rem)] h-[clamp(0.875rem,2vh,1.125rem)] stroke-[2.5]" 
+                          style={{ color: item.secondaryColor || item.strokeColor }} 
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <span className="text-[clamp(0.75rem,1.4vh,0.9rem)] font-bold text-neutral-800 leading-[1.2] px-1 max-w-[80%]">
                     {item.label}
                   </span>
                 </div>
