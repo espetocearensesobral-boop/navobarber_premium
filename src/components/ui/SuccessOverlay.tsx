@@ -23,11 +23,11 @@ export const SuccessOverlay: React.FC<SuccessOverlayProps> = ({
       setShow(true);
       const timer = setTimeout(() => {
         setShow(false);
-        setTimeout(onClose, 300);
+        setTimeout(() => onClose(), 300);
       }, duration);
       return () => clearTimeout(timer);
     }
-  }, [isVisible, duration, onClose]);
+  }, [isVisible, duration]);
 
   if (!isVisible && !show) return null;
 

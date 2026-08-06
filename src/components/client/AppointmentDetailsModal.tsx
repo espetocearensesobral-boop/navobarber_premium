@@ -614,7 +614,10 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
         isVisible={showSuccessOverlay}
         title={successOverlayMessage.title}
         subtitle={successOverlayMessage.subtitle}
-        onClose={() => setShowSuccessOverlay(false)}
+        onClose={() => {
+          setShowSuccessOverlay(false);
+          onClose(); // Close the modal
+        }}
       />
 
       {/* Reschedule Modal */}
