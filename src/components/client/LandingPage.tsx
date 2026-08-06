@@ -307,7 +307,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             <div className="flex flex-col items-center gap-1">
               <span className="text-[#a0a0a0] text-[0.65rem] font-bold tracking-widest uppercase">STATUS</span>
               <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full bg-green-500"></div>
                 <span className="text-green-500 font-semibold text-sm whitespace-nowrap">Aberto até 22h</span>
               </div>
             </div>
