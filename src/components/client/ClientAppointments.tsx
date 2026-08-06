@@ -200,8 +200,22 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
 
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
-  const [guestPhoneInput, setGuestPhoneInput] = useState('');
-  const [searchedPhone, setSearchedPhone] = useState('');
+  const [guestPhoneInput, setGuestPhoneInput] = useState(() => {
+    try {
+      const saved = localStorage.getItem('barberx_guest_phone');
+      return saved || '';
+    } catch {
+      return '';
+    }
+  });
+  const [searchedPhone, setSearchedPhone] = useState(() => {
+    try {
+      const saved = localStorage.getItem('barberx_guest_phone');
+      return saved || '';
+    } catch {
+      return '';
+    }
+  });
   const [isSearchingGuest, setIsSearchingGuest] = useState(false);
   const [guestPhoneError, setGuestPhoneError] = useState('');
 
@@ -218,8 +232,9 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
     if (guestPhoneError) setGuestPhoneError('');
   };
 
-  const handleGuestSearch = async () => {
-    const numbers = guestPhoneInput.replace(/\D/g, '');
+  const handleGuestSearch = async (overridePhone?: string) => {
+    const phoneToUse = overridePhone || guestPhoneInput;
+    const numbers = phoneToUse.replace(/\D/g, '');
     if (numbers.length < 8) {
       setGuestPhoneError('Telefone inválido.\nDigite o número com DDD (ex: 11 99999-9999)');
       return;
@@ -231,7 +246,7 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
     try {
       const [allAppointments] = await Promise.all([
         fetchAppointmentsFromSupabase(numbers),
-        new Promise(res => setTimeout(res, 500))
+        new Promise(res => setTimeout(res, 400))
       ]);
 
       const userAppointments = allAppointments.filter(apt => {
@@ -243,7 +258,10 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
           (a, b) => new Date(b.date || b.created_at || '').getTime() - new Date(a.date || a.created_at || '').getTime()
         );
         setAppointments(sorted);
-        setSearchedPhone(guestPhoneInput);
+        setSearchedPhone(phoneToUse);
+        try {
+          localStorage.setItem('barberx_guest_phone', phoneToUse);
+        } catch (e) {}
       } else {
         setGuestPhoneError('Nenhum agendamento encontrado para este número de telefone.');
         setAppointments([]);
@@ -261,6 +279,9 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
     setSearchedPhone('');
     setGuestPhoneInput('');
     setGuestPhoneError('');
+    try {
+      localStorage.removeItem('barberx_guest_phone');
+    } catch (e) {}
   };
 
   const getStatusBadge = (status: string) => {

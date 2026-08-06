@@ -1,5 +1,5 @@
-import React from 'react';
-import { X, CreditCard, Store } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, CreditCard, Store, Loader2 } from 'lucide-react';
 
 interface PaymentChoiceModalProps {
   isOpen: boolean;
@@ -14,7 +14,25 @@ export const PaymentChoiceModal: React.FC<PaymentChoiceModalProps> = ({
   onPayNow,
   onPayLater
 }) => {
+  const [loadingChoice, setLoadingChoice] = useState<'now' | 'later' | null>(null);
+
   if (!isOpen) return null;
+
+  const handlePayNowClick = () => {
+    setLoadingChoice('now');
+    setTimeout(() => {
+      onPayNow();
+      setLoadingChoice(null);
+    }, 150);
+  };
+
+  const handlePayLaterClick = () => {
+    setLoadingChoice('later');
+    setTimeout(() => {
+      onPayLater();
+      setLoadingChoice(null);
+    }, 150);
+  };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-surface-base/60 backdrop-blur-sm animate-in fade-in duration-200">
@@ -25,7 +43,10 @@ export const PaymentChoiceModal: React.FC<PaymentChoiceModalProps> = ({
           <h2 className="text-lg font-serif text-content-base font-semibold">Forma de Pagamento</h2>
           <button 
             onClick={onClose}
-            className="p-1.5 rounded-full bg-border-subtle backdrop-blur-[10px] text-content-muted hover:text-content-base transition-colors"
+            disabled={loadingChoice !== null}
+            className="p-1.5 rounded-full bg-border-subtle backdrop-blur-[10px] text-content-muted hover:text-content-base transition-colors disabled:opacity-50"
+            title="Fechar"
+            aria-label="Fechar"
           >
             <X className="w-5 h-5" />
           </button>
@@ -38,15 +59,22 @@ export const PaymentChoiceModal: React.FC<PaymentChoiceModalProps> = ({
 
           <div className="space-y-3 mt-4">
             <button
-              onClick={onPayNow}
-              className="w-full flex items-center justify-between p-4 rounded-xl border border-content-base bg-border-subtle backdrop-blur-[10px] hover:bg-surface-card transition-all group"
+              onClick={handlePayNowClick}
+              disabled={loadingChoice !== null}
+              className="w-full flex items-center justify-between p-4 rounded-xl border border-content-base bg-border-subtle backdrop-blur-[10px] hover:bg-surface-card transition-all group active:scale-98 disabled:opacity-60"
             >
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-full bg-gold-base text-surface-base flex items-center justify-center text-surface-base">
-                  <CreditCard className="w-5 h-5" />
+                <div className="w-10 h-10 rounded-full bg-gold-base text-surface-base flex items-center justify-center">
+                  {loadingChoice === 'now' ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <CreditCard className="w-5 h-5" />
+                  )}
                 </div>
                 <div className="text-left">
-                  <span className="block text-sm font-bold text-content-base">Pagar Agora</span>
+                  <span className="block text-sm font-bold text-content-base">
+                    {loadingChoice === 'now' ? 'Processando...' : 'Pagar Agora'}
+                  </span>
                   <span className="block text-[10px] text-content-base">Cartão, PIX, Assinatura</span>
                 </div>
               </div>
@@ -54,15 +82,22 @@ export const PaymentChoiceModal: React.FC<PaymentChoiceModalProps> = ({
             </button>
 
             <button
-              onClick={onPayLater}
-              className="w-full flex items-center justify-between p-4 rounded-xl border border-border-subtle bg-border-subtle backdrop-blur-[10px] hover:bg-surface-card transition-all group"
+              onClick={handlePayLaterClick}
+              disabled={loadingChoice !== null}
+              className="w-full flex items-center justify-between p-4 rounded-xl border border-border-subtle bg-border-subtle backdrop-blur-[10px] hover:bg-surface-card transition-all group active:scale-98 disabled:opacity-60"
             >
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-full bg-surface-card flex items-center justify-center text-content-base">
-                  <Store className="w-5 h-5" />
+                <div className="w-10 h-10 rounded-full bg-surface-card flex items-center justify-center text-content-base border border-border-subtle">
+                  {loadingChoice === 'later' ? (
+                    <Loader2 className="w-5 h-5 animate-spin text-gold-base" />
+                  ) : (
+                    <Store className="w-5 h-5" />
+                  )}
                 </div>
                 <div className="text-left">
-                  <span className="block text-sm font-bold text-content-base">Pagar na Barbearia</span>
+                  <span className="block text-sm font-bold text-content-base">
+                    {loadingChoice === 'later' ? 'Confirmando no local...' : 'Pagar na Barbearia'}
+                  </span>
                   <span className="block text-[10px] text-content-muted">Pula direto para confirmação</span>
                 </div>
               </div>

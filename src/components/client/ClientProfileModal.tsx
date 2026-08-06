@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
-import { X, Moon, Sun, ShieldCheck, Mail, Phone, Award, Edit2, Camera, Save, LogOut, Download, AlertCircle, Loader2 } from 'lucide-react';
+import { X, Moon, Sun, ShieldCheck, Mail, Phone, Award, Edit2, Camera, Save, LogOut, Download, AlertCircle, Loader2, AlertTriangle } from 'lucide-react';
 import { UserProfile } from '../../types';
 import { authFetch } from '../../lib/api';
+import { ConfirmDialog } from '../ui/ConfirmDialog';
 
 interface ClientProfileModalProps {
   isOpen: boolean;
@@ -22,6 +23,9 @@ export const ClientProfileModal: React.FC<ClientProfileModalProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [showDeleteAccountConfirm, setShowDeleteAccountConfirm] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   
   const [formData, setFormData] = useState({
     name: userProfile?.name || '',
@@ -203,10 +207,7 @@ export const ClientProfileModal: React.FC<ClientProfileModalProps> = ({
                     <span className="text-[10px] font-bold text-content-muted group-hover:text-content-base transition-colors">Editar</span>
                   </button>
                   <button
-                    onClick={() => {
-                      if (onLogout) onLogout();
-                      onClose();
-                    }}
+                    onClick={() => setShowLogoutConfirm(true)}
                     className="flex flex-col items-center space-y-2 group"
                   >
                     <div className="w-12 h-12 rounded-full bg-red-500/10 text-red-500 flex items-center justify-center border border-red-500/20 shadow-lg group-hover:bg-red-500/20 transition-all">
@@ -258,20 +259,7 @@ export const ClientProfileModal: React.FC<ClientProfileModalProps> = ({
                     <span>Exportar meus dados</span>
                   </button>
                   <button
-                    onClick={() => {
-                      if (confirm('Tem certeza que deseja excluir sua conta permanentemente? Esta ação apaga seus dados imediatamente e não pode ser desfeita.')) {
-                      authFetch(`/api/profiles/${userProfile.id}`, { method: 'DELETE' })
-                        .then(() => {
-                          alert('Sua conta e dados foram excluídos com sucesso.');
-                          if (onLogout) onLogout();
-                          onClose();
-                        })
-                        .catch(err => {
-                          console.warn(err);
-                          alert('Erro ao excluir conta.');
-                        });
-                    }
-                    }}
+                    onClick={() => setShowDeleteAccountConfirm(true)}
                     className="w-full py-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 font-bold text-xs hover:bg-red-500/20 transition-colors flex items-center justify-center space-x-2 focus:outline-none focus:ring-2 focus:ring-red-500/50"
                   >
                     <ShieldCheck className="w-4 h-4" />
@@ -373,6 +361,49 @@ export const ClientProfileModal: React.FC<ClientProfileModalProps> = ({
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={showLogoutConfirm}
+        onClose={() => setShowLogoutConfirm(false)}
+        onConfirm={() => {
+          setShowLogoutConfirm(false);
+          if (onLogout) onLogout();
+          onClose();
+        }}
+        variant="danger"
+        icon={<AlertTriangle className="w-6 h-6" />}
+        title="Deseja sair da conta?"
+        description="Ao sair da conta, você precisará fazer login novamente para acessar seus benefícios do clube VIP e histórico sincronizado."
+        confirmText="Sim, Sair"
+        cancelText="Permanecer Conectado"
+      />
+
+      <ConfirmDialog
+        isOpen={showDeleteAccountConfirm}
+        onClose={() => setShowDeleteAccountConfirm(false)}
+        onConfirm={async () => {
+          setIsDeletingAccount(true);
+          try {
+            await authFetch(`/api/profiles/${userProfile.id}`, { method: 'DELETE' });
+            alert('Sua conta e dados foram excluídos com sucesso.');
+            setShowDeleteAccountConfirm(false);
+            if (onLogout) onLogout();
+            onClose();
+          } catch (err) {
+            console.warn(err);
+            alert('Erro ao excluir conta.');
+          } finally {
+            setIsDeletingAccount(false);
+          }
+        }}
+        isLoading={isDeletingAccount}
+        variant="danger"
+        icon={<AlertTriangle className="w-6 h-6" />}
+        title="Excluir conta permanentemente?"
+        description="Esta ação apaga todos os seus dados, pontos de fidelidade e agendamentos salvos. Ela não pode ser desfeita."
+        confirmText="Excluir Conta"
+        cancelText="Cancelar"
+      />
     </div>
   );
 };
