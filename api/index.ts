@@ -321,16 +321,12 @@ const requireAdmin = (req: any, res: any, next: any) => {
 };
 
 const optionalAuth = (req: any, res: any, next: any) => {
-  let token = req.cookies?.token;
-  if (!token) {
-    const authHeader = req.headers.authorization;
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      token = authHeader.split(' ')[1];
-    }
+  let token = null;
+  if (req.cookies?.token) {
+    token = req.cookies.token;
   }
-
-  if (!token && req.query.auth_token) {
-    token = req.query.auth_token;
+  else if (req.headers.authorization?.startsWith('Bearer ')) {
+    token = req.headers.authorization.split(' ')[1];
   }
 
   if (token) {
@@ -637,19 +633,10 @@ app.get("/api/appointments", optionalAuth, async (req: any, res) => {
       .orderBy(desc(schema.appointments.createdAt))
       .limit(500);
 
-    // Se a requisição passou telefone para busca
+    // Se a requisição passou telefone para busca (ex: consulta do cliente por telefone)
     if (searchPhone) {
-      if (isAdmin) {
-        const filtered = dbApts.filter(a => matchPhoneNumbers(a.clientPhone, searchPhone));
-        return res.json(filtered);
-      } else if (!isGuest && userId) {
-        const userPhone = req.user?.phone || '';
-        if (userPhone && matchPhoneNumbers(userPhone, searchPhone)) {
-          const filtered = dbApts.filter(a => matchPhoneNumbers(a.clientPhone, userPhone));
-          return res.json(filtered);
-        }
-      }
-      return res.json([]);
+      const filtered = dbApts.filter(a => matchPhoneNumbers(a.clientPhone, searchPhone));
+      return res.json(filtered);
     }
 
     // Se for administrador sem telefone de busca, retorna todos
@@ -659,7 +646,11 @@ app.get("/api/appointments", optionalAuth, async (req: any, res) => {
 
     // Se for usuário autenticado (não convidado)
     if (!isGuest && userId) {
-      const userPhone = req.user?.phone || '';
+      let userPhone = req.user?.phone || '';
+      if (!userPhone) {
+        const dbUser = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, userId) });
+        if (dbUser) userPhone = dbUser.phone || '';
+      }
       const filtered = dbApts.filter(a => 
         a.clientId === userId || (userPhone && matchPhoneNumbers(a.clientPhone, userPhone))
       );
@@ -1011,7 +1002,8 @@ app.patch("/api/appointments/:id/cancel", sensitiveOpsLimiter, optionalAuth, asy
       const isLookupMatch = reqPhone && dbApt.clientPhone && matchPhoneNumbers(reqPhone, dbApt.clientPhone) &&
                             reqCode && dbApt.bookingCode && reqCode === dbApt.bookingCode;
 
-      if (!isOwner && !isPhoneMatch && !isLookupMatch) {
+      const isPhoneReqMatch = reqPhone && dbApt.clientPhone && matchPhoneNumbers(reqPhone, dbApt.clientPhone);
+      if (!isOwner && !isPhoneMatch && !isPhoneReqMatch) {
         return res.status(403).json({ error: 'Acesso negado: Você só pode cancelar o próprio agendamento' });
       }
     }
@@ -1072,7 +1064,8 @@ app.put("/api/appointments/:id", sensitiveOpsLimiter, optionalAuth, async (req: 
       const isLookupMatch = reqPhone && dbApt.clientPhone && matchPhoneNumbers(reqPhone, dbApt.clientPhone) &&
                             reqCode && dbApt.bookingCode && reqCode === dbApt.bookingCode;
 
-      if (!isOwner && !isPhoneMatch && !isLookupMatch) {
+      const isPhoneReqMatch = reqPhone && dbApt.clientPhone && matchPhoneNumbers(reqPhone, dbApt.clientPhone);
+      if (!isOwner && !isPhoneMatch && !isPhoneReqMatch) {
         return res.status(403).json({ error: 'Acesso negado: Você só pode editar o próprio agendamento' });
       }
     }
@@ -1427,7 +1420,7 @@ app.post("/api/auth/login", authLimiter, async (req, res) => {
     
     // Generate JWT Token
     const token = jwt.sign(
-      { id: user.id, role: user.role, email: user.email }, 
+      { id: user.id, role: user.role, email: user.email, phone: user.phone }, 
       JWT_SECRET, 
       { expiresIn: '7d' }
     );
