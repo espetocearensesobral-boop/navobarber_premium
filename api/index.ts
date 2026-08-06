@@ -176,6 +176,34 @@ if (!process.env.DATABASE_URL && !process.env.SQL_HOST) {
   console.warn("NOTICE: DATABASE_URL or SQL_HOST not defined. Ensure Supabase credentials are configured.");
 }
 
+const validateOrigin = (req: any, res: any, next: any) => {
+  const allowedOrigins = [
+    'https://navopremium.vercel.app',
+    'https://www.navopremium.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:5173',
+  ];
+  
+  const origin = req.headers.origin || req.headers.referer;
+  
+  // Para operações sensíveis (POST/PUT/PATCH/DELETE), valida origem
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+    if (!origin || !allowedOrigins.some(o => origin.includes(o))) {
+      console.warn(`[SECURITY] Blocked request from origin: ${origin}`);
+      return res.status(403).json({ error: 'Origem não autorizada' });
+    }
+  }
+  
+  next();
+};
+app.use(validateOrigin);
+
+const sensitiveOpsLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: { error: 'Muitas operações sensíveis. Aguarde alguns minutos.' }
+});
+
 app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false, crossOriginResourcePolicy: false, frameguard: false }));
 app.use("/api/", apiLimiter);
 app.use("/api", async (req, res, next) => {
@@ -489,7 +517,7 @@ app.get("/api/appointments/lookup/step2", async (req: any, res) => {
 });
 
 // PATCH /api/appointments/lookup/cancel — Cancela agendamento via telefone + código
-app.patch("/api/appointments/lookup/cancel", async (req: any, res) => {
+app.patch("/api/appointments/lookup/cancel", sensitiveOpsLimiter, async (req: any, res) => {
   try {
     const { phone, code } = req.body;
 
@@ -915,7 +943,7 @@ app.post("/api/appointments/:id/review", requireAuth, async (req: any, res) => {
   }
 });
 
-app.patch("/api/appointments/:id/cancel", optionalAuth, async (req: any, res) => {
+app.patch("/api/appointments/:id/cancel", sensitiveOpsLimiter, optionalAuth, async (req: any, res) => {
   try {
     const { id } = req.params;
     const { reason } = req.body;
@@ -971,7 +999,7 @@ app.patch("/api/appointments/:id/cancel", optionalAuth, async (req: any, res) =>
   }
 });
 
-app.put("/api/appointments/:id", optionalAuth, async (req: any, res) => {
+app.put("/api/appointments/:id", sensitiveOpsLimiter, optionalAuth, async (req: any, res) => {
   try {
     const { id } = req.params;
     const data = req.body;
