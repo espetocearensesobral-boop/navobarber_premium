@@ -75,6 +75,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
   const { showToast } = useToast();
   const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
   const [successOverlayMessage, setSuccessOverlayMessage] = useState({ title: '', subtitle: '' });
+  const [successOverlayAction, setSuccessOverlayAction] = useState<'close_modal' | 'stay_open'>('close_modal');
 
   useEffect(() => {
     let isMounted = true;
@@ -136,6 +137,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
         title: 'Agendamento atualizado!',
         subtitle: `Novo horário: ${formatDateDisplay(rescheduleDate)} às ${rescheduleTimeSlot}`
       });
+      setSuccessOverlayAction('stay_open');
       setShowSuccessOverlay(true);
 
       setTimeout(() => {
@@ -267,6 +269,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
           title: 'Cancelado com sucesso!',
           subtitle: 'O horário foi liberado para outros clientes'
         });
+        setSuccessOverlayAction('close_modal');
         setShowSuccessOverlay(true);
 
         setTimeout(() => {
@@ -616,7 +619,9 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
         subtitle={successOverlayMessage.subtitle}
         onClose={() => {
           setShowSuccessOverlay(false);
-          onClose(); // Close the modal
+          if (successOverlayAction === 'close_modal') {
+            onClose(); // Close the modal
+          }
         }}
       />
 
