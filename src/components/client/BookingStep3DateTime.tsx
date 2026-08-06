@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Professional, ServiceItem } from '../../types';
 import { Calendar as CalendarIcon, Clock, ArrowLeft, ArrowRight, Loader2, ChevronLeft, ChevronRight} from 'lucide-react';
+import { authFetch } from '../../lib/api';
 
 interface BookingStep3Props {
   selectedServices: ServiceItem[];
@@ -56,7 +57,7 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
       if (!selectedDate || !selectedBarber) return;
       setIsLoadingSlots(true);
       try {
-        const response = await fetch(`/api/availability?professionalId=${selectedBarber.id}&date=${selectedDate}`);
+        const response = await authFetch(`/api/availability?professionalId=${selectedBarber.id}&date=${selectedDate}`);
         if (response.ok) {
           const appointments = await response.json();
           const bookedTimes = Array.isArray(appointments) 

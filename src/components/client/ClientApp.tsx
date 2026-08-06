@@ -22,7 +22,7 @@ import { ClientMoreDrawer } from './ClientMoreDrawer';
 import { PWAInstallModal } from '../pwa/PWAInstallModal';
 import { Calendar, Crown, Award, Clock, Home, Menu, Smartphone, User, Sparkles, Scissors, Loader2, Sun, Moon, CheckCircle2, Info, AlertTriangle, Sliders, Download } from 'lucide-react';
 
-import { authFetch } from '../../lib/api';
+import { authFetch, saveToken } from '../../lib/api';
 
 export const ClientApp: React.FC = () => {
   const [isAppInitializing, setIsAppInitializing] = useState(true);
@@ -643,6 +643,7 @@ export const ClientApp: React.FC = () => {
           setIsLoginModalOpen(false);
           setIsGuest(false);
           setCurrentUser(user);
+          if (user.token) saveToken(user.token);
           localStorage.setItem('barberx_user', JSON.stringify(user));
           if (user.role === 'admin') {
             window.location.href = '/admin';

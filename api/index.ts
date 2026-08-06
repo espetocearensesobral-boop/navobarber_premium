@@ -244,6 +244,49 @@ app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ limit: "2mb", extended: true }));
 app.use(cookieParser());
 
+const setAuthCookie = (res: any, token: string) => {
+  const cookieOptions: any = {
+    httpOnly: true,
+    path: '/',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    sameSite: 'none',
+    secure: true,
+  };
+  
+  res.cookie('token', token, cookieOptions);
+  res.setHeader('X-Auth-Token', token);
+};
+
+// =====================================
+// CORS CONFIGURATION (ANTES DE TUDO)
+// =====================================
+app.use((req, res, next) => {
+  const allowedOrigins = [
+    'https://navopremium.vercel.app',
+    'https://www.navopremium.vercel.app',
+    'https://navobarber-premium.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'http://localhost:4173',
+  ];
+  
+  const origin = req.headers.origin;
+  
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Auth-Token');
+    res.setHeader('Access-Control-Expose-Headers', 'X-Auth-Token');
+  }
+  
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end();
+  }
+  
+  next();
+});
+
 // Auth Middleware
 const requireAuth = (req: any, res: any, next: any) => {
   let token = req.cookies?.token;
@@ -1390,15 +1433,12 @@ app.post("/api/auth/login", authLimiter, async (req, res) => {
       { expiresIn: '7d' }
     );
     
-    res.cookie('token', token, { 
-      httpOnly: true, 
-      secure: true, 
-      sameSite: 'lax', 
-      path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-    });
+    setAuthCookie(res, token);
 
-    res.json(safeUser);
+    res.json({
+      ...safeUser,
+      token: token,
+    });
   } catch (e: any) {
     console.error('Error in POST /api/auth/login:', e);
     res.status(500).json({ error: 'Erro ao fazer login. Tente novamente.' });
@@ -1506,15 +1546,12 @@ app.post("/api/profiles", authLimiter, async (req, res) => {
       { expiresIn: '7d' }
     );
     
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-    });
+    setAuthCookie(res, token);
 
-    res.json(safeProfile);
+    res.json({
+      ...safeProfile,
+      token: token,
+    });
   } catch (e: any) {
     console.error('Error in POST /api/profiles:', e);
     return handleError(res, e, req.path);

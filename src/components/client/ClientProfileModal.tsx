@@ -260,7 +260,7 @@ export const ClientProfileModal: React.FC<ClientProfileModalProps> = ({
                   <button
                     onClick={() => {
                       if (confirm('Tem certeza que deseja excluir sua conta permanentemente? Esta ação apaga seus dados imediatamente e não pode ser desfeita.')) {
-                      fetch(`/api/profiles/${userProfile.id}`, { method: 'DELETE' })
+                      authFetch(`/api/profiles/${userProfile.id}`, { method: 'DELETE' })
                         .then(() => {
                           alert('Sua conta e dados foram excluídos com sucesso.');
                           if (onLogout) onLogout();

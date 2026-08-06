@@ -625,7 +625,8 @@ const ApiKeysSettings = ({ showToast }: { showToast: (m: string) => void }) => {
   const fetchKeysStatus = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/validate-keys');
+      const { authFetch } = await import('../../lib/api');
+      const res = await authFetch('/api/admin/validate-keys');
       if (res.ok) {
         const json = await res.json();
         setData(json);
