@@ -954,9 +954,15 @@ app.patch("/api/appointments/:id/cancel", sensitiveOpsLimiter, optionalAuth, asy
     if (!dbApt) return res.status(404).json({ error: 'Agendamento não encontrado' });
 
     if (!isAdmin) {
+      let userPhone = req.user?.phone;
+      if (!userPhone && req.user?.id && req.user.id !== 'usr_guest') {
+        const dbUser = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, req.user.id) });
+        if (dbUser) userPhone = dbUser.phone;
+      }
+
       const isOwner = dbApt.clientId === req.user?.id;
-      const isPhoneMatch = req.user?.phone && dbApt.clientPhone && 
-        matchPhoneNumbers(req.user.phone, dbApt.clientPhone);
+      const isPhoneMatch = userPhone && dbApt.clientPhone && 
+        matchPhoneNumbers(userPhone, dbApt.clientPhone);
       
       const reqPhone = req.body.clientPhone || req.body.client_phone;
       const reqCode = req.body.bookingCode || req.body.booking_code;
@@ -1009,9 +1015,15 @@ app.put("/api/appointments/:id", sensitiveOpsLimiter, optionalAuth, async (req: 
     if (!dbApt) return res.status(404).json({ error: 'Agendamento não encontrado' });
 
     if (!isAdmin) {
+      let userPhone = req.user?.phone;
+      if (!userPhone && req.user?.id && req.user.id !== 'usr_guest') {
+        const dbUser = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, req.user.id) });
+        if (dbUser) userPhone = dbUser.phone;
+      }
+
       const isOwner = dbApt.clientId === req.user?.id;
-      const isPhoneMatch = req.user?.phone && dbApt.clientPhone && 
-        matchPhoneNumbers(req.user.phone, dbApt.clientPhone);
+      const isPhoneMatch = userPhone && dbApt.clientPhone && 
+        matchPhoneNumbers(userPhone, dbApt.clientPhone);
       
       const reqPhone = req.body.clientPhone || req.body.client_phone;
       const reqCode = req.body.bookingCode || req.body.booking_code;

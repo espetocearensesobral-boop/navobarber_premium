@@ -3,6 +3,7 @@ import { ServiceItem } from '../../types';
 import { DEFAULT_CATEGORIES, getCategoryName } from '../../data/categories';
 import { fetchServicesFromSupabase, getCachedServices } from '../../services/supabaseDataService';
 import { ServiceImageCarousel } from './ServiceImageCarousel';
+import { ImageWithFallback } from '../ui/ImageWithFallback';
 import { hapticLight, hapticMedium, hapticSuccess } from '../../lib/haptics';
 import { optimizeImageUrl } from '../../lib/imageUtils';
 import {
@@ -396,7 +397,7 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
                           {/* Image Container with Strong Black Bottom Gradient Overlay */}
                           <div className="h-52 sm:h-64 w-full relative bg-surface-base overflow-hidden flex items-center justify-center">
                             {thumbUrl ? (
-                              <img
+                              <ImageWithFallback
                                 src={thumbUrl}
                                 alt={service.title}
                                 decoding="async"
@@ -464,7 +465,7 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
                           {/* Card Image Container with Black Gradient */}
                           <div className="h-56 sm:h-64 w-full relative bg-surface-base overflow-hidden flex items-center justify-center">
                             {thumbUrl ? (
-                              <img
+                              <ImageWithFallback
                                 src={thumbUrl}
                                 alt={service.title}
                                 decoding="async"
