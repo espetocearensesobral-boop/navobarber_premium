@@ -177,18 +177,25 @@ if (!process.env.DATABASE_URL && !process.env.SQL_HOST) {
 }
 
 const validateOrigin = (req: any, res: any, next: any) => {
-  const allowedOrigins = [
-    'https://navopremium.vercel.app',
-    'https://www.navopremium.vercel.app',
-    'http://localhost:3000',
-    'http://localhost:5173',
-  ];
-  
-  const origin = req.headers.origin || req.headers.referer;
-  
+  const origin = req.headers.origin || req.headers.referer || '';
+  const host = req.headers.host || '';
+
   // Para operações sensíveis (POST/PUT/PATCH/DELETE), valida origem
   if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
-    if (!origin || !allowedOrigins.some(o => origin.includes(o))) {
+    // Se não houver origin/referer, é chamada interna do mesmo host/backend ou Postman/Mobile
+    if (!origin) {
+      return next();
+    }
+
+    const isAllowedDomain = 
+      origin.includes('navopremium.vercel.app') ||
+      origin.includes('.vercel.app') ||
+      origin.includes('.run.app') ||
+      origin.includes('localhost') ||
+      origin.includes('127.0.0.1') ||
+      (host && origin.includes(host));
+
+    if (!isAllowedDomain) {
       console.warn(`[SECURITY] Blocked request from origin: ${origin}`);
       return res.status(403).json({ error: 'Origem não autorizada' });
     }
