@@ -200,7 +200,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
     try {
       const imgData = await toPng(receiptRef.current, {
         pixelRatio: 3,
-        backgroundColor: '#1A1A1A',
+        backgroundColor: '#faf8f4',
         cacheBust: true,
       });
 
@@ -349,255 +349,294 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
   return (
     <>
       {/* Main Voucher/Receipt Modal */}
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-surface-base/70 backdrop-blur-md animate-in fade-in duration-200">
-        <div className="w-full sm:w-[440px] bg-surface-card rounded-3xl border border-border-subtle shadow-2xl animate-in zoom-in-95 duration-300 overflow-hidden flex flex-col max-h-[92vh]">
-          {/* Top Header */}
-          <div className="p-4 border-b border-border-subtle flex items-center justify-between sticky top-0 bg-surface-base/95 backdrop-blur-md z-10">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-lg bg-gold-base text-surface-base flex items-center justify-center text-surface-base shadow-md">
-                <Scissors className="w-4 h-4 stroke-[2.5]" />
-              </div>
-              <h2 className="text-base font-serif text-content-base font-semibold">Comprovante de Agendamento</h2>
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-md animate-in fade-in duration-200 overflow-y-auto">
+        <div className="w-full max-w-[380px] my-auto flex flex-col items-center animate-in zoom-in-95 duration-200">
+          
+          {/* VOUCHER TICKET CARD */}
+          <div
+            ref={receiptRef}
+            className="w-full bg-[#faf8f4] text-[#1a1a1a] rounded-[24px] overflow-hidden shadow-2xl border border-[#e8e0d4] relative select-none"
+          >
+            {/* Watermark Background */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden">
+              <span className="font-serif text-[26px] font-bold tracking-[0.15em] text-[#c9a84c] opacity-[0.05] -rotate-[15deg] select-none whitespace-nowrap">
+                NAVO PREMIUM
+              </span>
             </div>
-            <button
-              onClick={onClose}
-              className="p-1.5 rounded-full bg-border-subtle text-content-muted hover:text-content-base transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
 
-          <div className="overflow-y-auto overflow-x-hidden p-4 space-y-4">
-            {/* Receipt Content Card (Exportable to PDF) */}
-            <div
-              ref={receiptRef}
-              className="bg-surface-base/90 p-5 rounded-2xl border border-border-subtle space-y-5 relative overflow-hidden shadow-inner"
-            >
-              {/* Header / Logo */}
-              <div className="flex flex-col items-center space-y-1.5 border-b border-border-subtle pb-4">
-                <div className="w-11 h-11 rounded-xl bg-gold-base text-surface-base flex items-center justify-center text-surface-base shadow-lg">
+            <div className="relative z-10">
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 py-4 border-b border-[#ede8e0]">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-[#c9a84c] flex items-center justify-center text-white shadow-sm">
+                    <Scissors className="w-4 h-4 stroke-[2.5]" />
+                  </div>
+                  <h2 className="text-[15px] font-semibold text-[#2d2a26]">Comprovante</h2>
+                </div>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="w-7 h-7 rounded-full bg-[#f0ebe3] hover:bg-[#e5ddd2] flex items-center justify-center text-[#9a9188] hover:text-[#2d2a26] transition-colors cursor-pointer"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {/* Brand Strip */}
+              <div className="text-center px-5 pt-4 pb-3">
+                <div className="w-10 h-10 rounded-xl bg-[#c9a84c] flex items-center justify-center text-white mx-auto mb-2 shadow-[0_3px_12px_rgba(201,168,76,0.2)]">
                   <Scissors className="w-5 h-5 stroke-[2.5]" />
                 </div>
-                <h3 className="text-lg font-serif text-content-base font-semibold uppercase tracking-widest">BARBERX</h3>
-                <p className="text-[10px] text-content-muted font-mono uppercase tracking-wider text-center">
-                  VOUCHER #{currentApt.id.replace('apt_', '').substring(0, 8)}
-                </p>
+                <h1 className="text-xl font-bold tracking-[0.1em] text-[#2d2a26] mb-0.5 uppercase font-serif">NAVO PREMIUM</h1>
+                <div className="text-[10px] text-[#b0a898] tracking-[0.08em] font-mono uppercase">
+                  VOUCHER #{currentApt.id.replace('apt_', '').substring(0, 8).toUpperCase()}
+                </div>
               </div>
 
-              {/* Status Badge */}
-              <div className="flex justify-center">
-                <span
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-black border shadow-sm ${getStatusColor(
-                    currentApt.status
-                  )}`}
-                >
-                  {getStatusText(currentApt.status)}
-                </span>
-              </div>
-
-              {/* Details List */}
-              <div className="space-y-3.5 text-xs">
-                {/* Profissional */}
-                <div className="flex items-center justify-between p-2.5 rounded-xl bg-border-subtle border border-border-subtle">
-                  <div className="flex items-center space-x-2.5">
-                    <User className="w-4 h-4 text-gold-base" />
-                    <span className="text-content-muted font-medium">Profissional:</span>
+              {/* Status Bar */}
+              <div className="flex justify-center px-5 pb-3.5">
+                {currentApt.status === 'in_queue' ? (
+                  <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold bg-[#f59e0b]/10 text-[#d97706] border border-[#f59e0b]/20">
+                    <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
+                    Em fila de espera
                   </div>
-                  <span className="font-extrabold text-content-base text-sm">{currentApt.professional_name}</span>
-                </div>
-
-                {/* Data e Hora */}
-                <div className="flex items-center justify-between p-2.5 rounded-xl bg-border-subtle border border-border-subtle">
-                  <div className="flex items-center space-x-2.5">
-                    <Calendar className="w-4 h-4 text-gold-base" />
-                    <span className="text-content-muted font-medium">Data e Hora:</span>
+                ) : currentApt.status === 'in_service' ? (
+                  <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold bg-[#22c55e]/10 text-[#16a34a] border border-[#22c55e]/20">
+                    <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
+                    Em atendimento
                   </div>
-                  <div className="flex items-center space-x-1.5 font-bold text-content-base text-xs sm:text-sm">
-                    <span className="capitalize">{formatDateDisplay(currentApt.date)}</span>
-                    <span className="text-content-muted">•</span>
-                    <Clock className="w-3.5 h-3.5 text-gold-base" />
-                    <span className="text-gold-base font-black">{currentApt.time_slot}</span>
+                ) : isCancelled ? (
+                  <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold bg-[#ef4444]/10 text-[#dc2626] border border-[#ef4444]/20">
+                    <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                    Agendamento Cancelado
                   </div>
-                </div>
-
-                {/* Cliente */}
-                {currentApt.client_name && (
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-border-subtle border border-border-subtle">
-                    <div className="flex items-center space-x-2.5">
-                      <Phone className="w-4 h-4 text-content-base" />
-                      <span className="text-content-muted font-medium">Cliente:</span>
-                    </div>
-                    <div className="text-right">
-                      <span className="block font-bold text-content-base text-xs">{currentApt.client_name}</span>
-                      {currentApt.client_phone && (
-                        <span className="block text-[10px] text-content-muted">{currentApt.client_phone}</span>
-                      )}
-                    </div>
+                ) : currentApt.status === 'completed' ? (
+                  <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold bg-[#22c55e]/10 text-[#16a34a] border border-[#22c55e]/20">
+                    <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                    Concluído
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold bg-[#22c55e]/10 text-[#16a34a] border border-[#22c55e]/20">
+                    <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                    Confirmado
                   </div>
                 )}
+              </div>
 
-                {/* Localização */}
-                <div className="flex items-start space-x-2.5 p-2.5 rounded-xl bg-border-subtle border border-border-subtle">
-                  <MapPin className="w-4 h-4 text-gold-base shrink-0 mt-0.5" />
-                  <div>
-                    <span className="block text-content-muted font-medium text-[11px]">Localização</span>
-                    <span className="block font-bold text-content-base">Navo Premium</span>
-                    <span className="block text-[10px] text-content-muted">Rua Augusta, 1420 - Jardins</span>
+              {/* Perforation Line */}
+              <div className="relative my-0.5 mx-4 h-4 flex items-center justify-center">
+                <div className="w-full border-t-[1.5px] border-dashed border-[#ddd5c8]" />
+                <div className="absolute -left-[26px] w-[20px] h-[20px] bg-[#1a1a1a] rounded-full" />
+                <div className="absolute -right-[26px] w-[20px] h-[20px] bg-[#1a1a1a] rounded-full" />
+              </div>
+
+              {/* Details Grid */}
+              <div className="px-5 py-3.5 grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[9px] uppercase tracking-[0.12em] text-[#b0a898] font-semibold">Profissional</span>
+                  <span className="text-[13px] font-semibold text-[#2d2a26] leading-tight">{currentApt.professional_name}</span>
+                </div>
+
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[9px] uppercase tracking-[0.12em] text-[#b0a898] font-semibold">Cliente</span>
+                  <span className="text-[13px] font-semibold text-[#2d2a26] leading-tight">{currentApt.client_name || 'Cliente'}</span>
+                  {currentApt.client_phone && (
+                    <span className="text-[11px] font-normal text-[#7a7268]">{currentApt.client_phone}</span>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[9px] uppercase tracking-[0.12em] text-[#b0a898] font-semibold">Data</span>
+                  <span className="text-[13px] font-semibold text-[#2d2a26] capitalize leading-tight">{formatDateDisplay(currentApt.date)}</span>
+                </div>
+
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[9px] uppercase tracking-[0.12em] text-[#b0a898] font-semibold">Horário</span>
+                  <span className="text-[15px] font-bold text-[#c9a84c] leading-tight">{currentApt.time_slot}</span>
+                </div>
+
+                <div className="col-span-2 flex flex-col gap-0.5 pt-0.5">
+                  <span className="text-[9px] uppercase tracking-[0.12em] text-[#b0a898] font-semibold">Localização</span>
+                  <div className="flex items-start gap-2 mt-0.5">
+                    <div className="w-6.5 h-6.5 rounded-lg bg-[#f0ebe3] flex items-center justify-center text-[#c9a84c] shrink-0 mt-0.5">
+                      <MapPin className="w-3.5 h-3.5" />
+                    </div>
+                    <div>
+                      <div className="text-[13px] font-semibold text-[#2d2a26] leading-tight">Navo Premium</div>
+                      <div className="text-[11px] text-[#7a7268]">Rua Augusta, 1420 — Jardins</div>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Services List */}
-              <div className="pt-3 border-t border-border-subtle space-y-2">
-                <span className="block text-[11px] font-bold text-content-muted uppercase tracking-wider">
-                  Serviços Contratados ({currentApt.total_duration_minutes} min)
-                </span>
-                <div className="space-y-1.5">
+              {/* Perforation Line */}
+              <div className="relative my-0.5 mx-4 h-4 flex items-center justify-center">
+                <div className="w-full border-t-[1.5px] border-dashed border-[#ddd5c8]" />
+                <div className="absolute -left-[26px] w-[20px] h-[20px] bg-[#1a1a1a] rounded-full" />
+                <div className="absolute -right-[26px] w-[20px] h-[20px] bg-[#1a1a1a] rounded-full" />
+              </div>
+
+              {/* Services */}
+              <div className="px-5 pb-3">
+                <div className="text-[9px] uppercase tracking-[0.12em] text-[#b0a898] font-semibold mb-2">
+                  Serviços · {currentApt.total_duration_minutes || 60} min
+                </div>
+                <div className="space-y-0">
                   {(currentApt.services || []).map((service, index) => (
                     <div
                       key={index}
-                      className="flex justify-between items-center text-xs py-1 px-2 rounded bg-border-subtle"
+                      className="flex justify-between items-center py-2 border-b border-[#f0ebe3] last:border-b-0"
                     >
-                      <span className="font-semibold text-content-base">• {service.title}</span>
-                      <span className="font-bold text-content-base">R$ {service.price.toFixed(2)}</span>
+                      <div className="text-[13px] font-medium text-[#2d2a26] flex items-center gap-2">
+                        <span className="w-1 h-1 rounded-full bg-[#c9a84c]" />
+                        {service.title}
+                      </div>
+                      <span className="text-[13px] font-bold text-[#2d2a26] tabular-nums">
+                        R$ {service.price.toFixed(2)}
+                      </span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Financial Totals */}
-              <div className="pt-3 border-t border-border-subtle space-y-1.5 text-xs">
-                <div className="flex justify-between items-center text-content-muted">
-                  <span>Subtotal</span>
-                  <span>R$ {(currentApt.original_amount || currentApt.final_amount).toFixed(2)}</span>
+              {/* Total Section */}
+              <div className="px-5 py-3 bg-[#f5f2ec] border-t border-[#ede8e0]">
+                <div className="flex justify-between items-center">
+                  <span className="text-[11px] text-[#7a7268]">Subtotal</span>
+                  <span className="text-xs text-[#7a7268] tabular-nums">
+                    R$ {(currentApt.original_amount || currentApt.final_amount).toFixed(2)}
+                  </span>
                 </div>
                 {Number(currentApt.discount_amount) > 0 && (
-                  <div className="flex justify-between items-center text-status-success font-semibold">
-                    <span>Desconto</span>
-                    <span>- R$ {Number(currentApt.discount_amount).toFixed(2)}</span>
+                  <div className="flex justify-between items-center mt-1">
+                    <span className="text-[11px] text-[#16a34a]">Desconto</span>
+                    <span className="text-xs text-[#16a34a] font-semibold tabular-nums">
+                      - R$ {Number(currentApt.discount_amount).toFixed(2)}
+                    </span>
                   </div>
                 )}
-                <div className="flex justify-between items-center text-sm font-serif text-content-base font-semibold pt-1 border-t border-border-subtle">
-                  <span>Total</span>
-                  <span className="text-status-success font-black text-base">
+                <div className="flex justify-between items-center mt-1">
+                  <span className="text-[13px] font-semibold text-[#2d2a26]">Total</span>
+                  <span className="text-[18px] font-bold text-[#16a34a] tabular-nums">
                     R$ {Number(currentApt.final_amount).toFixed(2)}
                   </span>
                 </div>
-                <div className="flex justify-between items-center text-[10px] text-content-muted font-medium pt-1">
-                  <span>Forma de Pagamento</span>
-                  <span className="font-bold text-content-base uppercase">
+                <div className="flex justify-between items-center mt-2 pt-2 border-t-[1.5px] border-dashed border-[#ddd5c8]">
+                  <span className="text-[10px] text-[#b0a898]">Pagamento</span>
+                  <span className="text-[10px] font-bold text-[#7a7268] uppercase tracking-[0.08em]">
                     {getPaymentMethodText(currentApt.payment_method)}
                   </span>
                 </div>
               </div>
 
-              {/* Background Watermark */}
-              <div className="absolute -bottom-8 -right-8 opacity-5 pointer-events-none">
-                <Scissors className="w-36 h-36" />
+              {/* Footer */}
+              <div className="px-5 py-3 text-center border-t border-[#ede8e0] bg-[#f5f2ec]">
+                <p className="text-[10px] text-[#b0a898] leading-relaxed">
+                  Válido apenas para o dia e horário agendado. Chegue com 10 min de antecedência.
+                </p>
               </div>
             </div>
+          </div>
 
-            {/* Structured Action Buttons Grid */}
-            <div className="space-y-2 pt-1">
-              {/* Row 1: Baixar PDF & Localização */}
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <button
-                  type="button"
-                  onClick={handleDownloadPDF}
-                  disabled={isDownloading}
-                  className="py-3 px-3 rounded-xl bg-border-subtle border border-border-subtle hover:bg-surface-card text-content-base font-bold flex items-center justify-center space-x-2 transition-all disabled:opacity-50"
-                >
-                  {isDownloading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 text-gold-base animate-spin" />
-                      <span>Gerando...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Download className="w-4 h-4 text-content-base" />
-                      <span>Baixar PDF</span>
-                    </>
-                  )}
-                </button>
+          {/* ACTIONS */}
+          <div className="w-full mt-3 flex flex-col gap-1.5">
+            <div className="grid grid-cols-2 gap-1.5">
+              <button
+                type="button"
+                onClick={handleDownloadPDF}
+                disabled={isDownloading}
+                className="flex items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-[#e8e0d4] hover:bg-[#ddd5c8] text-[#5a5248] font-semibold text-[13px] transition-all cursor-pointer disabled:opacity-50"
+              >
+                {isDownloading ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Gerando...</span>
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Baixar PDF</span>
+                  </>
+                )}
+              </button>
 
-                <a
-                  href={getMapsUrl()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="py-3 px-3 rounded-xl bg-border-subtle border border-border-subtle hover:bg-surface-card text-content-base font-bold flex items-center justify-center space-x-2 transition-all"
-                >
-                  <MapPin className="w-4 h-4 text-status-success" />
-                  <span>Localização</span>
-                </a>
-              </div>
+              <a
+                href={getMapsUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-[#e8e0d4] hover:bg-[#ddd5c8] text-[#5a5248] font-semibold text-[13px] transition-all"
+              >
+                <MapPin className="w-3.5 h-3.5" />
+                <span>Localização</span>
+              </a>
+            </div>
 
-              {/* Row 2: Google Agenda & WhatsApp */}
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <a
-                  href={getGoogleCalendarUrl()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="py-3 px-3 rounded-xl bg-border-subtle border border-border-subtle hover:bg-surface-card text-content-base font-bold flex items-center justify-center space-x-2 transition-all"
-                >
-                  <Calendar className="w-4 h-4 text-gold-base" />
-                  <span>Google Agenda</span>
-                </a>
+            <div className="grid grid-cols-2 gap-1.5">
+              <a
+                href={getGoogleCalendarUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-[#e8e0d4] hover:bg-[#ddd5c8] text-[#5a5248] font-semibold text-[13px] transition-all"
+              >
+                <Calendar className="w-3.5 h-3.5" />
+                <span>Google Agenda</span>
+              </a>
 
-                <a
-                  href={getWhatsAppUrl()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="py-3 px-3 rounded-xl bg-border-subtle border border-border-subtle hover:bg-surface-card text-content-base font-bold flex items-center justify-center space-x-2 transition-all"
-                >
-                  <MessageCircle className="w-4 h-4 text-status-success" />
-                  <span>WhatsApp</span>
-                </a>
-              </div>
+              <a
+                href={getWhatsAppUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-[#25d366] hover:bg-[#1ebd5a] text-white font-semibold text-[13px] transition-all"
+              >
+                <MessageCircle className="w-3.5 h-3.5" />
+                <span>WhatsApp</span>
+              </a>
+            </div>
 
-              {/* Row 3: Conditional Action */}
-              {currentApt.status === 'completed' && !currentApt.is_reviewed && (
+            {currentApt.status === 'completed' && !currentApt.is_reviewed && (
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  if (onReviewClick) onReviewClick();
+                }}
+                className="w-full flex items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-[#c9a84c] hover:bg-[#b8983c] text-white font-semibold text-[13px] transition-all cursor-pointer shadow-md"
+              >
+                <Star className="w-3.5 h-3.5 fill-current" />
+                <span>Avaliar Serviço</span>
+              </button>
+            )}
+
+            {!isCancelled && currentApt.status !== 'completed' ? (
+              <>
                 <button
                   type="button"
                   onClick={() => {
-                    onClose();
-                    if (onReviewClick) onReviewClick();
+                    setRescheduleDate(currentApt?.date || '');
+                    setRescheduleTimeSlot(currentApt?.time_slot || currentApt?.timeSlot || '');
+                    setShowRescheduleModal(true);
                   }}
-                  className="w-full py-3 rounded-xl bg-gold-base text-surface-base font-bold flex items-center justify-center space-x-2 transition-all active:scale-95 hover:opacity-95 shadow-lg shadow-gold-base/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-base mt-1"
+                  className="w-full flex items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-[#2d2a26] hover:bg-[#1a1815] text-white font-semibold text-[13px] transition-all cursor-pointer"
                 >
-                  <Star className="w-4 h-4 fill-surface-base" />
-                  <span>Avaliar Serviço</span>
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span>Reagendar Horário</span>
                 </button>
-              )}
-              {!isCancelled && currentApt.status !== 'completed' ? (
-                <div className="space-y-2 mt-1">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setRescheduleDate(currentApt?.date || '');
-                      setRescheduleTimeSlot(currentApt?.time_slot || currentApt?.timeSlot || '');
-                      setShowRescheduleModal(true);
-                    }}
-                    className="w-full py-3 rounded-xl bg-gold-base/10 border border-gold-base/30 hover:bg-gold-base/20 text-content-base text-xs font-bold flex items-center justify-center space-x-2 transition-all"
-                  >
-                    <Calendar className="w-4 h-4" />
-                    <span>Reagendar Horário</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowCancelModal(true)}
-                    className="w-full py-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-bold flex items-center justify-center space-x-2 transition-all"
-                  >
-                    <XCircle className="w-4 h-4" />
-                    <span>Cancelar Agendamento</span>
-                  </button>
-                </div>
-              ) : (
-                <div className="w-full py-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold text-center flex items-center justify-center space-x-2">
-                  <XCircle className="w-4 h-4" />
-                  <span>Agendamento Cancelado</span>
-                </div>
-              )}
-            </div>
+
+                <button
+                  type="button"
+                  onClick={() => setShowCancelModal(true)}
+                  className="w-full flex items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-[#fef2f2] hover:bg-[#fee2e2] border border-[#fecaca] text-[#dc2626] font-semibold text-[13px] transition-all cursor-pointer"
+                >
+                  <XCircle className="w-3.5 h-3.5" />
+                  <span>Cancelar Agendamento</span>
+                </button>
+              </>
+            ) : (
+              <div className="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[#fef2f2] border border-[#fecaca] text-[#dc2626] font-semibold text-[13px]">
+                <XCircle className="w-3.5 h-3.5" />
+                <span>Agendamento Cancelado</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
