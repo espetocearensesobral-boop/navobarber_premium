@@ -29,10 +29,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeCategory, setActiveCategory] = useState<'todos' | 'cabelo' | 'barba'>('todos');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isHoursModalOpen, setIsHoursModalOpen] = useState(false);
 
   const toggleMenu = () => {
     hapticLight();
     setIsMenuOpen(prev => !prev);
+  };
+
+  const toggleHoursModal = () => {
+    hapticLight();
+    setIsHoursModalOpen(prev => !prev);
   };
 
   const scrollToSection = (index: number) => {
@@ -131,6 +137,31 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
 
   return (
     <div ref={containerRef} className="w-full h-full min-h-0 overflow-y-scroll snap-y snap-mandatory bg-white text-neutral-900 font-sans antialiased relative selection:bg-[#C8A96A]/20 selection:text-neutral-900 no-scrollbar">
+      {/* HOURS MODAL OVERLAY */}
+      <div className={`fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex flex-col items-center justify-center transition-opacity duration-300 ${isHoursModalOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+        <button 
+          onClick={toggleHoursModal} 
+          className="absolute top-5 right-5 w-11 h-11 rounded-full bg-white/8 border border-white/10 text-white text-xl flex items-center justify-center active:scale-95 transition-transform"
+          aria-label="Fechar modal"
+        >
+          ✕
+        </button>
+        <div className="bg-[#141414] border border-white/10 rounded-2xl p-8 w-full max-w-sm flex flex-col gap-5">
+          <div className="flex justify-between items-center text-[#f5f5f5] text-lg font-medium">
+            <span className="text-[#a0a0a0]">Seg - Sex</span>
+            <span>09:00 - 22:00</span>
+          </div>
+          <div className="flex justify-between items-center text-[#f5f5f5] text-lg font-medium">
+            <span className="text-[#a0a0a0]">Sábado</span>
+            <span>09:00 - 20:00</span>
+          </div>
+          <div className="flex justify-between items-center text-lg font-medium">
+            <span className="text-[#a0a0a0]">Domingo</span>
+            <span className="text-red-500">Fechado</span>
+          </div>
+        </div>
+      </div>
+
       {/* MENU OVERLAY */}
       <div className={`fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex flex-col items-center justify-center gap-8 transition-opacity duration-300 ${isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
         <button 
@@ -210,15 +241,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
           </div>
 
           {/* TRUST TAGS */}
-          <div className="flex flex-wrap gap-2 w-full">
-            <div className="flex items-center gap-1.5 bg-[#141414] border border-white/6 px-3 py-2 rounded-[10px] text-[0.78rem] text-[#a0a0a0]">
+          <div className="flex justify-center w-full">
+            <button 
+              onClick={toggleHoursModal}
+              className="flex items-center gap-1.5 bg-[#141414] border border-white/6 px-4 py-2 rounded-full text-[0.8rem] text-[#a0a0a0] cursor-pointer hover:bg-[#1a1a1a] transition-colors active:scale-95 shadow-sm"
+            >
               <span className="text-sm">🕐</span>
               <span>Aberto até <strong className="text-white font-semibold">22h</strong></span>
-            </div>
-            <div className="flex items-center gap-1.5 bg-[#141414] border border-white/6 px-3 py-2 rounded-[10px] text-[0.78rem] text-[#a0a0a0]">
-              <span className="text-sm">📍</span>
-              <span><strong className="text-white font-semibold">Centro</strong> da cidade</span>
-            </div>
+            </button>
           </div>
         </div>
 
@@ -500,8 +530,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
       </section>
 
       {/* SECTION 6: PRONTO PARA O SEU NOVO VISUAL? (DARK CARD) */}
-      <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
-        <div className="w-full flex-1 flex flex-col justify-center items-center max-h-full my-auto py-1 min-h-0">
+      <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between pt-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
+        <div className="w-full flex-1 flex flex-col justify-center items-center max-h-full my-auto py-1 px-[clamp(0.75rem,2vh,2rem)] min-h-0">
           <div className="max-w-md md:max-w-3xl lg:max-w-4xl w-full bg-neutral-900 text-white rounded-[clamp(0.875rem,2vh,1.5rem)] p-[clamp(0.875rem,2.2vh,2rem)] relative overflow-hidden shadow-xl text-center flex flex-col items-center justify-center my-auto min-h-0">
             <div className="w-[clamp(2rem,4vh,3rem)] h-[clamp(2rem,4vh,3rem)] rounded-2xl bg-[#C8A96A]/20 border border-[#C8A96A]/30 flex items-center justify-center text-[#C8A96A] mb-[clamp(0.375rem,1vh,1rem)] shrink-0">
               <Scissors className="w-[clamp(1rem,2.2vh,1.625rem)] h-[clamp(1rem,2.2vh,1.625rem)] stroke-[2.2]" />
@@ -526,7 +556,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
         </div>
 
         {/* MINIMALIST BACK TO TOP BUTTON IN THE BOTTOM WHITESPACE */}
-        <div className="flex justify-center pt-0.5 pb-0.5 shrink-0">
+        <div className="flex justify-center pt-2 pb-[clamp(1rem,3vh,2rem)] shrink-0 px-[clamp(0.75rem,2vh,2rem)]">
           <button 
             onClick={scrollToTop}
             className="group flex items-center gap-2 text-[clamp(0.6rem,1.1vh,0.7rem)] font-medium text-neutral-400 hover:text-neutral-900 transition-all duration-300 px-3 py-[clamp(0.2rem,0.5vh,0.4rem)] rounded-full border border-neutral-200/80 bg-neutral-50/80 hover:bg-neutral-100 active:scale-95 shadow-xs"
@@ -535,6 +565,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             <span>Voltar ao topo</span>
           </button>
         </div>
+
+        {/* FOOTER */}
+        <footer className="w-full bg-[#0a0a0a] border-t border-white/10 px-5 py-4 shrink-0 flex flex-col sm:flex-row justify-between items-center gap-2 mt-auto">
+          <p className="text-[0.7rem] text-[#a0a0a0]">
+            © 2026 BarberX Premium. Todos os direitos reservados.
+          </p>
+          <p className="text-[0.7rem] text-[#a0a0a0]">
+            Desenvolvido por <span className="text-[#d4a853] font-semibold">Navo</span>
+          </p>
+        </footer>
       </section>
     </div>
   );
