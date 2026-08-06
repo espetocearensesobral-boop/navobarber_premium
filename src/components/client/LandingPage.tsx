@@ -116,14 +116,44 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
     {
       name: 'Rafael M.',
       rating: 5,
+      date: '10 de Julho, 2026',
       text: 'Melhor barbearia da cidade. Atendimento impecável e resultado sempre perfeito.',
       avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150'
     },
     {
       name: 'Lucas S.',
       rating: 5,
+      date: '02 de Agosto, 2026',
       text: 'Ambiente sensacional e um corte de primeira. Recomendo demais!',
       avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&q=80&w=150'
+    },
+    {
+      name: 'Felipe C.',
+      rating: 5,
+      date: '28 de Julho, 2026',
+      text: 'Experiência incrível! O café é ótimo e os profissionais sabem exatamente o que estão fazendo.',
+      avatar: 'https://images.unsplash.com/photo-1600486913747-55e5470d6f40?auto=format&fit=crop&q=80&w=150'
+    },
+    {
+      name: 'Thiago R.',
+      rating: 5,
+      date: '15 de Junho, 2026',
+      text: 'Finalmente encontrei uma barbearia que acerta em cheio no corte que eu quero.',
+      avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=150'
+    },
+    {
+      name: 'Marcos V.',
+      rating: 5,
+      date: '05 de Agosto, 2026',
+      text: 'Estrutura de ponta e equipe muito simpática. O corte com toalha quente é sensacional.',
+      avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150'
+    },
+    {
+      name: 'João P.',
+      rating: 5,
+      date: '20 de Julho, 2026',
+      text: 'Sempre saio renovado. O ambiente climatizado e o wi-fi grátis ajudam muito na espera.',
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150'
     }
   ];
 
@@ -469,22 +499,27 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                 className="w-full bg-white border border-neutral-200/80 rounded-[clamp(0.625rem,1.4vh,1.125rem)] p-[clamp(0.5rem,1.2vh,1rem)] flex flex-col justify-between gap-[clamp(0.25rem,0.8vh,0.625rem)] shadow-xs hover:border-[#C8A96A]/50 hover:shadow-md transition-all flex-1 min-h-0"
               >
                 <div>
-                  <div className="flex items-center gap-[clamp(0.375rem,1vw,0.75rem)] mb-[clamp(0.25rem,0.8vh,0.625rem)]">
-                    <img 
-                      src={item.avatar} 
-                      alt={item.name}
-                      className="w-[clamp(1.75rem,3.5vh,2.5rem)] h-[clamp(1.75rem,3.5vh,2.5rem)] rounded-full object-cover shrink-0"
-                    />
-                    <div>
-                      <h4 className="text-[clamp(0.7rem,1.4vh,1rem)] font-bold text-neutral-900">
-                        {item.name}
-                      </h4>
-                      <div className="flex text-amber-400 gap-0.5 mt-0.5">
-                        {[...Array(item.rating)].map((_, i) => (
-                          <Star key={i} className="w-[clamp(0.6rem,1.1vh,0.8rem)] h-[clamp(0.6rem,1.1vh,0.8rem)] fill-current" />
-                        ))}
+                  <div className="flex items-center justify-between gap-[clamp(0.375rem,1vw,0.75rem)] mb-[clamp(0.25rem,0.8vh,0.625rem)]">
+                    <div className="flex items-center gap-[clamp(0.375rem,1vw,0.75rem)]">
+                      <img 
+                        src={item.avatar} 
+                        alt={item.name}
+                        className="w-[clamp(1.75rem,3.5vh,2.5rem)] h-[clamp(1.75rem,3.5vh,2.5rem)] rounded-full object-cover shrink-0"
+                      />
+                      <div>
+                        <h4 className="text-[clamp(0.7rem,1.4vh,1rem)] font-bold text-neutral-900">
+                          {item.name}
+                        </h4>
+                        <div className="flex text-amber-400 gap-0.5 mt-0.5">
+                          {[...Array(item.rating)].map((_, i) => (
+                            <Star key={i} className="w-[clamp(0.6rem,1.1vh,0.8rem)] h-[clamp(0.6rem,1.1vh,0.8rem)] fill-current" />
+                          ))}
+                        </div>
                       </div>
                     </div>
+                    <span className="text-[clamp(0.55rem,1vh,0.75rem)] text-neutral-400 self-start mt-1">
+                      {item.date}
+                    </span>
                   </div>
 
                   <p className="text-[clamp(0.625rem,1.25vh,0.875rem)] text-neutral-600 leading-relaxed font-normal italic line-clamp-3">
