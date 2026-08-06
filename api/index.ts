@@ -898,7 +898,12 @@ app.patch("/api/appointments/:id/cancel", optionalAuth, async (req: any, res) =>
       const isPhoneMatch = req.user?.phone && dbApt.clientPhone && 
         matchPhoneNumbers(req.user.phone, dbApt.clientPhone);
       
-      if (!isOwner && !isPhoneMatch) {
+      const reqPhone = req.body.clientPhone || req.body.client_phone;
+      const reqCode = req.body.bookingCode || req.body.booking_code;
+      const isLookupMatch = reqPhone && dbApt.clientPhone && matchPhoneNumbers(reqPhone, dbApt.clientPhone) &&
+                            reqCode && dbApt.bookingCode && reqCode === dbApt.bookingCode;
+
+      if (!isOwner && !isPhoneMatch && !isLookupMatch) {
         return res.status(403).json({ error: 'Acesso negado: Você só pode cancelar o próprio agendamento' });
       }
     }
@@ -948,7 +953,12 @@ app.put("/api/appointments/:id", optionalAuth, async (req: any, res) => {
       const isPhoneMatch = req.user?.phone && dbApt.clientPhone && 
         matchPhoneNumbers(req.user.phone, dbApt.clientPhone);
       
-      if (!isOwner && !isPhoneMatch) {
+      const reqPhone = req.body.clientPhone || req.body.client_phone;
+      const reqCode = req.body.bookingCode || req.body.booking_code;
+      const isLookupMatch = reqPhone && dbApt.clientPhone && matchPhoneNumbers(reqPhone, dbApt.clientPhone) &&
+                            reqCode && dbApt.bookingCode && reqCode === dbApt.bookingCode;
+
+      if (!isOwner && !isPhoneMatch && !isLookupMatch) {
         return res.status(403).json({ error: 'Acesso negado: Você só pode editar o próprio agendamento' });
       }
     }

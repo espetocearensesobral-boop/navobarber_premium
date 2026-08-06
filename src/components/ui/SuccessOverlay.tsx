@@ -33,7 +33,7 @@ export const SuccessOverlay: React.FC<SuccessOverlayProps> = ({
 
   return (
     <div className={`
-      fixed inset-0 z-[95] flex items-center justify-center p-4
+      fixed inset-0 z-[210] flex items-center justify-center p-4
       transition-opacity duration-300
       ${show ? 'opacity-100' : 'opacity-0'}
     `}>
