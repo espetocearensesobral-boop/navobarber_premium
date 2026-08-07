@@ -18,7 +18,6 @@ import {
   TrendingUp,
   Megaphone,
   Sparkles,
-  ShieldCheck,
   CheckCircle2,
   Crown,
   MessageSquare,
@@ -29,11 +28,9 @@ import {
   ExternalLink,
   Share2,
   Check,
-  Settings,
   Clock,
   DollarSign,
   QrCode,
-  Link as LinkIcon,
   Save,
   RefreshCw,
   Send
@@ -219,7 +216,7 @@ export const NavoRewardsAdmin: React.FC = () => {
   const handleValidateVoucher = () => {
     if (!voucherCodeInput.trim()) return;
     if (voucherCodeInput.toUpperCase().startsWith('NAV-RWD-')) {
-      setVoucherValidationResult(`✅ VOUCHER VÁLIDO: Código ${voucherCodeInput.toUpperCase()} confirmado! Pode conceder o prêmio/desconto ao cliente.`);
+      setVoucherValidationResult(`✅ VOUCHER VÁLIDO: Código ${voucherCodeInput.toUpperCase()} confirmado! Pode conceder o prêmio ao cliente.`);
     } else {
       setVoucherValidationResult(`⚠️ VOUCHER INVÁLIDO ou CÓDIGO INCORRETO. Verifique com o cliente.`);
     }
@@ -251,152 +248,222 @@ export const NavoRewardsAdmin: React.FC = () => {
   if (loading) {
     return (
       <div className="p-8 text-center space-y-3">
-        <div className="w-10 h-10 border-2 border-gold-base border-t-transparent rounded-full animate-spin mx-auto" />
-        <p className="text-xs text-content-muted">Carregando inteligência do Navo Rewards...</p>
+        <div className="w-8 h-8 border-2 border-gold-base border-t-transparent rounded-full animate-spin mx-auto" />
+        <p className="text-xs text-content-muted">Carregando painel Navo Rewards...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 p-4 sm:p-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-surface-card p-6 rounded-2xl border border-border-subtle shadow-xl">
-        <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold-base/10 border border-gold-base/30 text-gold-base text-xs font-bold mb-2">
-            <Award className="w-4 h-4" />
-            <span>Motor Integrado Navo Rewards & NPS</span>
+    <div className="space-y-4 animate-fade-in text-content-base min-w-0">
+      {/* 1. HEADER (Sem pill decorativo, subtítulo de 1 linha truncado) */}
+      <div className="flex items-center justify-between gap-3 bg-surface-card p-4 rounded-md border border-border-subtle relative overflow-hidden">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-base sm:text-xl font-serif text-content-base font-bold tracking-tight truncate">
+              Navo Rewards & NPS Admin
+            </h1>
+            <span className="text-[10px] bg-gold-base/10 text-gold-base border border-gold-base/30 px-2 py-0.5 rounded uppercase font-bold tracking-wider whitespace-nowrap shrink-0">
+              Fidelidade
+            </span>
           </div>
-          <h1 className="text-2xl font-serif font-black text-content-base">Navo Rewards & NPS Admin</h1>
-          <p className="text-xs text-content-muted mt-0.5">Central inteligente para fidelidade, cupons de desconto, motor de indicações e avaliações pós-serviço.</p>
+          <p className="text-xs text-content-muted mt-0.5 truncate">
+            Gestão de fidelidade, cupons de desconto, indicações e pesquisas NPS.
+          </p>
+        </div>
+
+        {/* Header Right Action Button */}
+        <div className="shrink-0 flex items-center justify-end">
+          <button
+            onClick={loadData}
+            disabled={loading}
+            className="h-10 sm:h-9 px-0 sm:px-3.5 w-10 sm:w-auto rounded-md bg-surface-base text-gold-base hover:text-content-base hover:bg-surface-card border border-border-subtle transition-all text-xs font-bold flex items-center justify-center gap-2 shrink-0 active:bg-surface-card active:scale-95 disabled:opacity-50 whitespace-nowrap"
+            aria-label="Atualizar Dados"
+          >
+            <RefreshCw className={`w-4 h-4 sm:w-3.5 sm:h-3.5 ${loading ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">Atualizar Dados</span>
+          </button>
+        </div>
+      </div>
+
+      {/* 2. KPIS (Sempre no topo, logo abaixo do Header) */}
+      <div className="bg-border-subtle border border-border-subtle rounded-md flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-4 gap-px no-scrollbar">
+        {/* KPI 1: NPS Score */}
+        <div className="bg-surface-card p-4 flex flex-col justify-between min-w-[70vw] sm:min-w-[220px] md:min-w-0 snap-align-start shrink-0 md:shrink flex-1">
+          <div className="flex justify-between items-start h-10">
+            <div className="min-w-0">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-content-muted block">
+                Score NPS
+              </span>
+              <div className="text-xl sm:text-2xl font-serif font-bold text-gold-base mt-1 num-tabular whitespace-nowrap truncate">
+                {data?.npsScore || 100} <span className="text-xs text-status-success font-sans">/ 100</span>
+              </div>
+            </div>
+            <div className="w-8 h-8 rounded-md bg-gold-base/10 border border-gold-base/30 flex items-center justify-center text-gold-base shrink-0">
+              <Star className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-3 pt-2.5 border-t border-border-subtle flex items-center justify-between text-[11px] text-content-muted">
+            <span className="truncate">Promotores / Detratores</span>
+            <span className="font-bold text-content-base num-tabular whitespace-nowrap shrink-0">
+              {data?.promoters || 0} / {data?.detractors || 0}
+            </span>
+          </div>
+        </div>
+
+        {/* KPI 2: Pontos Emitidos */}
+        <div className="bg-surface-card p-4 flex flex-col justify-between min-w-[70vw] sm:min-w-[220px] md:min-w-0 snap-align-start shrink-0 md:shrink flex-1">
+          <div className="flex justify-between items-start h-10">
+            <div className="min-w-0">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-content-muted block">
+                Pontos Emitidos
+              </span>
+              <div className="text-xl sm:text-2xl font-serif font-bold text-content-base mt-1 num-tabular whitespace-nowrap truncate">
+                +{data?.totalIssued || 0}
+              </div>
+            </div>
+            <div className="w-8 h-8 rounded-md bg-surface-base border border-border-subtle flex items-center justify-center text-gold-base shrink-0">
+              <Sparkles className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-3 pt-2.5 border-t border-border-subtle flex items-center justify-between text-[11px] text-content-muted">
+            <span className="truncate">Cortes e Indicações</span>
+            <span className="font-bold text-status-success num-tabular whitespace-nowrap shrink-0">Acumulado</span>
+          </div>
+        </div>
+
+        {/* KPI 3: Pontos Resgatados */}
+        <div className="bg-surface-card p-4 flex flex-col justify-between min-w-[70vw] sm:min-w-[220px] md:min-w-0 snap-align-start shrink-0 md:shrink flex-1">
+          <div className="flex justify-between items-start h-10">
+            <div className="min-w-0">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-content-muted block">
+                Pontos Resgatados
+              </span>
+              <div className="text-xl sm:text-2xl font-serif font-bold text-status-error mt-1 num-tabular whitespace-nowrap truncate">
+                -{data?.totalRedeemed || 0}
+              </div>
+            </div>
+            <div className="w-8 h-8 rounded-md bg-surface-base border border-border-subtle flex items-center justify-center text-gold-base shrink-0">
+              <Gift className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-3 pt-2.5 border-t border-border-subtle flex items-center justify-between text-[11px] text-content-muted">
+            <span className="truncate">Resgates Efetuados</span>
+            <span className="font-bold text-content-base num-tabular whitespace-nowrap shrink-0">Cupons</span>
+          </div>
+        </div>
+
+        {/* KPI 4: Avaliações Recebidas */}
+        <div className="bg-surface-card p-4 flex flex-col justify-between min-w-[70vw] sm:min-w-[220px] md:min-w-0 snap-align-start shrink-0 md:shrink flex-1">
+          <div className="flex justify-between items-start h-10">
+            <div className="min-w-0">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-content-muted block">
+                Avaliações Pós-Serviço
+              </span>
+              <div className="text-xl sm:text-2xl font-serif font-bold text-content-base mt-1 num-tabular whitespace-nowrap truncate">
+                {data?.totalReviews || 0}
+              </div>
+            </div>
+            <div className="w-8 h-8 rounded-md bg-surface-base border border-border-subtle flex items-center justify-center text-gold-base shrink-0">
+              <MessageSquare className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-3 pt-2.5 border-t border-border-subtle flex items-center justify-between text-[11px] text-content-muted">
+            <span className="truncate">Pesquisas Ativas</span>
+            <span className="font-bold text-gold-base num-tabular whitespace-nowrap shrink-0">100% NPS</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. LINHA DE CAMPANHA (com botão com verbo curto "Disparar", 1 linha) */}
+      <div className="bg-surface-card border border-border-subtle p-3.5 rounded-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 min-w-0">
+        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+          <div className="w-8 h-8 rounded bg-gold-base/10 border border-gold-base/30 text-gold-base flex items-center justify-center shrink-0">
+            <Megaphone className="w-4 h-4" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <span className="text-xs font-bold text-content-base block truncate">
+              Campanha de Re-engajamento
+            </span>
+            <p className="text-[11px] text-content-muted truncate">
+              Creditar +100 pontos para clientes inativos para incentivar retornos.
+            </p>
+          </div>
         </div>
 
         <button
           onClick={handleTriggerCampaign}
           disabled={campaignLoading}
-          className="px-4 py-3 rounded-xl bg-gold-base text-surface-base font-bold text-xs uppercase tracking-wider hover:opacity-95 shadow-lg flex items-center justify-center gap-2 shrink-0"
+          className="h-9 px-4 rounded bg-gold-base text-surface-base hover:bg-gold-base/90 transition-all text-xs font-bold flex items-center justify-center gap-2 shrink-0 whitespace-nowrap active:scale-95 disabled:opacity-50"
         >
-          <Megaphone className="w-4 h-4" />
-          <span>{campaignLoading ? 'Disparando...' : 'Disparar Bônus Re-engajamento (+100 Pts)'}</span>
+          <Megaphone className="w-3.5 h-3.5" />
+          <span>{campaignLoading ? 'Disparando...' : 'Disparar'}</span>
         </button>
       </div>
 
       {campaignMsg && (
-        <div className="p-4 rounded-xl bg-status-success/20 border border-status-success/40 text-status-success text-xs font-bold text-center animate-in fade-in">
+        <div className="p-3 bg-status-success/10 border border-status-success/30 text-status-success text-xs font-bold rounded-md animate-fade-in">
           {campaignMsg}
         </div>
       )}
 
       {configSuccessMsg && (
-        <div className="p-4 rounded-xl bg-status-success/20 border border-status-success/40 text-status-success text-xs font-bold text-center animate-in fade-in">
+        <div className="p-3 bg-status-success/10 border border-status-success/30 text-status-success text-xs font-bold rounded-md animate-fade-in">
           {configSuccessMsg}
         </div>
       )}
 
-      {/* TABS NAVIGATION BAR */}
-      <div className="bg-surface-card border border-border-subtle rounded-2xl p-1.5 flex items-center gap-1.5 overflow-x-auto custom-scrollbar">
-        <TabNavButton active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} icon={TrendingUp} label="Dashboard General" />
+      {/* 4. TABS UNDERLINE (Com scroll horizontal, sem cortar) */}
+      <div className="bg-surface-card border border-border-subtle rounded-md px-3 flex items-center gap-6 overflow-x-auto custom-scrollbar no-scrollbar min-w-0">
+        <TabNavButton active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} icon={TrendingUp} label="Dashboard Geral" />
         <TabNavButton active={activeTab === 'loyalty'} onClick={() => setActiveTab('loyalty')} icon={Crown} label="Clube de Fidelidade & Níveis" />
         <TabNavButton active={activeTab === 'rewards'} onClick={() => setActiveTab('rewards')} icon={Gift} label="Prêmios & Cupons Desconto" />
         <TabNavButton active={activeTab === 'referrals'} onClick={() => setActiveTab('referrals')} icon={Users} label="Motor de Indicações" />
         <TabNavButton active={activeTab === 'reviews'} onClick={() => setActiveTab('reviews')} icon={Star} label="Avaliações & NPS" />
       </div>
 
-      {/* TAB 1: DASHBOARD GENERAL */}
+      {/* 5. CONTEÚDO DA TAB */}
+      {/* TAB 1: DASHBOARD GERAL */}
       {activeTab === 'dashboard' && (
-        <div className="space-y-6">
-          {/* KPI Stats Bar */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* NPS Score */}
-            <div className="bg-surface-card p-5 rounded-2xl border border-border-subtle space-y-2 shadow-lg">
-              <div className="flex items-center justify-between text-content-muted">
-                <span className="text-xs font-bold uppercase tracking-wider">Score NPS (Satisfação)</span>
-                <Star className="w-4 h-4 text-gold-base" />
-              </div>
-              <div className="flex items-baseline space-x-2">
-                <span className="text-3xl font-serif font-black text-gold-base">{data?.npsScore || 100}</span>
-                <span className="text-xs font-bold text-status-success">/ 100</span>
-              </div>
-              <p className="text-[10px] text-content-muted">
-                Promotores (5⭐): {data?.promoters || 0} | Detratores: {data?.detractors || 0}
-              </p>
-            </div>
-
-            {/* Total Points Issued */}
-            <div className="bg-surface-card p-5 rounded-2xl border border-border-subtle space-y-2 shadow-lg">
-              <div className="flex items-center justify-between text-content-muted">
-                <span className="text-xs font-bold uppercase tracking-wider">Pontos Emitidos</span>
-                <Sparkles className="w-4 h-4 text-gold-base" />
-              </div>
-              <div className="text-3xl font-serif font-black text-content-base">
-                +{data?.totalIssued || 0}
-              </div>
-              <p className="text-[10px] text-content-muted">Acumulados via cortes, avaliações e indicações</p>
-            </div>
-
-            {/* Total Points Redeemed */}
-            <div className="bg-surface-card p-5 rounded-2xl border border-border-subtle space-y-2 shadow-lg">
-              <div className="flex items-center justify-between text-content-muted">
-                <span className="text-xs font-bold uppercase tracking-wider">Pontos Resgatados</span>
-                <Gift className="w-4 h-4 text-gold-base" />
-              </div>
-              <div className="text-3xl font-serif font-black text-status-error">
-                -{data?.totalRedeemed || 0}
-              </div>
-              <p className="text-[10px] text-content-muted">Trocados por upgrades, produtos e serviços</p>
-            </div>
-
-            {/* Total Reviews */}
-            <div className="bg-surface-card p-5 rounded-2xl border border-border-subtle space-y-2 shadow-lg">
-              <div className="flex items-center justify-between text-content-muted">
-                <span className="text-xs font-bold uppercase tracking-wider">Avaliações Recebidas</span>
-                <MessageSquare className="w-4 h-4 text-gold-base" />
-              </div>
-              <div className="text-3xl font-serif font-black text-content-base">
-                {data?.totalReviews || 0}
-              </div>
-              <p className="text-[10px] text-content-muted">Pesquisas detalhadas de pós-atendimento</p>
-            </div>
-          </div>
-
-          {/* Tier Distribution & Top Ambassadors */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Tier Distribution */}
-            <div className="bg-surface-card p-6 rounded-2xl border border-border-subtle shadow-xl space-y-4">
-              <h3 className="text-sm font-bold text-content-base uppercase tracking-wider flex items-center gap-2">
+        <div className="space-y-4 min-w-0">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Distribuição por Nível VIP */}
+            <div className="bg-surface-card p-4 sm:p-5 rounded-md border border-border-subtle space-y-3">
+              <h3 className="text-xs font-bold text-content-base uppercase tracking-wider flex items-center gap-2">
                 <Crown className="w-4 h-4 text-gold-base" />
                 <span>Distribuição por Nível VIP</span>
               </h3>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="p-4 rounded-xl bg-surface-base border border-border-subtle space-y-1">
-                  <span className="text-[10px] uppercase font-bold text-amber-700 block">Bronze (0 - 999 pts)</span>
-                  <span className="text-xl font-bold text-content-base">{data?.tierDistribution?.Bronze || 0} clientes</span>
+              <div className="grid grid-cols-2 gap-2.5">
+                <div className="p-3 rounded bg-surface-base border border-border-subtle space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-amber-700 block truncate">Bronze (0 - 999 pts)</span>
+                  <span className="text-base sm:text-lg font-bold text-content-base num-tabular block">{data?.tierDistribution?.Bronze || 0} clientes</span>
                   <span className="text-[10px] text-content-muted block">Multiplicador: {config.tierMultipliers?.Bronze || 1.0}x</span>
                 </div>
 
-                <div className="p-4 rounded-xl bg-surface-base border border-border-subtle space-y-1">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Prata (1000 - 2999 pts)</span>
-                  <span className="text-xl font-bold text-content-base">{data?.tierDistribution?.Prata || 0} clientes</span>
+                <div className="p-3 rounded bg-surface-base border border-border-subtle space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block truncate">Prata (1000 - 2999 pts)</span>
+                  <span className="text-base sm:text-lg font-bold text-content-base num-tabular block">{data?.tierDistribution?.Prata || 0} clientes</span>
                   <span className="text-[10px] text-content-muted block">Multiplicador: {config.tierMultipliers?.Prata || 1.2}x</span>
                 </div>
 
-                <div className="p-4 rounded-xl bg-surface-base border border-border-subtle space-y-1">
-                  <span className="text-[10px] uppercase font-bold text-gold-base block">Ouro (3000 - 5999 pts)</span>
-                  <span className="text-xl font-bold text-content-base">{data?.tierDistribution?.Ouro || 0} clientes</span>
+                <div className="p-3 rounded bg-surface-base border border-border-subtle space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-gold-base block truncate">Ouro (3000 - 5999 pts)</span>
+                  <span className="text-base sm:text-lg font-bold text-content-base num-tabular block">{data?.tierDistribution?.Ouro || 0} clientes</span>
                   <span className="text-[10px] text-content-muted block">Multiplicador: {config.tierMultipliers?.Ouro || 1.5}x</span>
                 </div>
 
-                <div className="p-4 rounded-xl bg-surface-base border border-border-subtle space-y-1">
-                  <span className="text-[10px] uppercase font-bold text-cyan-400 block">Diamante (6000+ pts)</span>
-                  <span className="text-xl font-bold text-content-base">{data?.tierDistribution?.Diamante || 0} clientes</span>
+                <div className="p-3 rounded bg-surface-base border border-border-subtle space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-cyan-400 block truncate">Diamante (6000+ pts)</span>
+                  <span className="text-base sm:text-lg font-bold text-content-base num-tabular block">{data?.tierDistribution?.Diamante || 0} clientes</span>
                   <span className="text-[10px] text-content-muted block">Multiplicador: {config.tierMultipliers?.Diamante || 2.0}x VIP</span>
                 </div>
               </div>
             </div>
 
-            {/* Top Ambassadors Leaderboard */}
-            <div className="bg-surface-card p-6 rounded-2xl border border-border-subtle shadow-xl space-y-4">
-              <h3 className="text-sm font-bold text-content-base uppercase tracking-wider flex items-center gap-2">
+            {/* Maiores Embaixadores */}
+            <div className="bg-surface-card p-4 sm:p-5 rounded-md border border-border-subtle space-y-3">
+              <h3 className="text-xs font-bold text-content-base uppercase tracking-wider flex items-center gap-2">
                 <Users className="w-4 h-4 text-gold-base" />
                 <span>Maiores Embaixadores (Mural de Indicações)</span>
               </h3>
@@ -404,63 +471,61 @@ export const NavoRewardsAdmin: React.FC = () => {
               {data?.ambassadors && data.ambassadors.length > 0 ? (
                 <div className="space-y-2 text-xs divide-y divide-border-subtle">
                   {data.ambassadors.map((amb: any, idx: number) => (
-                    <div key={amb.id || idx} className="pt-2 flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <span className={`w-6 h-6 rounded-full font-bold text-[10px] flex items-center justify-center ${
-                          idx === 0 ? 'bg-gold-base text-surface-base' : 'bg-surface-base text-content-muted'
+                    <div key={amb.id || idx} className="pt-2 flex items-center justify-between min-w-0">
+                      <div className="flex items-center space-x-2.5 min-w-0">
+                        <span className={`w-6 h-6 rounded font-bold text-[10px] flex items-center justify-center shrink-0 ${
+                          idx === 0 ? 'bg-gold-base text-surface-base' : 'bg-surface-base text-content-muted border border-border-subtle'
                         }`}>
                           #{idx + 1}
                         </span>
-                        <div>
-                          <span className="text-content-base font-bold block">{amb.name}</span>
-                          <span className="text-[10px] text-content-muted">Nível {amb.tier} • {amb.points} pts acumulados</span>
+                        <div className="min-w-0 truncate">
+                          <span className="text-content-base font-bold block truncate">{amb.name}</span>
+                          <span className="text-[10px] text-content-muted truncate block">Nível {amb.tier} • {amb.points} pts</span>
                         </div>
                       </div>
 
-                      <div className="text-right">
-                        <span className="text-xs font-bold text-gold-base block">{amb.totalReferrals} amigos indicados</span>
+                      <div className="text-right shrink-0">
+                        <span className="text-xs font-bold text-gold-base num-tabular block">{amb.totalReferrals} amigos</span>
                         <span className="text-[10px] text-status-success font-semibold">100% convertidos</span>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-content-muted py-8 text-center">Nenhum embaixador ativo ainda nesta semana.</p>
+                <p className="text-xs text-content-muted py-6 text-center">Nenhum embaixador ativo ainda nesta semana.</p>
               )}
             </div>
           </div>
         </div>
       )}
 
-      {/* TAB 2: CLUBE DE FIDELIDADE & NÍVEIS (EDITABLE ENGINE CONFIGS) */}
+      {/* TAB 2: CLUBE DE FIDELIDADE & NÍVEIS */}
       {activeTab === 'loyalty' && (
-        <div className="space-y-6">
-          {/* EDITABLE LOYALTY ENGINE RULES FORM */}
-          <form onSubmit={handleSaveConfig} className="bg-surface-card p-6 rounded-2xl border border-border-subtle space-y-6 shadow-xl">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-4 border-b border-border-subtle">
+        <div className="space-y-4 min-w-0">
+          <form onSubmit={handleSaveConfig} className="bg-surface-card p-4 sm:p-5 rounded-md border border-border-subtle space-y-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-border-subtle">
               <div>
-                <h3 className="text-base font-bold text-content-base flex items-center gap-2">
-                  <Crown className="w-5 h-5 text-gold-base" />
-                  <span>Configuração Editável de Cálculo de Pontos & Validade</span>
+                <h3 className="text-sm font-serif font-bold text-content-base flex items-center gap-2">
+                  <Crown className="w-4 h-4 text-gold-base" />
+                  <span>Configuração de Pontos & Validade</span>
                 </h3>
-                <p className="text-xs text-content-muted">Ajuste em tempo real a taxa de conversão, multiplicadores e prazo de expiração.</p>
+                <p className="text-[11px] text-content-muted mt-0.5">Ajuste a taxa de conversão, multiplicadores e expiração.</p>
               </div>
 
               <button
                 type="submit"
                 disabled={savingConfig}
-                className="px-4 py-2.5 rounded-xl bg-gold-base text-surface-base font-bold text-xs uppercase tracking-wider hover:opacity-95 shadow flex items-center gap-2"
+                className="h-9 px-4 rounded bg-gold-base text-surface-base font-bold text-xs flex items-center gap-2 hover:bg-gold-base/90 active:scale-95 disabled:opacity-50 whitespace-nowrap"
               >
-                <Save className="w-4 h-4" />
-                <span>{savingConfig ? 'Salvando...' : 'Salvar Alterações'}</span>
+                <Save className="w-3.5 h-3.5" />
+                <span>{savingConfig ? 'Salvando...' : 'Salvar Regras'}</span>
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-xs">
-              {/* Currency Per Point Ratio */}
-              <div className="p-4 bg-surface-base rounded-2xl border border-border-subtle space-y-3">
-                <label className="text-xs font-bold text-gold-base uppercase tracking-wider flex items-center gap-1.5">
-                  <DollarSign className="w-4 h-4" /> Razão de Conversão (R$ por Ponto)
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <div className="p-3 bg-surface-base rounded border border-border-subtle space-y-2">
+                <label className="text-[10px] font-bold text-gold-base uppercase tracking-wider flex items-center gap-1">
+                  <DollarSign className="w-3.5 h-3.5" /> Razão de Conversão
                 </label>
                 <div className="flex items-center gap-2">
                   <span className="text-content-muted font-bold">R$</span>
@@ -470,17 +535,15 @@ export const NavoRewardsAdmin: React.FC = () => {
                     min="0.1"
                     value={config.currencyPerPoint}
                     onChange={(e) => setConfig({ ...config, currencyPerPoint: Number(e.target.value) })}
-                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-content-base text-base font-bold focus:outline-none focus:border-gold-base"
+                    className="w-full bg-surface-card border border-border-subtle rounded p-2 text-content-base text-xs font-bold focus:outline-none focus:border-gold-base num-tabular"
                   />
-                  <span className="text-content-muted font-bold whitespace-nowrap">= 1 Ponto</span>
+                  <span className="text-content-muted font-bold whitespace-nowrap">= 1 Pts</span>
                 </div>
-                <p className="text-[11px] text-content-muted">Ex: Se R$ 1,00 = 1 Ponto, um corte de R$ 80 gera 80 pontos base.</p>
               </div>
 
-              {/* Points Expiration */}
-              <div className="p-4 bg-surface-base rounded-2xl border border-border-subtle space-y-3">
-                <label className="text-xs font-bold text-gold-base uppercase tracking-wider flex items-center gap-1.5">
-                  <Clock className="w-4 h-4" /> Duração / Validade dos Pontos (Dias)
+              <div className="p-3 bg-surface-base rounded border border-border-subtle space-y-2">
+                <label className="text-[10px] font-bold text-gold-base uppercase tracking-wider flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5" /> Validade (Dias)
                 </label>
                 <div className="flex items-center gap-2">
                   <input
@@ -488,17 +551,15 @@ export const NavoRewardsAdmin: React.FC = () => {
                     min="0"
                     value={config.pointsValidityDays}
                     onChange={(e) => setConfig({ ...config, pointsValidityDays: Number(e.target.value) })}
-                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-content-base text-base font-bold focus:outline-none focus:border-gold-base"
+                    className="w-full bg-surface-card border border-border-subtle rounded p-2 text-content-base text-xs font-bold focus:outline-none focus:border-gold-base num-tabular"
                   />
                   <span className="text-content-muted font-bold">dias</span>
                 </div>
-                <p className="text-[11px] text-content-muted">Digite 0 para pontos permanentes (sem expiração).</p>
               </div>
 
-              {/* Birthday Bonus */}
-              <div className="p-4 bg-surface-base rounded-2xl border border-border-subtle space-y-3">
-                <label className="text-xs font-bold text-gold-base uppercase tracking-wider flex items-center gap-1.5">
-                  <Gift className="w-4 h-4" /> Bônus de Aniversário
+              <div className="p-3 bg-surface-base rounded border border-border-subtle space-y-2">
+                <label className="text-[10px] font-bold text-gold-base uppercase tracking-wider flex items-center gap-1">
+                  <Gift className="w-3.5 h-3.5" /> Bônus Aniversário
                 </label>
                 <div className="flex items-center gap-2">
                   <input
@@ -506,22 +567,19 @@ export const NavoRewardsAdmin: React.FC = () => {
                     min="0"
                     value={config.birthdayBonus}
                     onChange={(e) => setConfig({ ...config, birthdayBonus: Number(e.target.value) })}
-                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-content-base text-base font-bold focus:outline-none focus:border-gold-base"
+                    className="w-full bg-surface-card border border-border-subtle rounded p-2 text-content-base text-xs font-bold focus:outline-none focus:border-gold-base num-tabular"
                   />
                   <span className="text-content-muted font-bold">pts</span>
                 </div>
-                <p className="text-[11px] text-content-muted">Creditado automaticamente na data de aniversário do cliente.</p>
               </div>
             </div>
 
-            {/* VIP TIER MULTIPLIERS */}
-            <div className="space-y-3 pt-2">
-              <h4 className="text-xs font-bold text-content-base uppercase tracking-wider">Multiplicadores por Nível VIP (Aceleração de Pontos)</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-                {/* Bronze */}
-                <div className="p-4 bg-surface-base rounded-xl border border-amber-700/30 space-y-2">
-                  <span className="text-[10px] font-bold uppercase text-amber-700 block">Bronze (0 - 999 pts)</span>
-                  <div className="flex items-center gap-1.5">
+            <div className="space-y-2 pt-2">
+              <h4 className="text-[10px] font-bold text-content-muted uppercase tracking-wider">Multiplicadores por Nível VIP</h4>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+                <div className="p-2.5 bg-surface-base rounded border border-border-subtle space-y-1">
+                  <span className="text-[10px] font-bold uppercase text-amber-700 block truncate">Bronze</span>
+                  <div className="flex items-center gap-1">
                     <input
                       type="number"
                       step="0.1"
@@ -531,16 +589,15 @@ export const NavoRewardsAdmin: React.FC = () => {
                         ...config,
                         tierMultipliers: { ...config.tierMultipliers, Bronze: Number(e.target.value) }
                       })}
-                      className="w-20 bg-surface-card border border-border-subtle rounded-xl p-2 text-content-base text-sm font-bold"
+                      className="w-16 bg-surface-card border border-border-subtle rounded p-1.5 text-content-base text-xs font-bold num-tabular"
                     />
-                    <span className="text-content-muted font-bold">x Pontos</span>
+                    <span className="text-content-muted text-[11px]">x Pts</span>
                   </div>
                 </div>
 
-                {/* Prata */}
-                <div className="p-4 bg-surface-base rounded-xl border border-slate-400/30 space-y-2">
-                  <span className="text-[10px] font-bold uppercase text-slate-400 block">Prata (1000 - 2999 pts)</span>
-                  <div className="flex items-center gap-1.5">
+                <div className="p-2.5 bg-surface-base rounded border border-border-subtle space-y-1">
+                  <span className="text-[10px] font-bold uppercase text-slate-400 block truncate">Prata</span>
+                  <div className="flex items-center gap-1">
                     <input
                       type="number"
                       step="0.1"
@@ -550,16 +607,15 @@ export const NavoRewardsAdmin: React.FC = () => {
                         ...config,
                         tierMultipliers: { ...config.tierMultipliers, Prata: Number(e.target.value) }
                       })}
-                      className="w-20 bg-surface-card border border-border-subtle rounded-xl p-2 text-content-base text-sm font-bold"
+                      className="w-16 bg-surface-card border border-border-subtle rounded p-1.5 text-content-base text-xs font-bold num-tabular"
                     />
-                    <span className="text-content-muted font-bold">x Pontos</span>
+                    <span className="text-content-muted text-[11px]">x Pts</span>
                   </div>
                 </div>
 
-                {/* Ouro */}
-                <div className="p-4 bg-surface-base rounded-xl border border-gold-base/30 space-y-2">
-                  <span className="text-[10px] font-bold uppercase text-gold-base block">Ouro (3000 - 5999 pts)</span>
-                  <div className="flex items-center gap-1.5">
+                <div className="p-2.5 bg-surface-base rounded border border-border-subtle space-y-1">
+                  <span className="text-[10px] font-bold uppercase text-gold-base block truncate">Ouro</span>
+                  <div className="flex items-center gap-1">
                     <input
                       type="number"
                       step="0.1"
@@ -569,16 +625,15 @@ export const NavoRewardsAdmin: React.FC = () => {
                         ...config,
                         tierMultipliers: { ...config.tierMultipliers, Ouro: Number(e.target.value) }
                       })}
-                      className="w-20 bg-surface-card border border-border-subtle rounded-xl p-2 text-content-base text-sm font-bold"
+                      className="w-16 bg-surface-card border border-border-subtle rounded p-1.5 text-content-base text-xs font-bold num-tabular"
                     />
-                    <span className="text-content-muted font-bold">x Pontos</span>
+                    <span className="text-content-muted text-[11px]">x Pts</span>
                   </div>
                 </div>
 
-                {/* Diamante */}
-                <div className="p-4 bg-surface-base rounded-xl border border-cyan-400/30 space-y-2">
-                  <span className="text-[10px] font-bold uppercase text-cyan-400 block">Diamante (6000+ pts)</span>
-                  <div className="flex items-center gap-1.5">
+                <div className="p-2.5 bg-surface-base rounded border border-border-subtle space-y-1">
+                  <span className="text-[10px] font-bold uppercase text-cyan-400 block truncate">Diamante</span>
+                  <div className="flex items-center gap-1">
                     <input
                       type="number"
                       step="0.1"
@@ -588,29 +643,29 @@ export const NavoRewardsAdmin: React.FC = () => {
                         ...config,
                         tierMultipliers: { ...config.tierMultipliers, Diamante: Number(e.target.value) }
                       })}
-                      className="w-20 bg-surface-card border border-border-subtle rounded-xl p-2 text-content-base text-sm font-bold"
+                      className="w-16 bg-surface-card border border-border-subtle rounded p-1.5 text-content-base text-xs font-bold num-tabular"
                     />
-                    <span className="text-content-muted font-bold">x Pontos VIP</span>
+                    <span className="text-content-muted text-[11px]">x Pts</span>
                   </div>
                 </div>
               </div>
             </div>
           </form>
 
-          {/* Manual Points Adjustment Tool */}
-          <div className="bg-surface-card p-6 rounded-2xl border border-border-subtle space-y-4 shadow-xl">
-            <h3 className="text-sm font-bold text-content-base uppercase tracking-wider flex items-center gap-2">
+          {/* Ajuste Manual */}
+          <div className="bg-surface-card p-4 sm:p-5 rounded-md border border-border-subtle space-y-3">
+            <h3 className="text-xs font-bold text-content-base uppercase tracking-wider flex items-center gap-2">
               <Zap className="w-4 h-4 text-gold-base" />
               <span>Ajuste Manual de Pontuação de Clientes</span>
             </h3>
 
-            <form onSubmit={handleManualPointsSubmit} className="space-y-4 max-w-2xl text-xs">
+            <form onSubmit={handleManualPointsSubmit} className="space-y-3 max-w-xl text-xs">
               <div>
-                <label className="block text-content-muted font-bold mb-1">Selecione o Cliente</label>
+                <label className="block text-[10px] font-bold text-content-muted uppercase tracking-wider mb-1">Selecione o Cliente</label>
                 <select
                   value={selectedClient}
                   onChange={(e) => setSelectedClient(e.target.value)}
-                  className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base focus:outline-none focus:border-gold-base"
+                  className="w-full bg-surface-base border border-border-subtle rounded-md p-2.5 text-content-base focus:outline-none focus:border-gold-base"
                 >
                   <option value="">-- Escolha o cliente --</option>
                   {clients.map((c) => (
@@ -623,35 +678,35 @@ export const NavoRewardsAdmin: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-content-muted font-bold mb-1">Quantidade de Pontos (Positivo ou Negativo)</label>
+                  <label className="block text-[10px] font-bold text-content-muted uppercase tracking-wider mb-1">Pontos (Ex: +100 ou -50)</label>
                   <input
                     type="number"
                     value={manualPointsAmount}
                     onChange={(e) => setManualPointsAmount(Number(e.target.value))}
-                    className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base focus:outline-none focus:border-gold-base"
+                    className="w-full bg-surface-base border border-border-subtle rounded-md p-2.5 text-content-base focus:outline-none focus:border-gold-base num-tabular"
                   />
                 </div>
                 <div>
-                  <label className="block text-content-muted font-bold mb-1">Motivo / Descrição</label>
+                  <label className="block text-[10px] font-bold text-content-muted uppercase tracking-wider mb-1">Motivo</label>
                   <input
                     type="text"
-                    placeholder="Ex: Cortesia VIP, Erro de lançamento..."
+                    placeholder="Ex: Cortesia VIP"
                     value={manualPointsReason}
                     onChange={(e) => setManualPointsReason(e.target.value)}
-                    className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base focus:outline-none focus:border-gold-base"
+                    className="w-full bg-surface-base border border-border-subtle rounded-md p-2.5 text-content-base focus:outline-none focus:border-gold-base"
                   />
                 </div>
               </div>
 
               <button
                 type="submit"
-                className="px-4 py-2.5 bg-gold-base text-surface-base font-bold rounded-xl hover:opacity-95 text-xs uppercase tracking-wider shadow"
+                className="h-9 px-4 bg-gold-base text-surface-base font-bold rounded-md hover:bg-gold-base/90 text-xs active:scale-95"
               >
                 Aplicar Ajuste de Pontos
               </button>
 
               {manualSuccessMsg && (
-                <div className="p-3 bg-status-success/20 border border-status-success/40 text-status-success text-xs font-bold rounded-xl">
+                <div className="p-2.5 bg-status-success/10 border border-status-success/30 text-status-success text-xs font-bold rounded-md">
                   {manualSuccessMsg}
                 </div>
               )}
@@ -662,27 +717,26 @@ export const NavoRewardsAdmin: React.FC = () => {
 
       {/* TAB 3: CATÁLOGO DE PRÊMIOS & CUPONS */}
       {activeTab === 'rewards' && (
-        <div className="space-y-6">
-          {/* Header & Add Button */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-surface-card p-5 rounded-2xl border border-border-subtle shadow-lg">
+        <div className="space-y-4 min-w-0">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-surface-card p-4 rounded-md border border-border-subtle">
             <div>
-              <h3 className="text-base font-bold text-content-base">Catálogo de Prêmios, Upgrades e Cupons</h3>
-              <p className="text-xs text-content-muted mt-0.5">Defina as ofertas disponíveis para troca de pontos e vouchers promocionais.</p>
+              <h3 className="text-sm font-serif font-bold text-content-base">Catálogo de Prêmios e Cupons</h3>
+              <p className="text-xs text-content-muted mt-0.5">Ofertas ativas para troca de pontos e cupons.</p>
             </div>
 
             <button
               onClick={() => setShowAddRewardModal(true)}
-              className="px-4 py-2.5 rounded-xl bg-gold-base text-surface-base font-bold text-xs uppercase tracking-wider hover:opacity-95 shadow flex items-center gap-1.5 shrink-0"
+              className="h-9 px-3.5 rounded bg-gold-base text-surface-base font-bold text-xs flex items-center gap-1.5 shrink-0 hover:bg-gold-base/90 active:scale-95 whitespace-nowrap"
             >
-              <Plus className="w-4 h-4" />
-              <span>Criar Nova Oferta / Cupom</span>
+              <Plus className="w-3.5 h-3.5" />
+              <span>Criar Oferta / Cupom</span>
             </button>
           </div>
 
-          {/* Voucher Validator */}
-          <div className="bg-surface-card p-5 rounded-2xl border border-border-subtle space-y-3 shadow-lg max-w-2xl">
-            <h4 className="text-xs font-bold uppercase text-gold-base tracking-wider flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4" /> Validar Código de Voucher de Cliente
+          {/* Validador de Voucher */}
+          <div className="bg-surface-card p-4 rounded-md border border-border-subtle space-y-2.5 max-w-xl">
+            <h4 className="text-[10px] font-bold uppercase text-gold-base tracking-wider flex items-center gap-1">
+              <CheckCircle2 className="w-3.5 h-3.5" /> Validar Código de Voucher do Cliente
             </h4>
             <div className="flex gap-2">
               <input
@@ -690,59 +744,86 @@ export const NavoRewardsAdmin: React.FC = () => {
                 placeholder="Ex: NAV-RWD-123456"
                 value={voucherCodeInput}
                 onChange={(e) => setVoucherCodeInput(e.target.value)}
-                className="flex-1 bg-surface-base border border-border-subtle rounded-xl p-2.5 text-xs text-content-base font-mono uppercase focus:outline-none focus:border-gold-base"
+                className="flex-1 bg-surface-base border border-border-subtle rounded-md p-2 text-xs text-content-base font-mono uppercase focus:outline-none focus:border-gold-base min-w-0"
               />
               <button
                 onClick={handleValidateVoucher}
-                className="px-4 py-2.5 bg-gold-base text-surface-base font-bold text-xs rounded-xl hover:opacity-95 uppercase"
+                className="h-9 px-4 bg-gold-base text-surface-base font-bold text-xs rounded-md hover:bg-gold-base/90 active:scale-95 shrink-0 whitespace-nowrap"
               >
                 Validar Voucher
               </button>
             </div>
             {voucherValidationResult && (
-              <div className="p-3 bg-surface-base border border-gold-base/40 text-content-base text-xs font-medium rounded-xl">
+              <div className="p-2.5 bg-surface-base border border-gold-base/30 text-content-base text-xs font-medium rounded-md">
                 {voucherValidationResult}
               </div>
             )}
           </div>
 
-          {/* Modal for adding rewards */}
+          {/* Lista de Prêmios */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {rewardsList.map((rw) => (
+              <div
+                key={rw.id}
+                className="bg-surface-card p-4 rounded-md border border-border-subtle flex items-center justify-between gap-3"
+              >
+                <div className="space-y-1 min-w-0 flex-1">
+                  <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-gold-base/10 text-gold-base text-[10px] font-bold border border-gold-base/30">
+                    <Gift className="w-3 h-3" />
+                    <span>{rw.pointsRequired} PONTOS</span>
+                  </div>
+                  <h4 className="font-bold text-content-base text-xs truncate">{rw.title}</h4>
+                  <p className="text-[11px] text-content-muted truncate">{rw.valueDescription}</p>
+                </div>
+
+                <button
+                  onClick={() => handleDeleteReward(rw.id)}
+                  className="w-8 h-8 rounded bg-surface-base text-status-error border border-border-subtle hover:border-status-error/50 shrink-0 flex items-center justify-center active:scale-95"
+                  title="Remover oferta"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Modal Adicionar Oferta */}
           {showAddRewardModal && (
-            <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-surface-base/80 backdrop-blur-md">
-              <div className="w-full max-w-md bg-surface-card rounded-2xl border border-border-subtle p-6 shadow-2xl space-y-4">
-                <h3 className="text-base font-bold text-content-base">Adicionar Oferta ou Cupom</h3>
+            <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-surface-base/80 backdrop-blur-sm">
+              <div className="w-full max-w-md bg-surface-card rounded-md border border-border-subtle p-5 space-y-4 shadow-lg">
+                <h3 className="text-sm font-serif font-bold text-content-base">Adicionar Oferta ou Cupom</h3>
 
                 <form onSubmit={handleCreateReward} className="space-y-3 text-xs">
                   <div>
-                    <label className="block text-content-muted font-bold mb-1">Título do Prêmio ou Cupom</label>
+                    <label className="block text-[10px] font-bold text-content-muted uppercase tracking-wider mb-1">Título</label>
                     <input
                       type="text"
                       required
-                      placeholder="Ex: 15% OFF no Próximo Corte ou Pomada Grátis"
+                      placeholder="Ex: 15% OFF no Próximo Corte"
                       value={newReward.title}
                       onChange={(e) => setNewReward({ ...newReward, title: e.target.value })}
-                      className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base focus:outline-none focus:border-gold-base"
+                      className="w-full bg-surface-base border border-border-subtle rounded-md p-2.5 text-content-base focus:outline-none focus:border-gold-base"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-content-muted font-bold mb-1">Pontos Necessários</label>
+                    <label className="block text-[10px] font-bold text-content-muted uppercase tracking-wider mb-1">Pontos Necessários</label>
                     <input
                       type="number"
                       required
                       min={50}
                       value={newReward.pointsRequired}
                       onChange={(e) => setNewReward({ ...newReward, pointsRequired: Number(e.target.value) })}
-                      className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base focus:outline-none focus:border-gold-base"
+                      className="w-full bg-surface-base border border-border-subtle rounded-md p-2.5 text-content-base focus:outline-none focus:border-gold-base num-tabular"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-content-muted font-bold mb-1">Tipo da Oferta</label>
+                    <label className="block text-[10px] font-bold text-content-muted uppercase tracking-wider mb-1">Tipo da Oferta</label>
                     <select
                       value={newReward.rewardType}
                       onChange={(e) => setNewReward({ ...newReward, rewardType: e.target.value })}
-                      className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base focus:outline-none focus:border-gold-base"
+                      className="w-full bg-surface-base border border-border-subtle rounded-md p-2.5 text-content-base focus:outline-none focus:border-gold-base"
                     >
                       <option value="upgrade">Upgrade de Serviço</option>
                       <option value="product">Produto Físico</option>
@@ -752,13 +833,13 @@ export const NavoRewardsAdmin: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-content-muted font-bold mb-1">Descrição do Valor / Benefício</label>
+                    <label className="block text-[10px] font-bold text-content-muted uppercase tracking-wider mb-1">Descrição do Benefício</label>
                     <textarea
                       required
-                      placeholder="Ex: Válido para qualquer serviço de barba ou produto de bancada."
+                      placeholder="Ex: Válido para qualquer serviço de barba ou produto."
                       value={newReward.valueDescription}
                       onChange={(e) => setNewReward({ ...newReward, valueDescription: e.target.value })}
-                      className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base focus:outline-none focus:border-gold-base min-h-[60px]"
+                      className="w-full bg-surface-base border border-border-subtle rounded-md p-2.5 text-content-base focus:outline-none focus:border-gold-base min-h-[60px]"
                     />
                   </div>
 
@@ -766,13 +847,13 @@ export const NavoRewardsAdmin: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setShowAddRewardModal(false)}
-                      className="flex-1 py-2.5 rounded-xl border border-border-subtle text-content-muted font-bold uppercase"
+                      className="flex-1 h-9 rounded border border-border-subtle text-content-muted font-bold text-xs"
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 py-2.5 rounded-xl bg-gold-base text-surface-base font-bold uppercase shadow"
+                      className="flex-1 h-9 rounded bg-gold-base text-surface-base font-bold text-xs"
                     >
                       Salvar Oferta
                     </button>
@@ -781,63 +862,35 @@ export const NavoRewardsAdmin: React.FC = () => {
               </div>
             </div>
           )}
-
-          {/* List of Rewards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {rewardsList.map((rw) => (
-              <div
-                key={rw.id}
-                className="bg-surface-card p-5 rounded-2xl border border-border-subtle flex items-center justify-between gap-4 shadow-md"
-              >
-                <div className="space-y-1">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-gold-base/15 text-gold-base text-[10px] font-bold border border-gold-base/30">
-                    <Gift className="w-3 h-3" />
-                    <span>{rw.pointsRequired} PONTOS</span>
-                  </div>
-                  <h4 className="font-bold text-content-base text-sm">{rw.title}</h4>
-                  <p className="text-xs text-content-muted leading-relaxed">{rw.valueDescription}</p>
-                </div>
-
-                <button
-                  onClick={() => handleDeleteReward(rw.id)}
-                  className="p-2.5 rounded-xl bg-surface-base text-status-error border border-border-subtle hover:border-status-error/50 shrink-0"
-                  title="Remover oferta"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            ))}
-          </div>
         </div>
       )}
 
-      {/* TAB 4: MOTOR DE INDICAÇÕES (RULES & LINK GENERATOR) */}
+      {/* TAB 4: MOTOR DE INDICAÇÕES */}
       {activeTab === 'referrals' && (
-        <div className="space-y-6">
-          {/* EDITABLE REFERRAL RULES FORM */}
-          <form onSubmit={handleSaveConfig} className="bg-surface-card p-6 rounded-2xl border border-border-subtle space-y-6 shadow-xl">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-4 border-b border-border-subtle">
+        <div className="space-y-4 min-w-0">
+          <form onSubmit={handleSaveConfig} className="bg-surface-card p-4 sm:p-5 rounded-md border border-border-subtle space-y-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-border-subtle">
               <div>
-                <h3 className="text-base font-bold text-content-base flex items-center gap-2">
-                  <Users className="w-5 h-5 text-gold-base" />
-                  <span>Configuração Editável de Bonificação por Indicação</span>
+                <h3 className="text-sm font-serif font-bold text-content-base flex items-center gap-2">
+                  <Users className="w-4 h-4 text-gold-base" />
+                  <span>Configuração do Motor de Indicações</span>
                 </h3>
-                <p className="text-xs text-content-muted">Defina quantos pontos quem indica e quem é indicado recebem, além dos prêmios de milestone.</p>
+                <p className="text-[11px] text-content-muted mt-0.5">Defina os bônus para quem indica e quem é indicado.</p>
               </div>
 
               <button
                 type="submit"
                 disabled={savingConfig}
-                className="px-4 py-2.5 rounded-xl bg-gold-base text-surface-base font-bold text-xs uppercase tracking-wider hover:opacity-95 shadow flex items-center gap-2"
+                className="h-9 px-4 rounded bg-gold-base text-surface-base font-bold text-xs flex items-center gap-2 hover:bg-gold-base/90 active:scale-95 disabled:opacity-50 whitespace-nowrap"
               >
-                <Save className="w-4 h-4" />
+                <Save className="w-3.5 h-3.5" />
                 <span>{savingConfig ? 'Salvando...' : 'Salvar Regras'}</span>
               </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-              <div className="p-4 bg-surface-base rounded-xl border border-border-subtle space-y-2">
-                <span className="text-[10px] font-bold uppercase text-gold-base">Bônus de Quem Indica</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+              <div className="p-3 bg-surface-base rounded border border-border-subtle space-y-1.5">
+                <span className="text-[10px] font-bold uppercase text-gold-base block truncate">Bônus de Quem Indica</span>
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
@@ -846,15 +899,14 @@ export const NavoRewardsAdmin: React.FC = () => {
                       ...config,
                       referralPoints: { ...config.referralPoints, referrerBonus: Number(e.target.value) }
                     })}
-                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2 text-content-base font-bold text-sm"
+                    className="w-full bg-surface-card border border-border-subtle rounded p-2 text-content-base font-bold text-xs num-tabular"
                   />
                   <span className="text-content-muted font-bold">pts</span>
                 </div>
-                <p className="text-[10px] text-content-muted">Creditado após o 1º corte concluído do amigo.</p>
               </div>
 
-              <div className="p-4 bg-surface-base rounded-xl border border-border-subtle space-y-2">
-                <span className="text-[10px] font-bold uppercase text-gold-base">Bônus de Boas-Vindas do Amigo</span>
+              <div className="p-3 bg-surface-base rounded border border-border-subtle space-y-1.5">
+                <span className="text-[10px] font-bold uppercase text-gold-base block truncate">Bônus do Amigo Indicado</span>
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
@@ -863,15 +915,14 @@ export const NavoRewardsAdmin: React.FC = () => {
                       ...config,
                       referralPoints: { ...config.referralPoints, referredBonus: Number(e.target.value) }
                     })}
-                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2 text-content-base font-bold text-sm"
+                    className="w-full bg-surface-card border border-border-subtle rounded p-2 text-content-base font-bold text-xs num-tabular"
                   />
                   <span className="text-content-muted font-bold">pts</span>
                 </div>
-                <p className="text-[10px] text-content-muted">Ganha no cadastro via link de indicação.</p>
               </div>
 
-              <div className="p-4 bg-surface-base rounded-xl border border-border-subtle space-y-2">
-                <span className="text-[10px] font-bold uppercase text-gold-base">Meta para Milestone (Nº Amigos)</span>
+              <div className="p-3 bg-surface-base rounded border border-border-subtle space-y-1.5">
+                <span className="text-[10px] font-bold uppercase text-gold-base block truncate">Meta Amigos (Milestone)</span>
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
@@ -880,15 +931,14 @@ export const NavoRewardsAdmin: React.FC = () => {
                       ...config,
                       referralPoints: { ...config.referralPoints, milestoneCount: Number(e.target.value) }
                     })}
-                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2 text-content-base font-bold text-sm"
+                    className="w-full bg-surface-card border border-border-subtle rounded p-2 text-content-base font-bold text-xs num-tabular"
                   />
                   <span className="text-content-muted font-bold">amigos</span>
                 </div>
-                <p className="text-[10px] text-content-muted">Quantidade de amigos para ativar super bônus.</p>
               </div>
 
-              <div className="p-4 bg-surface-base rounded-xl border border-border-subtle space-y-2">
-                <span className="text-[10px] font-bold uppercase text-gold-base">Bônus Milestone Embaixador</span>
+              <div className="p-3 bg-surface-base rounded border border-border-subtle space-y-1.5">
+                <span className="text-[10px] font-bold uppercase text-gold-base block truncate">Bônus Milestone</span>
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
@@ -897,345 +947,126 @@ export const NavoRewardsAdmin: React.FC = () => {
                       ...config,
                       referralPoints: { ...config.referralPoints, milestoneBonus: Number(e.target.value) }
                     })}
-                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2 text-content-base font-bold text-sm"
+                    className="w-full bg-surface-card border border-border-subtle rounded p-2 text-content-base font-bold text-xs num-tabular"
                   />
                   <span className="text-content-muted font-bold">pts</span>
                 </div>
-                <p className="text-[10px] text-content-muted">Super bônus extra em pontos.</p>
               </div>
             </div>
           </form>
 
-          {/* GERADOR DE LINK DE INDICAÇÃO PARA CLIENTES */}
-          <div className="bg-surface-card p-6 rounded-2xl border border-border-subtle space-y-4 shadow-xl">
-            <h3 className="text-sm font-bold text-content-base uppercase tracking-wider flex items-center gap-2">
-              <LinkIcon className="w-4 h-4 text-gold-base" />
-              <span>Gerador e Disparo de Links de Indicação para Clientes</span>
+          {/* Gerador de Link de Indicação */}
+          <div className="bg-surface-card p-4 sm:p-5 rounded-md border border-border-subtle space-y-3">
+            <h3 className="text-xs font-bold text-content-base uppercase tracking-wider flex items-center gap-2">
+              <Share2 className="w-4 h-4 text-gold-base" />
+              <span>Gerador de Link de Indicação para Clientes</span>
             </h3>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-xs">
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-content-muted font-bold mb-1">Selecione o Cliente para Gerar o Link de Indicação Dele</label>
-                  <select
-                    value={refClient?.id || ''}
-                    onChange={(e) => {
-                      const found = clients.find(c => c.id === e.target.value);
-                      if (found) setRefClient(found);
-                    }}
-                    className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-content-base font-bold focus:outline-none focus:border-gold-base"
-                  >
-                    {clients.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name} ({c.phone || 'Sem celular'}) - Código: {c.referralCode || 'Automático'}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+            <div className="space-y-3 max-w-2xl text-xs">
+              <div>
+                <label className="block text-[10px] font-bold text-content-muted uppercase tracking-wider mb-1">Selecione o Cliente Remetente</label>
+                <select
+                  value={refClient?.id || ''}
+                  onChange={(e) => {
+                    const found = clients.find(c => c.id === e.target.value);
+                    if (found) setRefClient(found);
+                  }}
+                  className="w-full bg-surface-base border border-border-subtle rounded-md p-2.5 text-content-base focus:outline-none focus:border-gold-base"
+                >
+                  {clients.map(c => (
+                    <option key={c.id} value={c.id}>{c.name} - Código: {c.referralCode || 'Sem código'}</option>
+                  ))}
+                </select>
+              </div>
 
-                <div className="p-4 bg-surface-base rounded-xl border border-border-subtle space-y-2 font-mono text-[11px]">
-                  <span className="text-gold-base font-sans text-xs font-bold block">Código de Indicação:</span>
-                  <span className="text-content-base font-bold text-sm block">{currentRefCode}</span>
-                  <span className="text-gold-base font-sans text-xs font-bold block pt-1">URL Completa do Link:</span>
+              <div>
+                <label className="block text-[10px] font-bold text-content-muted uppercase tracking-wider mb-1">Mensagem do WhatsApp</label>
+                <textarea
+                  value={customRefMsg}
+                  onChange={(e) => setCustomRefMsg(e.target.value)}
+                  className="w-full bg-surface-base border border-border-subtle rounded-md p-2.5 text-content-base focus:outline-none focus:border-gold-base min-h-[60px]"
+                />
+              </div>
+
+              <div className="p-3 bg-surface-base rounded-md border border-border-subtle space-y-2">
+                <span className="text-[10px] font-bold uppercase text-content-muted block">Link Único Gerado</span>
+                <div className="flex gap-2">
                   <input
+                    type="text"
                     readOnly
                     value={generatedRefUrl}
-                    className="w-full bg-surface-card p-2 rounded-lg border border-border-subtle text-content-base font-mono text-[10px] select-all"
+                    className="flex-1 bg-surface-card border border-border-subtle rounded-md p-2 text-xs font-mono text-gold-base min-w-0"
                   />
-                </div>
-
-                <div className="flex flex-wrap gap-2">
                   <button
-                    onClick={() => copyToClipboard(generatedRefUrl, false)}
-                    className="px-4 py-2.5 bg-surface-base border border-gold-base/50 text-gold-base font-bold rounded-xl hover:bg-gold-base/10 flex items-center gap-1.5"
+                    onClick={() => copyToClipboard(generatedRefUrl)}
+                    className="h-9 px-3 bg-gold-base text-surface-base font-bold text-xs rounded-md hover:bg-gold-base/90 shrink-0 flex items-center gap-1"
                   >
-                    {copiedLink ? <Check className="w-4 h-4 text-status-success" /> : <Copy className="w-4 h-4" />}
-                    <span>{copiedLink ? 'Copiado!' : 'Copiar Link'}</span>
+                    {copiedLink ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copiedLink ? 'Copiado!' : 'Copiar'}</span>
                   </button>
-
-                  <a
-                    href={generatedRefUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="px-4 py-2.5 bg-surface-base border border-border-subtle text-content-base font-bold rounded-xl hover:bg-surface-card flex items-center gap-1.5"
+                  <button
+                    onClick={() => shareViaWhatsapp(refClient?.phone || '', `${customRefMsg} ${generatedRefUrl}`)}
+                    className="h-9 px-3 bg-[#25D366] text-white font-bold text-xs rounded-md hover:opacity-90 shrink-0 flex items-center gap-1"
                   >
-                    <ExternalLink className="w-4 h-4" />
-                    <span>Testar Link</span>
-                  </a>
+                    <Send className="w-3.5 h-3.5" />
+                    <span>WhatsApp</span>
+                  </button>
                 </div>
-              </div>
-
-              {/* WHATSAPP SHARE CARD */}
-              <div className="p-4 bg-surface-base rounded-2xl border border-border-subtle space-y-3">
-                <h4 className="font-bold text-content-base text-xs flex items-center gap-1.5">
-                  <Send className="w-4 h-4 text-status-success" />
-                  <span>Enviar Convite Pronto no WhatsApp do Cliente</span>
-                </h4>
-
-                <div>
-                  <label className="block text-[10px] text-content-muted font-bold mb-1">Mensagem Personalizável</label>
-                  <textarea
-                    rows={3}
-                    value={customRefMsg}
-                    onChange={(e) => setCustomRefMsg(e.target.value)}
-                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
-                  />
-                </div>
-
-                <div className="p-3 bg-surface-card rounded-xl border border-border-subtle text-[11px] text-content-muted italic">
-                  Preview: "{customRefMsg} {generatedRefUrl}"
-                </div>
-
-                <button
-                  onClick={() => shareViaWhatsapp(refClient?.phone, `${customRefMsg} ${generatedRefUrl}`)}
-                  className="w-full py-3 bg-status-success text-white font-bold rounded-xl hover:opacity-95 uppercase tracking-wider flex items-center justify-center gap-2 shadow"
-                >
-                  <Send className="w-4 h-4" />
-                  <span>Enviar via WhatsApp ({refClient?.name || 'Cliente'})</span>
-                </button>
               </div>
             </div>
-          </div>
-
-          {/* Referral Ranking List */}
-          <div className="bg-surface-card p-6 rounded-2xl border border-border-subtle space-y-4 shadow-xl">
-            <h4 className="text-xs font-bold text-content-base uppercase tracking-wider flex items-center gap-2">
-              <Crown className="w-4 h-4 text-gold-base" />
-              <span>Ranking Geral de Clientes Embaixadores</span>
-            </h4>
-
-            {data?.ambassadors && data.ambassadors.length > 0 ? (
-              <div className="space-y-2 text-xs divide-y divide-border-subtle">
-                {data.ambassadors.map((amb: any, idx: number) => (
-                  <div key={amb.id || idx} className="pt-2 flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <span className="w-6 h-6 rounded-full bg-gold-base/20 text-gold-base font-bold text-xs flex items-center justify-center">
-                        #{idx + 1}
-                      </span>
-                      <div>
-                        <span className="text-content-base font-bold block">{amb.name}</span>
-                        <span className="text-[10px] text-content-muted">Nível VIP: {amb.tier}</span>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-sm font-extrabold text-gold-base block">{amb.totalReferrals} indicações</span>
-                      <span className="text-[10px] text-content-muted">+{amb.totalReferrals * (config.referralPoints?.referrerBonus || 100)} pts acumulados</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-xs text-content-muted py-6 text-center">Nenhum registro de indicação recente.</p>
-            )}
           </div>
         </div>
       )}
 
-      {/* TAB 5: AVALIAÇÕES & NPS (RULES, DIRECT LINK & QR CODE GENERATOR) */}
+      {/* TAB 5: AVALIAÇÕES & NPS */}
       {activeTab === 'reviews' && (
-        <div className="space-y-6">
-          {/* EDITABLE REVIEW RULES FORM */}
-          <form onSubmit={handleSaveConfig} className="bg-surface-card p-6 rounded-2xl border border-border-subtle space-y-6 shadow-xl">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-4 border-b border-border-subtle">
-              <div>
-                <h3 className="text-base font-bold text-content-base flex items-center gap-2">
-                  <Star className="w-5 h-5 text-gold-base" />
-                  <span>Configuração Editável de Bônus por Avaliação / NPS</span>
-                </h3>
-                <p className="text-xs text-content-muted">Ajuste os pontos concedidos quando o cliente avalia o atendimento pós-corte.</p>
-              </div>
-
+        <div className="space-y-4 min-w-0">
+          <div className="bg-surface-card p-4 sm:p-5 rounded-md border border-border-subtle space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-xs font-bold text-content-base uppercase tracking-wider flex items-center gap-2">
+                <QrCode className="w-4 h-4 text-gold-base" />
+                <span>Link & QR Code para Pesquisas de Avaliação pós-serviço</span>
+              </h3>
               <button
-                type="submit"
-                disabled={savingConfig}
-                className="px-4 py-2.5 rounded-xl bg-gold-base text-surface-base font-bold text-xs uppercase tracking-wider hover:opacity-95 shadow flex items-center gap-2"
+                onClick={() => setShowQrModal(true)}
+                className="h-8 px-3 rounded bg-surface-base border border-border-subtle text-gold-base hover:text-content-base text-xs font-bold flex items-center gap-1.5 active:scale-95"
               >
-                <Save className="w-4 h-4" />
-                <span>{savingConfig ? 'Salvando...' : 'Salvar Regras'}</span>
+                <QrCode className="w-3.5 h-3.5" />
+                <span>Ver QR Code</span>
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-              <div className="p-4 bg-surface-base rounded-xl border border-border-subtle space-y-2">
-                <span className="text-[10px] font-bold uppercase text-gold-base">Pontos por Avaliação Concluída</span>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="number"
-                    value={config.reviewPoints?.baseReview || 20}
-                    onChange={(e) => setConfig({
-                      ...config,
-                      reviewPoints: { ...config.reviewPoints, baseReview: Number(e.target.value) }
-                    })}
-                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2 text-content-base font-bold text-sm"
-                  />
-                  <span className="text-content-muted font-bold">pts</span>
-                </div>
-                <p className="text-[10px] text-content-muted">Base enviada ao responder a pesquisa.</p>
-              </div>
-
-              <div className="p-4 bg-surface-base rounded-xl border border-border-subtle space-y-2">
-                <span className="text-[10px] font-bold uppercase text-gold-base">Bônus Extra por Foto do Corte</span>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="number"
-                    value={config.reviewPoints?.withPhotoBonus || 30}
-                    onChange={(e) => setConfig({
-                      ...config,
-                      reviewPoints: { ...config.reviewPoints, withPhotoBonus: Number(e.target.value) }
-                    })}
-                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2 text-content-base font-bold text-sm"
-                  />
-                  <span className="text-content-muted font-bold">pts</span>
-                </div>
-                <p className="text-[10px] text-content-muted">Adicionado se anexa foto do resultado.</p>
-              </div>
-
-              <div className="p-4 bg-surface-base rounded-xl border border-border-subtle space-y-2">
-                <span className="text-[10px] font-bold uppercase text-gold-base">Bônus Extra Nota 5 Estrelas</span>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="number"
-                    value={config.reviewPoints?.fiveStarBonus || 10}
-                    onChange={(e) => setConfig({
-                      ...config,
-                      reviewPoints: { ...config.reviewPoints, fiveStarBonus: Number(e.target.value) }
-                    })}
-                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2 text-content-base font-bold text-sm"
-                  />
-                  <span className="text-content-muted font-bold">pts</span>
-                </div>
-                <p className="text-[10px] text-content-muted">Incentivo para nota máxima (Promotores).</p>
-              </div>
-            </div>
-          </form>
-
-          {/* GERADOR DE LINK DE AVALIAÇÃO & QR CODE */}
-          <div className="bg-surface-card p-6 rounded-2xl border border-border-subtle space-y-4 shadow-xl">
-            <h3 className="text-sm font-bold text-content-base uppercase tracking-wider flex items-center gap-2">
-              <QrCode className="w-4 h-4 text-gold-base" />
-              <span>Gerador de Link Direto de Avaliação & QR Code de Espelho/Balcão</span>
-            </h3>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-xs">
-              <div className="space-y-3">
-                <div className="p-4 bg-surface-base rounded-xl border border-border-subtle space-y-2 font-mono text-[11px]">
-                  <span className="text-gold-base font-sans text-xs font-bold block">URL Pública Direta de Avaliação:</span>
-                  <input
-                    readOnly
-                    value={generatedEvalUrl}
-                    className="w-full bg-surface-card p-2.5 rounded-lg border border-border-subtle text-content-base font-mono text-[11px] select-all"
-                  />
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() => copyToClipboard(generatedEvalUrl, true)}
-                    className="px-4 py-2.5 bg-surface-base border border-gold-base/50 text-gold-base font-bold rounded-xl hover:bg-gold-base/10 flex items-center gap-1.5"
-                  >
-                    {copiedEvalLink ? <Check className="w-4 h-4 text-status-success" /> : <Copy className="w-4 h-4" />}
-                    <span>{copiedEvalLink ? 'Link Copiado!' : 'Copiar Link de Avaliação'}</span>
-                  </button>
-
-                  <button
-                    onClick={() => setShowQrModal(true)}
-                    className="px-4 py-2.5 bg-gold-base text-surface-base font-bold rounded-xl hover:opacity-95 flex items-center gap-1.5 shadow"
-                  >
-                    <QrCode className="w-4 h-4" />
-                    <span>Gerar QR Code de Mesa/Balcão</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* DISPARO WHATSAPP PARA AVALIAÇÃO */}
-              <div className="p-4 bg-surface-base rounded-2xl border border-border-subtle space-y-3">
-                <h4 className="font-bold text-content-base text-xs flex items-center gap-1.5">
-                  <Send className="w-4 h-4 text-status-success" />
-                  <span>Enviar Solicitação de Avaliação no WhatsApp</span>
-                </h4>
-
-                <div>
-                  <label className="block text-[10px] text-content-muted font-bold mb-1">Selecione o Cliente</label>
-                  <select
-                    value={evalClient?.id || ''}
-                    onChange={(e) => {
-                      const found = clients.find(c => c.id === e.target.value);
-                      if (found) setEvalClient(found);
-                    }}
-                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2 text-content-base font-bold text-xs focus:outline-none focus:border-gold-base"
-                  >
-                    {clients.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name} ({c.phone || 'Sem celular'})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-[10px] text-content-muted font-bold mb-1">Mensagem de Solicitação</label>
-                  <textarea
-                    rows={2}
-                    value={customEvalMsg}
-                    onChange={(e) => setCustomEvalMsg(e.target.value)}
-                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2 text-xs text-content-base focus:outline-none focus:border-gold-base"
-                  />
-                </div>
-
+            <div className="p-3 bg-surface-base rounded-md border border-border-subtle space-y-2 max-w-2xl">
+              <span className="text-[10px] font-bold uppercase text-content-muted block">Link Público da Pesquisa NPS</span>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  readOnly
+                  value={generatedEvalUrl}
+                  className="flex-1 bg-surface-card border border-border-subtle rounded-md p-2 text-xs font-mono text-gold-base min-w-0"
+                />
                 <button
-                  onClick={() => shareViaWhatsapp(evalClient?.phone, `${customEvalMsg} ${generatedEvalUrl}`)}
-                  className="w-full py-2.5 bg-status-success text-white font-bold rounded-xl hover:opacity-95 uppercase tracking-wider flex items-center justify-center gap-2 shadow"
+                  onClick={() => copyToClipboard(generatedEvalUrl, true)}
+                  className="h-9 px-3 bg-gold-base text-surface-base font-bold text-xs rounded-md hover:bg-gold-base/90 shrink-0 flex items-center gap-1"
                 >
-                  <Send className="w-4 h-4" />
-                  <span>Pedir Avaliação a {evalClient?.name || 'Cliente'}</span>
+                  {copiedEvalLink ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copiedEvalLink ? 'Copiado!' : 'Copiar'}</span>
                 </button>
               </div>
             </div>
           </div>
 
-          {/* QR CODE MODAL */}
-          {showQrModal && (
-            <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-surface-base/80 backdrop-blur-md">
-              <div className="w-full max-w-sm bg-surface-card rounded-2xl border border-border-subtle p-6 shadow-2xl space-y-4 text-center">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold-base/20 text-gold-base text-xs font-bold border border-gold-base/30">
-                  <QrCode className="w-4 h-4" /> QR Code da Barbearia
-                </div>
-
-                <h3 className="text-base font-bold text-content-base">Avalie e Ganhe Pontos</h3>
-                <p className="text-xs text-content-muted">Imprima ou coloque este QR Code nas bancadas, espelhos e balcão de recepção.</p>
-
-                <div className="p-4 bg-white rounded-2xl border border-border-subtle shadow-inner inline-block mx-auto">
-                  <img
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(generatedEvalUrl)}`}
-                    alt="QR Code de Avaliação Navo"
-                    className="w-48 h-48 mx-auto"
-                  />
-                </div>
-
-                <div className="text-[11px] font-mono text-content-muted break-all">
-                  {generatedEvalUrl}
-                </div>
-
-                <button
-                  onClick={() => setShowQrModal(false)}
-                  className="w-full py-2.5 bg-gold-base text-surface-base font-bold rounded-xl uppercase text-xs shadow"
-                >
-                  Fechar Visualizador QR Code
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Detailed Review Feed */}
-          <div className="bg-surface-card p-6 rounded-2xl border border-border-subtle space-y-4 shadow-xl">
+          {/* Feed de Avaliações */}
+          <div className="bg-surface-card p-4 sm:p-5 rounded-md border border-border-subtle space-y-3">
             <h4 className="text-xs font-bold text-content-base uppercase tracking-wider flex items-center gap-2">
               <MessageSquare className="w-4 h-4 text-gold-base" />
-              <span>Feed em Tempo Real de Pesquisas de Pós-Atendimento</span>
+              <span>Feed de Pesquisas de Pós-Atendimento</span>
             </h4>
 
             {data?.reviewsList && data.reviewsList.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                 {data.reviewsList.map((rev: any) => (
-                  <div key={rev.id} className="p-4 rounded-xl bg-surface-base border border-border-subtle space-y-2">
+                  <div key={rev.id} className="p-3.5 rounded bg-surface-base border border-border-subtle space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-1">
                         {[1, 2, 3, 4, 5].map((s) => (
@@ -1245,27 +1076,54 @@ export const NavoRewardsAdmin: React.FC = () => {
                           />
                         ))}
                       </div>
-                      <span className="text-[10px] text-content-muted">
+                      <span className="text-[10px] text-content-muted num-tabular">
                         {new Date(rev.createdAt).toLocaleDateString('pt-BR')}
                       </span>
                     </div>
 
-                    <p className="text-content-base font-medium italic">
+                    <p className="text-content-base font-medium italic text-xs">
                       "{rev.comment || 'Corte e atendimento perfeitos!'}"
                     </p>
 
-                    <div className="text-[10px] text-content-muted space-y-0.5 pt-2 border-t border-border-subtle/50">
-                      <p>• Entendeu o pedido: <span className="text-content-base font-bold">{rev.understoodRequest || 'Sim'}</span></p>
-                      <p>• Tempo de espera: <span className="text-content-base font-bold">{rev.waitTimeAcceptable || 'Aceitável'}</span></p>
-                      <p>• Indicaria a Navo: <span className="text-content-base font-bold">{rev.wouldRecommend || 'Com certeza'}</span></p>
+                    <div className="text-[10px] text-content-muted space-y-0.5 pt-2 border-t border-border-subtle">
+                      <p>• Atendimento: <span className="text-content-base font-bold">{rev.understoodRequest || 'Sim'}</span></p>
+                      <p>• Recomendaria: <span className="text-content-base font-bold">{rev.wouldRecommend || 'Com certeza'}</span></p>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-content-muted py-8 text-center">Nenhuma avaliação recente registrada.</p>
+              <p className="text-xs text-content-muted py-6 text-center">Nenhuma avaliação recente registrada.</p>
             )}
           </div>
+
+          {/* Modal QR Code */}
+          {showQrModal && (
+            <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-surface-base/80 backdrop-blur-sm">
+              <div className="w-full max-w-xs bg-surface-card rounded-md border border-border-subtle p-5 space-y-3 text-center shadow-lg">
+                <h3 className="text-sm font-serif font-bold text-content-base">QR Code para Mesas & Espelhos</h3>
+
+                <div className="p-3 bg-white rounded border border-border-subtle inline-block mx-auto">
+                  <img
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(generatedEvalUrl)}`}
+                    alt="QR Code de Avaliação Navo"
+                    className="w-40 h-40 mx-auto"
+                  />
+                </div>
+
+                <div className="text-[10px] font-mono text-content-muted break-all">
+                  {generatedEvalUrl}
+                </div>
+
+                <button
+                  onClick={() => setShowQrModal(false)}
+                  className="w-full h-9 bg-gold-base text-surface-base font-bold rounded text-xs"
+                >
+                  Fechar QR Code
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -1276,11 +1134,11 @@ const TabNavButton = ({ active, onClick, icon: Icon, label }: any) => (
   <button
     onClick={onClick}
     className={`
-      px-4 py-2.5 flex items-center justify-center gap-2 text-xs font-bold rounded-xl transition-all whitespace-nowrap shrink-0
-      ${active ? 'bg-gold-base text-surface-base shadow-md' : 'text-content-muted hover:text-content-base bg-surface-card/60 hover:bg-surface-card'}
+      py-3 text-xs font-bold border-b-2 flex items-center gap-2 transition-all whitespace-nowrap shrink-0 active:scale-95
+      ${active ? 'border-gold-base text-gold-base' : 'border-transparent text-content-muted hover:text-content-base'}
     `}
   >
-    <Icon className="w-4 h-4" />
+    <Icon className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
     <span>{label}</span>
   </button>
 );
