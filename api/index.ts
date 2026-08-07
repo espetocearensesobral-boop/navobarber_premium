@@ -417,13 +417,6 @@ async function initializeDb(): Promise<void> {
           created_at timestamp DEFAULT now() NOT NULL
         );
       `;
-      await queryClient`
-        CREATE TABLE IF NOT EXISTS site_settings (
-          key text PRIMARY KEY,
-          value jsonb NOT NULL,
-          updated_at timestamp DEFAULT now() NOT NULL
-        );
-      `;
     } catch (migErr: any) {
       console.warn('[API] Aviso na migração de tabelas:', migErr.message);
     }
@@ -1398,41 +1391,6 @@ app.delete("/api/cash-transactions/:id", requireAuth, requireAdmin, async (req, 
   try {
     await db.delete(schema.cashTransactions).where(eq(schema.cashTransactions.id, req.params.id));
     res.json({ success: true });
-  } catch (e: any) {
-    return handleError(res, e, req.path);
-  }
-});
-
-// =====================================
-// Site Settings API (Landing page, etc)
-// =====================================
-app.get("/api/site-settings/:key", async (req, res) => {
-  try {
-    const setting = await db.query.siteSettings.findFirst({
-      where: eq(schema.siteSettings.key, req.params.key)
-    });
-    if (!setting) {
-      return res.status(404).json({ error: "Setting not found" });
-    }
-    res.json(setting.value);
-  } catch (e: any) {
-    return handleError(res, e, req.path);
-  }
-});
-
-app.post("/api/site-settings/:key", requireAuth, requireAdmin, async (req, res) => {
-  try {
-    const key = req.params.key;
-    const value = req.body;
-    await db.insert(schema.siteSettings).values({
-      key,
-      value,
-      updatedAt: new Date()
-    }).onConflictDoUpdate({
-      target: schema.siteSettings.key,
-      set: { value, updatedAt: new Date() }
-    });
-    res.json({ success: true, key, value });
   } catch (e: any) {
     return handleError(res, e, req.path);
   }

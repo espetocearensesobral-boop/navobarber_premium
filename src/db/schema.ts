@@ -140,12 +140,6 @@ export const cashTransactions = pgTable('cash_transactions', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-export const siteSettings = pgTable('site_settings', {
-  key: text('key').primaryKey(),
-  value: jsonb('value').notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
-});
-
 // Relationships
 export const scheduleBlocksRelations = relations(scheduleBlocks, ({ one }) => ({
   professional: one(professionals, {
