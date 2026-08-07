@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Appointment } from '../../types';
 import { fetchAppointmentsFromSupabase } from '../../services/supabaseDataService';
+import { authFetch, API_BASE } from '../../lib/api';
 import { motion, AnimatePresence } from 'motion/react';
 import { hapticLight, hapticSuccess, hapticMedium } from '../../lib/haptics';
 import {
@@ -140,9 +141,18 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
       );
 
       setAppointments(merged);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao carregar agendamentos:", error);
-      if (localCombined.length > 0) {
+      if (error.status === 401 && isGuest && searchedPhone) {
+        // Token expired or invalid, reset guest auth state
+        setSearchedPhone('');
+        setVerifiedVoucher('');
+        setAppointments([]);
+        setHasError(true);
+        try {
+          localStorage.removeItem('barberx_guest_phone');
+        } catch (e) {}
+      } else if (localCombined.length > 0) {
         setAppointments(localCombined);
       } else {
         setHasError(true);
@@ -231,7 +241,6 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
 
   // Voucher verification mode for visitors
   const [isVoucherVerificationMode, setIsVoucherVerificationMode] = useState(false);
-  const [pendingGuestAppointments, setPendingGuestAppointments] = useState<Appointment[]>([]);
   const [voucherInput, setVoucherInput] = useState('');
   const [voucherError, setVoucherError] = useState('');
 
@@ -262,42 +271,34 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
     setVoucherInput('');
 
     try {
-      const [allAppointments] = await Promise.all([
-        fetchAppointmentsFromSupabase(numbers),
+      const [res] = await Promise.all([
+        fetch(`${API_BASE}/appointments/lookup/step1?phone=${encodeURIComponent(numbers)}`),
         new Promise(res => setTimeout(res, 400))
       ]);
 
-      const userAppointments = allAppointments.filter(apt => {
-        return matchPhoneNumbers(apt.client_phone, numbers);
-      });
-
-      if (userAppointments.length > 0) {
-        const sorted = userAppointments.sort(
-          (a, b) => new Date(b.date || b.created_at || '').getTime() - new Date(a.date || a.created_at || '').getTime()
-        );
-
-        setPendingGuestAppointments(sorted);
-        setSearchedPhone(phoneToUse);
-        setIsVoucherVerificationMode(true); // Enter voucher verification step!
-        setAppointments([]); // Hide appointments until voucher is validated
-        try {
-          localStorage.setItem('barberx_guest_phone', phoneToUse);
-        } catch (e) {}
-      } else {
-        setGuestPhoneError('Nenhum agendamento encontrado para este número de telefone.');
-        setAppointments([]);
-        setPendingGuestAppointments([]);
-        setSearchedPhone('');
-        setIsVoucherVerificationMode(false);
+      const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.error || 'Nenhum agendamento encontrado.');
       }
-    } catch (err) {
-      setGuestPhoneError('Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.');
+
+      setSearchedPhone(phoneToUse);
+      setIsVoucherVerificationMode(true); // Enter voucher verification step
+      setAppointments([]); // Hide appointments until voucher is validated
+      try {
+        localStorage.setItem('barberx_guest_phone', phoneToUse);
+      } catch (e) {}
+    } catch (err: any) {
+      setGuestPhoneError(err.message || 'Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.');
+      setAppointments([]);
+      setSearchedPhone('');
+      setIsVoucherVerificationMode(false);
     } finally {
       setIsSearchingGuest(false);
     }
   };
 
-  const handleVerifyVoucher = () => {
+  const handleVerifyVoucher = async () => {
     if (!voucherInput.trim()) {
       setVoucherError('Digite o código do voucher informado no comprovante de agendamento.');
       return;
@@ -305,32 +306,43 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
 
     const cleanInput = voucherInput.trim().toUpperCase().replace(/^#/, '');
 
-    const isMatch = pendingGuestAppointments.some(apt => {
-      const code = (apt.booking_code || (apt as any).bookingCode || '').toUpperCase().replace(/^#/, '');
-      const shortCode = apt.id.replace('apt_', '').substring(0, 8).toUpperCase();
-      const fullId = apt.id.toUpperCase();
-      return code === cleanInput || shortCode === cleanInput || fullId === cleanInput || (code && (code.includes(cleanInput) || cleanInput.includes(code)));
-    });
+    try {
+      const res = await fetch(`${API_BASE}/appointments/lookup/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: searchedPhone, code: cleanInput }),
+        credentials: 'include' // needed to set cookie
+      });
 
-    if (isMatch) {
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Código do Voucher incorreto para o telefone informado.');
+      }
+
       hapticSuccess();
-      setAppointments(pendingGuestAppointments);
       setVerifiedVoucher(cleanInput);
       setIsVoucherVerificationMode(false);
       setVoucherError('');
+      
       try {
         localStorage.setItem('barberx_guest_phone', searchedPhone);
         localStorage.setItem('barberx_guest_voucher', cleanInput);
       } catch (e) {}
-    } else {
+
+      // Reload appointments with newly acquired guest auth session
+      loadAppointments(searchedPhone);
+    } catch (err: any) {
       hapticMedium();
-      setVoucherError('Código do Voucher incorreto para o telefone informado.\nVerifique o código impresso no seu comprovante.');
+      setVoucherError(err.message || 'Erro ao validar o código.');
     }
   };
 
-  const handleClearSearch = () => {
+  const handleClearSearch = async () => {
+    try {
+      await fetch(`${API_BASE}/appointments/lookup/logout`, { method: 'POST', credentials: 'include' });
+    } catch (e) {}
+
     setAppointments([]);
-    setPendingGuestAppointments([]);
     setSearchedPhone('');
     setVerifiedVoucher('');
     setGuestPhoneInput('');

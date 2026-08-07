@@ -466,6 +466,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             >
               <span>Já possui agendamento? Clique aqui.</span>
             </button>
+
+            {/* SCROLL DOWN INDICATOR */}
+            <button
+              onClick={() => scrollToSection(1)}
+              className="mt-8 flex flex-col items-center justify-center cursor-pointer opacity-70 hover:opacity-100 transition-all active:scale-95 group"
+              aria-label="Rolar para a próxima seção"
+            >
+              <div className="w-6 h-10 rounded-full border-[1.5px] border-white/60 flex justify-center p-1 relative">
+                <div className="w-1 h-2 bg-white/80 rounded-full animate-bounce mt-1" style={{ animationDuration: '2s' }}></div>
+              </div>
+            </button>
           </div>
         </div>
 
@@ -782,32 +793,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
               </div>
 
               {/* Action Buttons Zone */}
-              <div className="space-y-2 pt-2 border-t border-neutral-200/80 shrink-0">
+              <div className="pt-2 sm:pt-3 border-t border-neutral-200/80 shrink-0">
                 <button 
                   onClick={handleOpenGoogleMaps}
-                  className="w-full bg-neutral-900 hover:bg-black text-white font-extrabold text-[clamp(0.68rem,1.3vh,0.85rem)] py-[clamp(0.45rem,1.1vh,0.65rem)] px-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md active:scale-98 cursor-pointer tracking-wide border border-neutral-900"
+                  className="w-full bg-neutral-900 hover:bg-black text-white font-extrabold text-[clamp(0.75rem,1.5vh,0.875rem)] py-[clamp(0.75rem,1.8vh,1rem)] px-4 rounded-xl flex items-center justify-center gap-2.5 transition-all shadow-md active:scale-98 cursor-pointer tracking-wide border border-neutral-900"
                 >
-                  <Navigation className="w-3.5 h-3.5 fill-[#C8A96A] text-[#C8A96A]" />
-                  <span>COMO CHEGAR (GOOGLE MAPS)</span>
+                  <Navigation className="w-4 h-4 fill-[#C8A96A] text-[#C8A96A]" />
+                  <span>COMO CHEGAR</span>
                 </button>
-
-                <div className="grid grid-cols-2 gap-2">
-                  <button 
-                    onClick={handleOpenWaze}
-                    className="w-full bg-white hover:bg-neutral-50 text-neutral-800 border border-neutral-300 font-bold text-[clamp(0.625rem,1.1vh,0.75rem)] py-1.5 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-2xs active:scale-98 cursor-pointer"
-                  >
-                    <Compass className="w-3.5 h-3.5 text-cyan-600" />
-                    <span>ABRIR NO WAZE</span>
-                  </button>
-
-                  <button 
-                    onClick={handleOpenWhatsApp}
-                    className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-[clamp(0.625rem,1.1vh,0.75rem)] py-1.5 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-2xs active:scale-98 cursor-pointer"
-                  >
-                    <MessageCircle className="w-3.5 h-3.5 fill-current" />
-                    <span>WHATSAPP</span>
-                  </button>
-                </div>
               </div>
 
             </div>
@@ -868,10 +861,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
         <div className="flex justify-center pt-2 pb-[clamp(1rem,3vh,2rem)] shrink-0 px-[clamp(0.75rem,2vh,2rem)]">
           <button 
             onClick={scrollToTop}
-            className="group flex items-center gap-2 text-[clamp(0.6rem,1.1vh,0.7rem)] font-medium text-neutral-400 hover:text-neutral-900 transition-all duration-300 px-3 py-[clamp(0.2rem,0.5vh,0.4rem)] rounded-full border border-neutral-200/80 bg-neutral-50/80 hover:bg-neutral-100 active:scale-95 shadow-xs"
+            className="group flex flex-col items-center justify-center cursor-pointer opacity-70 hover:opacity-100 transition-all active:scale-95"
+            aria-label="Voltar ao topo"
           >
-            <ArrowUp className="w-3 h-3 text-neutral-400 group-hover:text-neutral-900 group-hover:-translate-y-0.5 transition-transform duration-300" />
-            <span>Voltar ao topo</span>
+            <div className="w-10 h-10 rounded-full border-[1.5px] border-neutral-300 flex justify-center items-center text-neutral-400 group-hover:border-neutral-500 group-hover:text-neutral-600 transition-colors bg-white">
+              <ArrowUp className="w-4 h-4 group-hover:-translate-y-1 transition-transform duration-300" />
+            </div>
           </button>
         </div>
 

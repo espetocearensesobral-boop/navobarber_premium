@@ -1,4 +1,4 @@
-const API_BASE = '';
+export const API_BASE = '';
 
 export const saveToken = (token: string) => {
   if (typeof window === 'undefined') return;

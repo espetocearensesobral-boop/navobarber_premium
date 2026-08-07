@@ -126,7 +126,11 @@ export async function fetchAppointmentsFromSupabase(phone?: string): Promise<App
   try {
     const url = phone ? `${API_BASE}/appointments?phone=${encodeURIComponent(phone)}` : `${API_BASE}/appointments`;
     const res = await authFetch(url);
-    if (!res.ok) throw new Error('Falha ao buscar agendamentos do Supabase');
+    if (!res.ok) {
+      const err: any = new Error('Falha ao buscar agendamentos do Supabase');
+      err.status = res.status;
+      throw err;
+    }
     const data = await res.json();
     if (!Array.isArray(data)) {
       return [];

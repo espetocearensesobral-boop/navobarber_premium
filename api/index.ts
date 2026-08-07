@@ -587,6 +587,59 @@ app.get("/api/appointments/lookup/step1", async (req: any, res) => {
   }
 });
 
+// POST /api/appointments/lookup/verify — Valida código e gera sessão (cookie HTTP-only)
+app.post("/api/appointments/lookup/verify", sensitiveOpsLimiter, async (req: any, res) => {
+  try {
+    const { phone, code } = req.body;
+    if (!phone || !code) {
+      return res.status(400).json({ error: 'Informe telefone e código.' });
+    }
+    const inputPhone = phone.toString().trim();
+    const cleanCode = code.toString().toUpperCase().trim();
+    
+    const allApts = await db
+      .select()
+      .from(schema.appointments)
+      .orderBy(desc(schema.appointments.createdAt))
+      .limit(500);
+      
+    const candidates = allApts.filter((apt: any) => matchPhoneNumbers(apt.clientPhone, inputPhone));
+    
+    const isMatch = candidates.some((apt: any) => {
+      const aptCode = (apt.bookingCode || apt.id || '').toUpperCase();
+      return aptCode === cleanCode || aptCode.endsWith(cleanCode) || cleanCode.endsWith(aptCode) || apt.id.toUpperCase().includes(cleanCode);
+    });
+
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Código de confirmação incorreto para o telefone informado.' });
+    }
+
+    const token = jwt.sign(
+      { role: 'guest_auth', phone: inputPhone, id: `guest_${Date.now()}` },
+      JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    res.cookie('guest_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 3600 * 1000 // 1 hour
+    });
+
+    return res.json({ success: true, message: 'Validado com sucesso.' });
+  } catch (e: any) {
+    console.error('[API] Erro em lookup/verify:', e);
+    return res.status(500).json({ error: 'Erro ao validar código. Tente novamente.' });
+  }
+});
+
+// POST /api/appointments/lookup/logout — Revoga a sessão de visitante
+app.post("/api/appointments/lookup/logout", (req: any, res) => {
+  res.clearCookie('guest_token');
+  res.json({ success: true });
+});
+
 // GET /api/appointments/lookup/step2 — Valida código e retorna detalhes do agendamento
 app.get("/api/appointments/lookup/step2", async (req: any, res) => {
   try {
@@ -731,6 +784,26 @@ app.get("/api/appointments", optionalAuth, async (req: any, res) => {
 
     // Se a requisição passou telefone para busca (ex: consulta do cliente por telefone)
     if (searchPhone) {
+      let isAuthorized = false;
+      if (isAdmin) {
+        isAuthorized = true;
+      } else if (req.user?.phone && matchPhoneNumbers(req.user.phone, searchPhone)) {
+        isAuthorized = true;
+      } else if (req.cookies?.guest_token) {
+        try {
+          const guestDecoded: any = jwt.verify(req.cookies.guest_token, JWT_SECRET);
+          if (guestDecoded.phone && matchPhoneNumbers(guestDecoded.phone, searchPhone)) {
+            isAuthorized = true;
+          }
+        } catch (e) {
+          // Token inválido ou expirado
+        }
+      }
+
+      if (!isAuthorized) {
+        return res.status(401).json({ error: 'Sessão expirada ou não autorizada. Valide o código novamente.' });
+      }
+
       const filtered = dbApts.filter(a => matchPhoneNumbers(a.clientPhone, searchPhone));
       return res.json(filtered);
     }
