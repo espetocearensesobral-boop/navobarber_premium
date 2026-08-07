@@ -133,7 +133,7 @@ export const BookingStep2Barbers: React.FC<BookingStep2Props> = ({
       {loading ? (
         <div className="space-y-3 pt-2">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="flex items-center justify-between p-4 rounded-[20px] bg-border-subtle border border-border-subtle animate-pulse">
+            <div key={i} className="flex items-center justify-between p-4 rounded-2xl bg-border-subtle border border-border-subtle animate-pulse">
               <div className="flex items-center space-x-3.5 w-full">
                 <div className="w-14 h-14 rounded-full bg-white/10 shrink-0" />
                 <div className="space-y-2 w-full max-w-[200px]">

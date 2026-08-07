@@ -75,7 +75,7 @@ export const PWAInstallModal: React.FC<PWAInstallModalProps> = ({ isOpen, onClos
 
           {/* Header */}
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-16 h-16 rounded-[20px] bg-gold-base flex items-center justify-center text-surface-base shrink-0">
+            <div className="w-16 h-16 rounded-2xl bg-gold-base flex items-center justify-center text-surface-base shrink-0">
               <Smartphone className="w-8 h-8" strokeWidth={1.5} />
             </div>
             <div>
@@ -90,7 +90,7 @@ export const PWAInstallModal: React.FC<PWAInstallModalProps> = ({ isOpen, onClos
           </div>
 
           {/* Automatic Install Section */}
-          <div className="bg-surface-card rounded-[20px] p-5 mb-8">
+          <div className="bg-surface-card rounded-2xl p-5 mb-8">
             <div className="flex gap-4 items-start mb-5">
               <div className="px-2.5 py-1 rounded-lg bg-gold-base/10 border border-gold-base/20 flex items-center gap-1.5 text-gold-base shrink-0">
                 <Zap className="w-3.5 h-3.5" fill="currentColor" />
@@ -105,7 +105,7 @@ export const PWAInstallModal: React.FC<PWAInstallModalProps> = ({ isOpen, onClos
             <button
               onClick={handleInstall}
               disabled={installing}
-              className="w-full py-4 px-4 bg-gold-base hover:brightness-110 text-surface-base font-bold text-[17px] rounded-[16px] transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
+              className="w-full py-4 px-4 bg-gold-base hover:brightness-110 text-surface-base font-bold text-[17px] rounded-xl transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
             >
               <Download className="w-5 h-5" strokeWidth={2} />
               <span>Adicionar à Tela Inicial</span>
@@ -116,7 +116,7 @@ export const PWAInstallModal: React.FC<PWAInstallModalProps> = ({ isOpen, onClos
           <div className="space-y-4">
             <h3 className="text-[11px] font-bold text-content-muted uppercase tracking-wider">Como instalar</h3>
             
-            <div className="bg-surface-card/50 rounded-[20px] p-5">
+            <div className="bg-surface-card/50 rounded-2xl p-5">
               <div className="flex bg-surface-base/50 p-1.5 rounded-2xl mb-8">
                 <button
                   onClick={() => { setActiveTab('android'); hapticLight(); }}

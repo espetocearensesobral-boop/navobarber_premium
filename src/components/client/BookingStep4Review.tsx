@@ -350,7 +350,7 @@ export const BookingStep4Review: React.FC<BookingStep4ReviewProps> = ({
 
       {/* Floating Bottom Tray */}
       <div className="sticky bottom-3 left-0 right-0 px-5 z-40 flex justify-center pointer-events-none animate-fade-in my-3">
-        <div className="pointer-events-auto w-full max-w-[400px] bg-surface-base/90 backdrop-blur-xl border border-border-subtle p-3.5 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex items-center justify-between space-x-3">
+        <div className="pointer-events-auto w-full max-w-[400px] bg-surface-base/90 backdrop-blur-xl border border-border-subtle p-3.5 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex items-center justify-between space-x-3">
           {showCancelConfirm ? (
             <div className="flex-1 flex flex-col items-center animate-fade-in">
               <span className="text-[11px] font-bold text-content-base mb-2 uppercase tracking-wider">Cancelar agendamento?</span>

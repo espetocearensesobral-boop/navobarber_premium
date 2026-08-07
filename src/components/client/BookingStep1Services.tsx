@@ -518,7 +518,7 @@ export const BookingStep1Services: React.FC<BookingStep1Props> = ({
       {/* Sticky Bottom Tray with Clear ("Limpar") button */}
       {selectedServices.length > 0 && (
         <div className="sticky bottom-2 z-40 px-4 my-2 flex justify-center pointer-events-none animate-fade-in">
-          <div className="pointer-events-auto w-full max-w-[440px] bg-surface-base/95 backdrop-blur-xl border border-border-subtle p-3.5 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.9)] flex items-center justify-between">
+          <div className="pointer-events-auto w-full max-w-[440px] bg-surface-base/95 backdrop-blur-xl border border-border-subtle p-3.5 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.9)] flex items-center justify-between">
             <div className="flex flex-col pl-2">
               <div className="flex items-center space-x-1.5 mb-0.5">
                 <span className="w-5 h-5 rounded-full bg-gold-base/20 flex items-center justify-center text-gold-base font-black text-[10px]">

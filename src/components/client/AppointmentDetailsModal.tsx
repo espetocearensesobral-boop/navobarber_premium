@@ -355,7 +355,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
           {/* VOUCHER TICKET CARD */}
           <div
             ref={receiptRef}
-            className="w-full bg-[#faf8f4] text-[#1a1a1a] rounded-[24px] overflow-hidden shadow-2xl border border-[#e8e0d4] relative select-none"
+            className="w-full bg-[#faf8f4] text-[#1a1a1a] rounded-modal overflow-hidden shadow-2xl border border-[#e8e0d4] relative select-none"
           >
             {/* Watermark Background */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden">
