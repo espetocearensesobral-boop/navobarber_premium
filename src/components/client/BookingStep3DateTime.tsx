@@ -68,10 +68,11 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
     let isMounted = true;
     
     const fetchAvailability = async () => {
-      if (!selectedDate || !selectedBarber) return;
+      if (!selectedDate) return;
       setIsLoadingSlots(true);
       try {
-        const response = await authFetch(`/api/availability?professionalId=${selectedBarber.id}&date=${selectedDate}`);
+        const profId = selectedBarber?.id || 'prof_any';
+        const response = await authFetch(`/api/availability?professionalId=${profId}&date=${selectedDate}`);
         if (response.ok) {
           const appointments = await response.json();
           const bookedTimes = Array.isArray(appointments) 
@@ -264,7 +265,15 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
           <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
             {baseSlots.map((time) => {
               const isSelected = selectedTimeSlot === time;
-              const isAvailable = !busySlots.includes(time);
+              
+              // Validar se o horário já passou na data de hoje
+              const now = new Date();
+              const currentHour = now.getHours();
+              const currentMinute = now.getMinutes();
+              const [slotH, slotM] = time.split(':').map(Number);
+              const isPastTime = selectedDate === todayStr && (slotH < currentHour || (slotH === currentHour && slotM <= currentMinute));
+              
+              const isAvailable = !busySlots.includes(time) && !isPastTime;
               return (
                 <button
                   key={time}

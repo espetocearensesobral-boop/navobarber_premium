@@ -1470,21 +1470,148 @@ app.delete("/api/cash-transactions/:id", requireAuth, requireAdmin, async (req, 
 app.get("/api/availability", async (req, res) => {
   try {
     const { professionalId, date } = req.query;
-    if (!professionalId || !date) {
-      return res.status(400).json({ error: 'Missing professionalId or date' });
+    if (!date) {
+      return res.status(400).json({ error: 'Data não informada' });
     }
-    
-    let appointments = [];
-    appointments = await db.query.appointments.findMany({
+
+    const dateStr = String(date);
+    const profIdStr = professionalId ? String(professionalId) : '';
+
+    // Buscar agendamentos não cancelados para a data
+    const allAppointments = await db.query.appointments.findMany({
       where: (apt: any, { and, eq, ne }: any) => and(
-        eq(apt.professionalId, professionalId),
-        eq(apt.date, date),
+        eq(apt.date, dateStr),
         ne(apt.status, 'cancelled')
       )
     });
-    
-    // Only return time slots, no PII
-    res.json(appointments.map((a: any) => ({ timeSlot: a.timeSlot })));
+
+    // Buscar bloqueios de agenda para a data
+    let allBlocks: any[] = [];
+    try {
+      allBlocks = await db.query.scheduleBlocks.findMany({
+        where: (blk: any, { eq }: any) => eq(blk.date, dateStr)
+      });
+    } catch (e) {
+      // Tabela scheduleBlocks pode não estar criada em alguns cenários
+    }
+
+    // Buscar profissionais ativos
+    const allProfs = await db.query.professionals.findMany();
+    const activeProfs = allProfs.filter((p: any) => p.id !== 'prof_any');
+
+    if (profIdStr && profIdStr !== 'prof_any') {
+      // Para um profissional específico
+      const profApts = allAppointments.filter((a: any) => a.professionalId === profIdStr);
+      const profBlocks = allBlocks.filter((b: any) => b.professionalId === profIdStr);
+
+      const busyTimeSlots = new Set<string>();
+
+      // Expansão de horários conforme duração do serviço
+      for (const apt of profApts) {
+        if (apt.timeSlot) {
+          busyTimeSlots.add(apt.timeSlot);
+          const duration = Number(apt.totalDurationMinutes || 30);
+          if (duration > 30) {
+            const [h, m] = apt.timeSlot.split(':').map(Number);
+            let totalMins = h * 60 + m;
+            for (let d = 30; d < duration; d += 30) {
+              totalMins += 30;
+              const slotH = String(Math.floor(totalMins / 60)).padStart(2, '0');
+              const slotM = String(totalMins % 60).padStart(2, '0');
+              busyTimeSlots.add(`${slotH}:${slotM}`);
+            }
+          }
+        }
+      }
+
+      // Horários bloqueados por bloqueio de agenda
+      for (const blk of profBlocks) {
+        const startTime = blk.startTime || blk.start_time;
+        const endTime = blk.endTime || blk.end_time;
+        if (startTime && endTime) {
+          const [sh, sm] = startTime.split(':').map(Number);
+          const [eh, em] = endTime.split(':').map(Number);
+          let startMins = sh * 60 + sm;
+          const endMins = eh * 60 + em;
+          while (startMins < endMins) {
+            const slotH = String(Math.floor(startMins / 60)).padStart(2, '0');
+            const slotM = String(startMins % 60).padStart(2, '0');
+            busyTimeSlots.add(`${slotH}:${slotM}`);
+            startMins += 30;
+          }
+        }
+      }
+
+      return res.json(Array.from(busyTimeSlots).map(ts => ({ timeSlot: ts })));
+    } else {
+      // prof_any ou sem preferência: o horário só está ocupado se TODOS os profissionais estiverem ocupados
+      if (activeProfs.length === 0) {
+        return res.json([]);
+      }
+
+      const profBusyMap = new Map<string, Set<string>>();
+      for (const prof of activeProfs) {
+        profBusyMap.set(prof.id, new Set<string>());
+      }
+
+      for (const apt of allAppointments) {
+        const pSlots = profBusyMap.get(apt.professionalId);
+        if (pSlots && apt.timeSlot) {
+          pSlots.add(apt.timeSlot);
+          const duration = Number(apt.totalDurationMinutes || 30);
+          if (duration > 30) {
+            const [h, m] = apt.timeSlot.split(':').map(Number);
+            let totalMins = h * 60 + m;
+            for (let d = 30; d < duration; d += 30) {
+              totalMins += 30;
+              const slotH = String(Math.floor(totalMins / 60)).padStart(2, '0');
+              const slotM = String(totalMins % 60).padStart(2, '0');
+              pSlots.add(`${slotH}:${slotM}`);
+            }
+          }
+        }
+      }
+
+      for (const blk of allBlocks) {
+        const pSlots = profBusyMap.get(blk.professionalId);
+        const startTime = blk.startTime || blk.start_time;
+        const endTime = blk.endTime || blk.end_time;
+        if (pSlots && startTime && endTime) {
+          const [sh, sm] = startTime.split(':').map(Number);
+          const [eh, em] = endTime.split(':').map(Number);
+          let startMins = sh * 60 + sm;
+          const endMins = eh * 60 + em;
+          while (startMins < endMins) {
+            const slotH = String(Math.floor(startMins / 60)).padStart(2, '0');
+            const slotM = String(startMins % 60).padStart(2, '0');
+            pSlots.add(`${slotH}:${slotM}`);
+            startMins += 30;
+          }
+        }
+      }
+
+      const candidateSlots = new Set<string>();
+      for (const set of profBusyMap.values()) {
+        for (const slot of set) {
+          candidateSlots.add(slot);
+        }
+      }
+
+      const allBusySlots = new Set<string>();
+      for (const slot of candidateSlots) {
+        let countBusy = 0;
+        for (const prof of activeProfs) {
+          if (profBusyMap.get(prof.id)?.has(slot)) {
+            countBusy++;
+          }
+        }
+        if (countBusy >= activeProfs.length) {
+          allBusySlots.add(slot);
+        }
+      }
+
+      return res.json(Array.from(allBusySlots).map(ts => ({ timeSlot: ts })));
+    }
   } catch (e: any) {
     return handleError(res, e, req.path);
   }

@@ -1,10 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { 
   ShopProfile, 
   defaultShopProfile, 
   fetchShopProfile, 
   daysOfWeekMap 
 } from '../../services/shopProfileService';
+import { fetchServicesFromSupabase } from '../../services/supabaseDataService';
 import { 
   Clock, 
   MapPin, 
@@ -58,10 +59,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHoursModalOpen, setIsHoursModalOpen] = useState(false);
   const [shopProfile, setShopProfile] = useState<ShopProfile>(defaultShopProfile);
+  const [dbServices, setDbServices] = useState<any[]>([]);
 
   useEffect(() => {
     fetchShopProfile().then(data => {
       if (data) setShopProfile(data);
+    });
+    fetchServicesFromSupabase().then(data => {
+      if (data && data.length > 0) setDbServices(data);
     });
   }, []);
 
@@ -89,13 +94,54 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
     scrollToSection(0);
   };
 
-  const services = [
+  const nextAvailableTimeSlot = useMemo(() => {
+    const now = new Date();
+    const dayIndex = now.getDay();
+    const dayItem = daysOfWeekMap.find(item => item.dayIndex === dayIndex);
+    
+    if (dayItem && shopProfile.operatingSchedule?.[dayItem.key]?.active) {
+      const sch = shopProfile.operatingSchedule[dayItem.key];
+      const [openH, openM] = (sch.open || shopProfile.openTime || '09:00').split(':').map(Number);
+      const [closeH, closeM] = (sch.close || shopProfile.closeTime || '20:00').split(':').map(Number);
+      
+      const currentMins = now.getHours() * 60 + now.getMinutes();
+      const openMins = openH * 60 + openM;
+      const closeMins = closeH * 60 + closeM;
+      
+      if (currentMins < openMins) {
+        return sch.open || shopProfile.openTime || '09:00';
+      } else if (currentMins < closeMins - 30) {
+        const nextTotalMins = Math.ceil((currentMins + 1) / 30) * 30;
+        const h = Math.floor(nextTotalMins / 60);
+        const m = nextTotalMins % 60;
+        if (h * 60 + m <= closeMins) {
+          return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+        }
+      }
+    }
+
+    for (let i = 1; i <= 7; i++) {
+      const nextDate = new Date();
+      nextDate.setDate(now.getDate() + i);
+      const nextDayIndex = nextDate.getDay();
+      const nextDayItem = daysOfWeekMap.find(item => item.dayIndex === nextDayIndex);
+      if (nextDayItem && shopProfile.operatingSchedule?.[nextDayItem.key]?.active) {
+        const openTime = shopProfile.operatingSchedule[nextDayItem.key].open || shopProfile.openTime || '09:00';
+        const dayLabel = i === 1 ? 'Amanhã' : nextDayItem.label.split('-')[0].trim();
+        return `${dayLabel} ${openTime}`;
+      }
+    }
+
+    return '09:00';
+  }, [shopProfile]);
+
+  const defaultServices = [
     {
       id: 'srv_1',
       title: 'Corte Clássico',
       category: 'cabelo',
       price: 60,
-      duration: '45 min',
+      duration_minutes: 45,
       description: 'Tesoura e máquina com acabamento.',
       image: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=400&auto=format&fit=crop',
     },
@@ -104,7 +150,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
       title: 'Barba Premium',
       category: 'barba',
       price: 45,
-      duration: '30 min',
+      duration_minutes: 30,
       description: 'Toalha quente e navalha.',
       image: 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=400&auto=format&fit=crop',
     },
@@ -113,16 +159,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
       title: 'Combo Corte + Barba',
       category: 'cabelo',
       price: 95,
-      duration: '75 min',
+      duration_minutes: 75,
       description: 'Experiência completa Navo Premium.',
       image: 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=400&auto=format&fit=crop',
     }
   ];
 
-  const filteredServices = services.filter(s => {
+  const servicesToDisplay = dbServices.length > 0 ? dbServices : defaultServices;
+
+  const filteredServices = servicesToDisplay.filter(s => {
     if (activeCategory === 'todos') return true;
-    if (activeCategory === 'cabelo') return s.category === 'cabelo';
-    if (activeCategory === 'barba') return s.category === 'barba';
+    const cat = (s.category || '').toLowerCase();
+    if (activeCategory === 'cabelo') return cat.includes('cabelo') || cat.includes('corte');
+    if (activeCategory === 'barba') return cat.includes('barba');
     return true;
   });
 
@@ -365,7 +414,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
           <div className="flex justify-between items-center w-full px-2">
             <div className="flex flex-col items-center gap-1">
               <span className="text-[#a0a0a0] text-[0.65rem] font-bold tracking-widest uppercase">PRÓXIMO</span>
-              <span className="text-white font-bold text-sm">14:30</span>
+              <span className="text-white font-bold text-sm">{nextAvailableTimeSlot}</span>
             </div>
 
             <button onClick={toggleHoursModal} className="flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition-transform hover:opacity-80">

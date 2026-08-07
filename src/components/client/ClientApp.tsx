@@ -474,6 +474,8 @@ export const ClientApp: React.FC = () => {
                     <BookingStep2Barbers
                       selectedServices={selectedServices}
                       selectedBarber={selectedBarber}
+                      selectedDate={selectedDate}
+                      selectedTimeSlot={selectedTimeSlot}
                       onSelectBarber={setSelectedBarber}
                       onBack={() => goToStep(1, 'Retornando para serviços...')}
                       onNext={() => goToStep(3, 'Buscando horários na agenda...')}

@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Professional, ServiceItem } from '../../types';
 import { fetchProfessionalsFromSupabase, getCachedProfessionals } from '../../services/supabaseDataService';
-import { UserCheck, Star, Zap, CheckCircle, ArrowLeft, ArrowRight, User, Loader2 } from 'lucide-react';
+import { UserCheck, Star, Zap, CheckCircle, ArrowLeft, ArrowRight, User, Loader2, Calendar, Clock, AlertCircle } from 'lucide-react';
 import { optimizeImageUrl } from '../../lib/imageUtils';
+import { authFetch } from '../../lib/api';
 
 interface BookingStep2Props {
   selectedServices?: ServiceItem[];
   selectedBarber: Professional | null;
+  selectedDate?: string;
+  selectedTimeSlot?: string;
   onSelectBarber: (barber: Professional) => void;
   onBack: () => void;
   onNext: () => void;
@@ -41,6 +44,8 @@ function processBarbersList(data: Professional[]): Professional[] {
 export const BookingStep2Barbers: React.FC<BookingStep2Props> = ({
   selectedServices = [],
   selectedBarber,
+  selectedDate,
+  selectedTimeSlot,
   onSelectBarber,
   onBack,
   onNext
@@ -50,6 +55,7 @@ export const BookingStep2Barbers: React.FC<BookingStep2Props> = ({
   const [loading, setLoading] = useState(!cached || cached.length === 0);
   const [showBackConfirm, setShowBackConfirm] = useState(false);
   const [isAdvancing, setIsAdvancing] = useState(false);
+  const [busyMap, setBusyMap] = useState<Record<string, string[]>>({});
 
   const totalPrice = selectedServices.reduce((a, b) => a + (b.price || 0), 0);
   const servicesSummaryText = selectedServices.length > 0
@@ -72,8 +78,57 @@ export const BookingStep2Barbers: React.FC<BookingStep2Props> = ({
     return () => { isMounted = false; };
   }, []);
 
+  // Buscar disponibilidade de cada barbeiro para a data selecionada
+  useEffect(() => {
+    if (!selectedDate) return;
+    let isMounted = true;
+
+    async function loadBarbersAvailability() {
+      try {
+        const newMap: Record<string, string[]> = {};
+        for (const b of barbers) {
+          if (b.id === 'prof_any') continue;
+          const res = await authFetch(`/api/availability?professionalId=${b.id}&date=${selectedDate}`);
+          if (res.ok) {
+            const data = await res.json();
+            newMap[b.id] = Array.isArray(data) ? data.map((item: any) => item?.timeSlot).filter(Boolean) : [];
+          }
+        }
+        if (isMounted) {
+          setBusyMap(newMap);
+        }
+      } catch (err) {
+        console.warn('Erro ao carregar disponibilidade dos barbeiros:', err);
+      }
+    }
+
+    loadBarbersAvailability();
+    return () => { isMounted = false; };
+  }, [selectedDate, barbers]);
+
+  // Format date BR
+  const formatDateBR = (iso: string) => {
+    if (!iso) return '';
+    const parts = iso.split('-');
+    if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    return iso;
+  };
+
   return (
     <div className="space-y-3 pb-28 px-4">
+      {/* Active Filter Banner if Date/Time selected */}
+      {selectedDate && (
+        <div className="bg-surface-card border border-gold-base/30 rounded-card p-3 flex items-center justify-between text-xs animate-fade-in shadow-sm">
+          <div className="flex items-center space-x-2 text-content-base">
+            <Calendar className="w-4 h-4 text-gold-base shrink-0" />
+            <span>Filtro de agenda: <strong>{formatDateBR(selectedDate)}</strong> {selectedTimeSlot ? `às ${selectedTimeSlot}` : ''}</span>
+          </div>
+          <span className="text-[10px] text-gold-base font-bold uppercase tracking-wider bg-gold-base/10 px-2 py-0.5 rounded-full border border-gold-base/20">
+            {selectedTimeSlot ? 'Horário Filtrado' : 'Data Filtrada'}
+          </span>
+        </div>
+      )}
+
       {/* Barbers List */}
       {loading ? (
         <div className="space-y-3 pt-2">
@@ -102,15 +157,25 @@ export const BookingStep2Barbers: React.FC<BookingStep2Props> = ({
               : (barber.nickname || barber.specialties?.[0] || barber.role || 'Barbeiro especialista');
             const cortesCount = barber.reviews_count || 120;
 
+            // Verificar se o profissional está ocupado no horário selecionado
+            const isOccupiedAtSlot = Boolean(
+              selectedTimeSlot && 
+              !isAny && 
+              busyMap[barber.id]?.includes(selectedTimeSlot)
+            );
+
             return (
               <div
                 key={barber.id}
                 onClick={() => {
+                  if (isOccupiedAtSlot) return;
                   if ('vibrate' in navigator) navigator.vibrate(50);
                   onSelectBarber(barber);
                 }}
-                className={`flex items-center justify-between p-3.5 sm:p-4 rounded-card cursor-pointer transition-all duration-200 select-none ${
-                  isSelected
+                className={`flex items-center justify-between p-3.5 sm:p-4 rounded-card cursor-pointer transition-all duration-200 select-none relative overflow-hidden ${
+                  isOccupiedAtSlot
+                    ? 'opacity-50 cursor-not-allowed bg-surface-card border border-status-danger/30'
+                    : isSelected
                     ? 'bg-surface-base border-2 border-content-base shadow-[0_0_20px_rgba(201,169,110,0.15)] scale-[1.01]'
                     : 'bg-surface-card border border-border-subtle hover:border-border-subtle hover:bg-surface-card'
                 }`}
@@ -131,7 +196,6 @@ export const BookingStep2Barbers: React.FC<BookingStep2Props> = ({
                         loading="eager"
                         className="w-full h-full object-cover rounded-full"
                         onError={(e) => {
-                          // Fallback to initial badge on image load error
                           (e.target as HTMLElement).style.display = 'none';
                         }}
                       />
@@ -144,9 +208,7 @@ export const BookingStep2Barbers: React.FC<BookingStep2Props> = ({
 
                   {/* Info Column */}
                   <div className="min-w-0">
-                    <h3 className={`font-bold text-base leading-snug truncate transition-colors ${
-                      isSelected ? 'text-content-base' : 'text-content-base'
-                    }`}>
+                    <h3 className="font-bold text-base leading-snug truncate text-content-base">
                       {barber.name}
                     </h3>
 
@@ -158,6 +220,11 @@ export const BookingStep2Barbers: React.FC<BookingStep2Props> = ({
                       {isAny ? (
                         <span className="text-[10px] text-status-success font-bold uppercase tracking-wider bg-status-success/10 px-2 py-0.5 rounded-full border border-status-success/20">
                           Mais disponibilidade
+                        </span>
+                      ) : isOccupiedAtSlot ? (
+                        <span className="text-[10px] text-red-400 font-bold uppercase tracking-wider bg-red-500/10 px-2 py-0.5 rounded-full border border-red-500/20 flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3" />
+                          Ocupado às {selectedTimeSlot}
                         </span>
                       ) : (
                         <div className="flex items-center text-content-muted text-xs">
