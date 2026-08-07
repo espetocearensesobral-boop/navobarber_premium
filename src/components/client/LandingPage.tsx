@@ -18,6 +18,10 @@ import {
   Car, 
   MessageCircle, 
   Navigation,
+  Compass,
+  ExternalLink,
+  Phone,
+  Instagram,
   ArrowUp,
   ArrowRight,
   List,
@@ -196,6 +200,30 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
     const num = shopProfile.whatsapp ? shopProfile.whatsapp.replace(/\D/g, '') : '5511999998888';
     window.open(`https://wa.me/${num}?text=Olá!%20Gostaria%20de%20agendar%20um%20horário%20na%20${encodeURIComponent(shopProfile.name)}.`, '_blank', 'noopener,noreferrer');
   };
+
+  const handleOpenWaze = () => {
+    hapticLight();
+    const address = shopProfile.address || 'Rua Augusta 1420 Jardins São Paulo';
+    const url = `https://waze.com/ul?q=${encodeURIComponent(address)}&navigate=yes`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  const isShopOpenNow = (() => {
+    const now = new Date();
+    const dayIndex = now.getDay();
+    const dayItem = daysOfWeekMap.find(item => item.dayIndex === dayIndex);
+    if (!dayItem) return true;
+    const sch = shopProfile.operatingSchedule?.[dayItem.key];
+    if (!sch || !sch.active) return false;
+
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    const [openH, openM] = (sch.open || shopProfile.openTime || '09:00').split(':').map(Number);
+    const [closeH, closeM] = (sch.close || shopProfile.closeTime || '20:00').split(':').map(Number);
+    const openMinutes = (openH || 9) * 60 + (openM || 0);
+    const closeMinutes = (closeH || 20) * 60 + (closeM || 0);
+
+    return currentMinutes >= openMinutes && currentMinutes < closeMinutes;
+  })();
 
   return (
     <div ref={containerRef} className="w-full h-full min-h-0 overflow-y-scroll snap-y snap-mandatory bg-white text-neutral-900 font-sans antialiased relative selection:bg-[#C8A96A]/20 selection:text-neutral-900 no-scrollbar">
@@ -578,52 +606,147 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
       {/* SECTION 5: LOCALIZAÇÃO */}
       <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
         <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full h-full flex flex-col justify-between items-stretch min-h-0 my-auto">
-          <div className="shrink-0 mb-[clamp(0.25rem,0.8vh,0.75rem)]">
-            <span className="text-[#C8A96A] text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase block mb-0.5">
-              LOCALIZAÇÃO
-            </span>
-            <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-bold text-neutral-900 tracking-tight leading-tight">
-              Onde estamos
-            </h2>
+          {/* Section Header */}
+          <div className="shrink-0 mb-[clamp(0.25rem,0.8vh,0.75rem)] flex items-end justify-between gap-3">
+            <div>
+              <span className="text-[#C8A96A] text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase flex items-center gap-1.5 mb-0.5">
+                <MapPin className="w-3.5 h-3.5 text-[#C8A96A]" />
+                LOCALIZAÇÃO & ATENDIMENTO
+              </span>
+              <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-bold text-neutral-900 tracking-tight leading-tight font-serif">
+                Onde estamos
+              </h2>
+            </div>
+
+            {/* Live Open/Closed Status Pill */}
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-neutral-900 text-white border border-neutral-800 shadow-xs shrink-0">
+              <span className={`w-2 h-2 rounded-full ${isShopOpenNow ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'}`} />
+              <span className="text-[clamp(0.6rem,1.1vh,0.75rem)] font-bold uppercase tracking-wider">
+                {isShopOpenNow ? 'Aberto Agora' : 'Atendimento Fechado'}
+              </span>
+            </div>
           </div>
 
-          <div className="bg-white border border-neutral-200/80 rounded-[clamp(0.625rem,1.4vh,1.125rem)] p-[clamp(0.5rem,1.2vh,1rem)] shadow-xs flex-1 min-h-0 my-auto flex flex-col md:grid md:grid-cols-2 gap-[clamp(0.5rem,1.2vh,1.25rem)] items-center justify-between">
-            {/* Map Image Graphic */}
-            <div className="relative w-full flex-1 min-h-[clamp(4.5rem,12vh,10rem)] rounded-[clamp(0.5rem,1vh,0.875rem)] overflow-hidden bg-neutral-100 border border-neutral-200 shrink-0 md:shrink">
-              <img 
-                src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?q=80&w=800&auto=format&fit=crop" 
-                alt="Mapa Navo Premium" 
-                className="w-full h-full object-cover filter contrast-105"
+          {/* Main Card Container */}
+          <div className="bg-neutral-950 border border-neutral-800 rounded-[clamp(0.75rem,1.6vh,1.25rem)] p-[clamp(0.625rem,1.5vh,1.25rem)] shadow-xl flex-1 min-h-0 my-auto flex flex-col md:grid md:grid-cols-12 gap-[clamp(0.625rem,1.5vh,1.25rem)] items-stretch justify-between text-white overflow-hidden">
+            
+            {/* Real Interactive Google Maps Embedded iframe */}
+            <div className="relative w-full md:col-span-7 flex-1 min-h-[clamp(8.5rem,18vh,15rem)] rounded-[clamp(0.625rem,1.2vh,1rem)] overflow-hidden bg-neutral-900 border border-neutral-800 shrink-0 md:shrink group">
+              <iframe
+                title="Mapa de Localização da Barbearia"
+                width="100%"
+                height="100%"
+                style={{ border: 0, filter: 'contrast(102%) brightness(96%)' }}
+                loading="lazy"
+                allowFullScreen
+                src={`https://maps.google.com/maps?q=${encodeURIComponent(shopProfile.address || 'Rua Augusta, 1420 - Jardins, São Paulo - SP')}&t=&z=16&ie=UTF8&iwloc=&output=embed`}
+                className="w-full h-full min-h-full rounded-[clamp(0.5rem,1vh,0.875rem)]"
               />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-[clamp(1.75rem,3.5vh,2.5rem)] h-[clamp(1.75rem,3.5vh,2.5rem)] rounded-full bg-neutral-900 text-white flex items-center justify-center shadow-lg">
-                  <MapPin className="w-[clamp(0.875rem,1.8vh,1.25rem)] h-[clamp(0.875rem,1.8vh,1.25rem)] fill-current text-white" />
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-[clamp(0.375rem,1vh,0.875rem)] flex flex-col justify-between w-full min-h-0">
-              <div className="space-y-[clamp(0.25rem,0.8vh,0.625rem)] text-[clamp(0.625rem,1.25vh,0.875rem)] text-neutral-700">
-                <div className="flex items-start gap-2">
-                  <MapPin className="w-[clamp(0.75rem,1.4vh,1rem)] h-[clamp(0.75rem,1.4vh,1rem)] text-[#C8A96A] shrink-0 mt-0.5" />
-                  <span className="font-medium">{shopProfile.address}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock className="w-[clamp(0.75rem,1.4vh,1rem)] h-[clamp(0.75rem,1.4vh,1rem)] text-[#C8A96A] shrink-0" />
-                  <span className="font-medium">
-                    Aberto das {shopProfile.openTime || '09:00'} às {shopProfile.closeTime || '20:00'}
+              
+              {/* Map Floating Top Badge & Expand Link */}
+              <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between pointer-events-none">
+                <div className="bg-neutral-900/90 backdrop-blur-md border border-white/10 px-2.5 py-1 rounded-lg shadow-md flex items-center gap-2 pointer-events-auto">
+                  <div className="w-2 h-2 rounded-full bg-[#C8A96A]" />
+                  <span className="text-[10px] sm:text-[11px] font-bold text-white uppercase tracking-wide truncate max-w-[150px] sm:max-w-xs">
+                    {shopProfile.unitName || 'Unidade Jardins'}
                   </span>
                 </div>
+
+                <button
+                  onClick={handleOpenGoogleMaps}
+                  className="bg-neutral-900/95 hover:bg-neutral-900 text-[#C8A96A] border border-[#C8A96A]/40 px-2 py-1 rounded-lg shadow-md transition-all pointer-events-auto flex items-center gap-1 text-[10px] sm:text-[11px] font-bold"
+                  title="Abrir no Google Maps"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                  <span className="hidden sm:inline">Ver no Mapa</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Details Panel & Action Buttons */}
+            <div className="md:col-span-5 flex flex-col justify-between space-y-[clamp(0.375rem,1vh,0.875rem)] min-h-0">
+              
+              {/* Highlighted Custom Typography */}
+              <div className="space-y-[clamp(0.375rem,1vh,0.75rem)]">
+                <div>
+                  <span className="text-[clamp(0.6rem,1vh,0.725rem)] font-bold uppercase tracking-widest text-[#C8A96A] block mb-0.5">
+                    {shopProfile.unitName || 'Unidade Jardins'}
+                  </span>
+                  <h3 className="text-[clamp(1.1rem,2.2vh,1.5rem)] font-extrabold text-white tracking-tight leading-tight font-serif">
+                    {shopProfile.name}
+                  </h3>
+                </div>
+
+                {/* Big Display Address Highlight Callout */}
+                <div className="bg-neutral-900/90 border border-neutral-800 p-[clamp(0.5rem,1.2vh,0.75rem)] rounded-xl space-y-1.5">
+                  <div className="flex items-start gap-2">
+                    <div className="w-6 h-6 rounded-lg bg-[#C8A96A]/15 border border-[#C8A96A]/30 text-[#C8A96A] flex items-center justify-center shrink-0 mt-0.5">
+                      <MapPin className="w-3.5 h-3.5" />
+                    </div>
+                    <div>
+                      <span className="text-[9px] text-neutral-400 font-bold uppercase tracking-wider block">Endereço de Atendimento</span>
+                      <p className="text-[clamp(0.725rem,1.4vh,0.9rem)] font-bold text-white leading-snug">
+                        {shopProfile.address}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick Info Grid (Hours & Phone) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                  <div className="bg-neutral-900/60 border border-neutral-800 p-2 rounded-lg flex items-center gap-2">
+                    <Clock className="w-3.5 h-3.5 text-[#C8A96A] shrink-0" />
+                    <div>
+                      <span className="text-[8.5px] text-neutral-400 uppercase tracking-wider block font-bold">Horário Hoje</span>
+                      <span className="text-[10.5px] font-bold text-neutral-200">
+                        {shopProfile.openTime || '09:00'} às {shopProfile.closeTime || '20:00'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="bg-neutral-900/60 border border-neutral-800 p-2 rounded-lg flex items-center gap-2">
+                    <Phone className="w-3.5 h-3.5 text-[#C8A96A] shrink-0" />
+                    <div>
+                      <span className="text-[8.5px] text-neutral-400 uppercase tracking-wider block font-bold">Contato Direto</span>
+                      <span className="text-[10.5px] font-bold text-neutral-200">
+                        {shopProfile.phone || '(11) 99999-8888'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <button 
-                onClick={handleOpenGoogleMaps}
-                className="w-full bg-white border border-neutral-300 text-neutral-900 font-semibold text-[clamp(0.65rem,1.3vh,0.875rem)] py-[clamp(0.375rem,0.9vh,0.625rem)] rounded-xl flex items-center justify-center gap-2 hover:bg-neutral-50 active:scale-98 transition-all shadow-xs shrink-0"
-              >
-                <Navigation className="w-[clamp(0.75rem,1.4vh,1rem)] h-[clamp(0.75rem,1.4vh,1rem)]" />
-                <span>Como chegar</span>
-              </button>
+              {/* Action Buttons Zone */}
+              <div className="space-y-1.5 pt-1 border-t border-neutral-800/80 shrink-0">
+                <button 
+                  onClick={handleOpenGoogleMaps}
+                  className="w-full bg-gradient-to-r from-[#d4a853] via-[#e5be6b] to-[#c49a4a] hover:brightness-110 text-neutral-950 font-extrabold text-[clamp(0.68rem,1.3vh,0.85rem)] py-[clamp(0.45rem,1.1vh,0.65rem)] px-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-[0_4px_15px_rgba(212,168,83,0.25)] active:scale-98 cursor-pointer tracking-wide"
+                >
+                  <Navigation className="w-3.5 h-3.5 fill-neutral-950" />
+                  <span>COMO CHEGAR (GOOGLE MAPS)</span>
+                </button>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <button 
+                    onClick={handleOpenWaze}
+                    className="w-full bg-neutral-900 hover:bg-neutral-800 text-white border border-neutral-700/80 font-bold text-[clamp(0.625rem,1.1vh,0.75rem)] py-1.5 rounded-xl flex items-center justify-center gap-1.5 transition-all active:scale-98 cursor-pointer"
+                  >
+                    <Compass className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>ABRIR NO WAZE</span>
+                  </button>
+
+                  <button 
+                    onClick={handleOpenWhatsApp}
+                    className="w-full bg-[#25D366]/15 hover:bg-[#25D366]/25 border border-[#25D366]/40 text-[#25D366] font-bold text-[clamp(0.625rem,1.1vh,0.75rem)] py-1.5 rounded-xl flex items-center justify-center gap-1.5 transition-all active:scale-98 cursor-pointer"
+                  >
+                    <MessageCircle className="w-3.5 h-3.5 fill-current" />
+                    <span>WHATSAPP</span>
+                  </button>
+                </div>
+              </div>
+
             </div>
+
           </div>
         </div>
       </section>
