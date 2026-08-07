@@ -24,16 +24,16 @@
 }
 
 :root {
-  /* 4-Color Core Palette */
-  --color-surface-base: #000000;
-  --color-surface-card: #121212;
-  --color-gold-base: #C9A96E;
-  --color-gold-deep: #C9A96E;
-  --color-content-base: #F2EFE7;
+  /* Heritage Modern Core Palette */
+  --color-surface-base: #12131A;
+  --color-surface-card: #191B24;
+  --color-gold-base: #C8A24B;
+  --color-gold-deep: #A88234;
+  --color-content-base: #F2EDE4;
 
   /* Derived from Core */
-  --color-border-subtle: rgba(242, 239, 231, 0.1);
-  --color-content-muted: rgba(242, 239, 231, 0.65);
+  --color-border-subtle: rgba(242, 237, 228, 0.1);
+  --color-content-muted: #9A9790;
 
   /* Status (Derived from Core) */
   --color-status-success: #10B981;
@@ -50,7 +50,7 @@
   /* Radii */
   --radius-sm: 4px;
   --radius-md: 6px;
-  --radius-lg: 8px;
+  --radius-lg: 10px;
   --radius-xl: 12px;
 }
 
@@ -131,6 +131,36 @@ button, a, input, select, textarea {
   font-size: 1.25rem;
   font-weight: 600;
   letter-spacing: 0.02em;
+}
+
+.num-tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+.barber-pole-line {
+  background: repeating-linear-gradient(
+    135deg,
+    #C8A24B 0,
+    #C8A24B 8px,
+    #12131A 8px,
+    #12131A 14px,
+    #EF4444 14px,
+    #EF4444 22px,
+    #12131A 22px,
+    #12131A 28px
+  );
+}
+
+.barber-pole-border {
+  border-top: 2px solid transparent;
+  border-image: repeating-linear-gradient(
+    90deg,
+    #C8A24B 0 12px,
+    transparent 12px 18px,
+    #EF4444 18px 30px,
+    transparent 30px 36px
+  ) 1;
 }
 
 /* Gradients using the Core Palette */

@@ -171,14 +171,15 @@ export const AdminLayout: React.FC = () => {
       {/* Sidebar - Desktop */}
       <aside className="hidden lg:flex lg:w-64 lg:flex-col shrink-0 lg:bg-surface-card lg:border-r lg:border-border-subtle lg:fixed lg:inset-y-0">
         {/* Logo */}
-        <div className="flex items-center h-16 px-6 border-b border-border-subtle">
+        <div className="flex items-center h-16 px-6 border-b border-border-subtle relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-0.5 barber-pole-line" />
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gold-base text-surface-base rounded-lg flex items-center justify-center shadow">
+            <div className="w-8 h-8 bg-gold-base text-surface-base rounded-xl flex items-center justify-center shadow-md shrink-0">
               <Scissors className="w-4 h-4" />
             </div>
-            <div>
-              <h1 className="text-base font-black text-gold-hover tracking-tight">Navo Premium</h1>
-              <p className="text-[10px] text-content-muted font-bold uppercase tracking-widest">Admin Panel</p>
+            <div className="min-w-0">
+              <h1 className="text-base font-serif font-bold text-content-base tracking-tight truncate">Navo Premium</h1>
+              <p className="text-[9px] text-gold-base font-extrabold uppercase tracking-widest">Heritage Barber & Club</p>
             </div>
           </div>
         </div>
@@ -327,11 +328,11 @@ export const AdminLayout: React.FC = () => {
       <main className="flex-1 lg:ml-64 pt-16 lg:pt-0 h-[100dvh] overflow-y-auto no-scrollbar relative w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10 pb-24 w-full">
           {/* Page Header */}
-          <div className="mb-6 lg:mb-10">
-            <h2 className="text-2xl font-black text-content-base mb-1 tracking-tight">
+          <div className="mb-6 lg:mb-8">
+            <h2 className="text-2xl font-serif font-bold text-content-base mb-1 tracking-tight">
               {navItems.find(item => item.id === activeTab)?.label}
             </h2>
-            <p className="text-sm font-medium text-content-muted">
+            <p className="text-xs font-medium text-content-muted">
               {navItems.find(item => item.id === activeTab)?.description}
             </p>
           </div>
