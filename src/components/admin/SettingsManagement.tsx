@@ -36,31 +36,32 @@ export const SettingsManagement: React.FC = () => {
 
   return (
     <div className="space-y-4 animate-in fade-in duration-300 min-w-0">
-      {/* PAGE HEADER (Zona de ação fixada na direita do cabeçalho) */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-card p-4 rounded-md border border-border-subtle">
+      {/* PAGE HEADER (Action zone fixed at right) */}
+      <div className="flex items-center justify-between gap-3 bg-surface-card p-4 rounded-md border border-border-subtle">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-lg sm:text-xl font-serif text-content-base font-bold tracking-tight truncate">
+            <h1 className="text-base sm:text-xl font-serif text-content-base font-bold tracking-tight truncate">
               Configurações do Sistema
             </h1>
             <span className="text-[10px] bg-gold-base/10 text-gold-base border border-gold-base/30 px-2 py-0.5 rounded uppercase font-bold tracking-wider whitespace-nowrap shrink-0">
               Geral
             </span>
           </div>
-          <p className="text-content-muted text-xs mt-0.5 truncate">
+          <p className="text-content-muted text-xs mt-0.5 truncate hidden sm:block">
             Gerencie a identidade da barbearia, canais de contato e links sociais.
           </p>
         </div>
 
-        {/* Action Zone: Header Right Button (Fixed 36px height) */}
+        {/* Action Zone: Header Right Button (Fixed touch target >= 40px, icon-only on mobile) */}
         <div className="shrink-0 flex items-center justify-end">
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="h-9 px-4 bg-gold-base text-surface-base hover:bg-gold-base/90 rounded-md text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm active:scale-95 disabled:opacity-50 whitespace-nowrap"
+            className="h-10 sm:h-9 px-0 sm:px-4 w-10 sm:w-auto bg-gold-base text-surface-base hover:bg-gold-base/90 rounded-md text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm active:scale-95 disabled:opacity-50 whitespace-nowrap"
+            aria-label="Salvar Alterações"
           >
-            <Save className="w-3.5 h-3.5" />
-            <span>{isSaving ? 'Salvando...' : 'Salvar Alterações'}</span>
+            <Save className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+            <span className="hidden sm:inline">{isSaving ? 'Salvando...' : 'Salvar Alterações'}</span>
           </button>
         </div>
       </div>
@@ -73,7 +74,7 @@ export const SettingsManagement: React.FC = () => {
         </div>
       )}
 
-      {/* TAB BAR (Rectangular 4-6px buttons) */}
+      {/* TAB BAR (Rectangular 4-6px buttons, touch height 10 on mobile) */}
       <div className="bg-surface-card border border-border-subtle rounded-md p-1 flex items-center gap-1 overflow-x-auto custom-scrollbar">
         <TabButton active={activeTab === 'profile'} onClick={() => setActiveTab('profile')} icon={Store} label="Perfil & Unidade" />
         <TabButton active={activeTab === 'contacts'} onClick={() => setActiveTab('contacts')} icon={Phone} label="Canais de Contato" />
@@ -92,11 +93,11 @@ const TabButton = ({ active, onClick, icon: Icon, label }: any) => (
   <button
     onClick={onClick}
     className={`
-      h-9 px-3.5 flex items-center justify-center gap-2 text-xs font-bold rounded transition-all whitespace-nowrap shrink-0
+      h-10 sm:h-9 px-3.5 flex items-center justify-center gap-2 text-xs font-bold rounded transition-all whitespace-nowrap shrink-0 active:scale-95
       ${active ? 'bg-gold-base text-surface-base' : 'text-content-muted hover:text-content-base bg-surface-card/60 hover:bg-surface-base'}
     `}
   >
-    <Icon className="w-3.5 h-3.5" />
+    <Icon className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
     <span>{label}</span>
   </button>
 );
@@ -181,12 +182,12 @@ const ProfileSettings = ({ onSave, isSaving }: { onSave: () => void; isSaving: b
       </div>
     </div>
 
-    {/* Action Zone: Form Footer */}
+    {/* Action Zone: Form Footer (Touch target >= 40px) */}
     <div className="pt-4 border-t border-border-subtle flex justify-end">
       <button
         onClick={onSave}
         disabled={isSaving}
-        className="h-10 px-5 bg-gold-base text-surface-base hover:bg-gold-base/90 rounded-md text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap"
+        className="h-11 sm:h-10 w-full sm:w-auto px-5 bg-gold-base text-surface-base hover:bg-gold-base/90 rounded-md text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap"
       >
         <Save className="w-4 h-4" />
         <span>{isSaving ? 'Salvando...' : 'Salvar Alterações do Perfil'}</span>
@@ -240,7 +241,7 @@ const ContactSettings = ({ onSave, isSaving }: { onSave: () => void; isSaving: b
       <button
         onClick={onSave}
         disabled={isSaving}
-        className="h-10 px-5 bg-gold-base text-surface-base hover:bg-gold-base/90 rounded-md text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap"
+        className="h-11 sm:h-10 w-full sm:w-auto px-5 bg-gold-base text-surface-base hover:bg-gold-base/90 rounded-md text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap"
       >
         <Save className="w-4 h-4" />
         <span>{isSaving ? 'Salvando...' : 'Salvar Contatos'}</span>
@@ -299,7 +300,7 @@ const LinkSettings = ({ onSave, isSaving }: { onSave: () => void; isSaving: bool
       <button
         onClick={onSave}
         disabled={isSaving}
-        className="h-10 px-5 bg-gold-base text-surface-base hover:bg-gold-base/90 rounded-md text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap"
+        className="h-11 sm:h-10 w-full sm:w-auto px-5 bg-gold-base text-surface-base hover:bg-gold-base/90 rounded-md text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap"
       >
         <Save className="w-4 h-4" />
         <span>{isSaving ? 'Salvando...' : 'Salvar Links'}</span>
