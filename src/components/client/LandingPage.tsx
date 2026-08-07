@@ -25,6 +25,7 @@ import {
   Instagram,
   ArrowUp,
   ArrowRight,
+  ArrowLeft,
   List,
   Menu,
   X,
@@ -894,16 +895,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
 
       {/* MODAL FULLSCREEN CARROSSEL DE FOTOS DOS CORTES REAIS */}
       {selectedGalleryIndex !== null && galleryFeaturedItems[selectedGalleryIndex] && (
-        <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-2xl flex flex-col justify-between p-4 md:p-8 animate-in fade-in duration-200 select-none overflow-hidden">
-          {/* Top Bar: Selo de Destaque, Counter, Close */}
-          <div className="flex items-center justify-between z-10 w-full max-w-4xl mx-auto">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex flex-col justify-between p-3 sm:p-4 md:p-6 animate-in fade-in duration-200 select-none overflow-hidden">
+          {/* Top Bar: Counter & Close */}
+          <div className="flex items-center justify-between z-10 w-full max-w-4xl mx-auto mb-2">
             <div className="flex items-center gap-2">
-              <span className="bg-gradient-to-r from-amber-400 via-[#C8A96A] to-amber-500 text-neutral-950 font-black text-xs px-3 py-1 rounded-full shadow-lg flex items-center gap-1.5 uppercase tracking-wider">
-                <Star className="w-3.5 h-3.5 fill-neutral-950" />
-                <span>Selo de Destaque</span>
-              </span>
-              <span className="text-neutral-300 text-xs font-bold font-mono px-2.5 py-1 rounded-lg bg-white/10 border border-white/10">
-                {selectedGalleryIndex + 1} / {galleryFeaturedItems.length}
+              <span className="text-white text-xs font-bold font-mono px-3 py-1.5 rounded-xl bg-black/50 border border-white/20 backdrop-blur-md shadow-md">
+                FOTO {selectedGalleryIndex + 1} / {galleryFeaturedItems.length}
               </span>
             </div>
 
@@ -912,7 +909,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                 hapticLight();
                 setSelectedGalleryIndex(null);
               }}
-              className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all active:scale-95 border border-white/10 cursor-pointer"
+              className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-all active:scale-95 border border-white/20 backdrop-blur-md cursor-pointer shadow-md"
               title="Fechar (Esc)"
             >
               <X className="w-5 h-5" />
@@ -920,25 +917,25 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
           </div>
 
           {/* Center Carousel Display */}
-          <div className="relative flex-1 flex items-center justify-center my-3 max-h-[62vh] md:max-h-[72vh] w-full max-w-4xl mx-auto">
+          <div className="relative flex-1 flex items-center justify-center my-2 w-full max-w-4xl mx-auto min-h-0">
             {/* Left Navigation Arrow */}
             <button
               onClick={() => {
                 hapticLight();
                 setSelectedGalleryIndex(prev => (prev !== null && prev > 0 ? prev - 1 : galleryFeaturedItems.length - 1));
               }}
-              className="absolute left-2 md:left-4 z-20 w-11 h-11 md:w-13 md:h-13 rounded-full bg-black/70 hover:bg-black/90 text-white border border-white/20 flex items-center justify-center backdrop-blur-md transition-all active:scale-90 shadow-2xl cursor-pointer"
+              className="absolute left-2 md:left-4 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-black/60 hover:bg-black/85 text-white border border-white/25 flex items-center justify-center backdrop-blur-md transition-all active:scale-90 shadow-2xl cursor-pointer"
               title="Anterior"
             >
               <ChevronLeft className="w-6 h-6 stroke-[2.5]" />
             </button>
 
-            {/* Photo Container */}
-            <div className="relative w-full h-full flex items-center justify-center rounded-2xl overflow-hidden shadow-2xl border border-white/15 bg-neutral-900 group">
+            {/* Photo Container - Fills area cleanly */}
+            <div className="relative w-full h-full flex items-center justify-center rounded-2xl overflow-hidden shadow-2xl border border-white/20 bg-neutral-900 group">
               <img
                 src={galleryFeaturedItems[selectedGalleryIndex].src}
                 alt={galleryFeaturedItems[selectedGalleryIndex].title}
-                className="w-full h-full object-contain md:object-cover max-h-[58vh] md:max-h-[68vh] transition-transform duration-300"
+                className="w-full h-full object-cover transition-transform duration-300"
               />
             </div>
 
@@ -948,52 +945,63 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                 hapticLight();
                 setSelectedGalleryIndex(prev => (prev !== null ? (prev + 1) % galleryFeaturedItems.length : 0));
               }}
-              className="absolute right-2 md:right-4 z-20 w-11 h-11 md:w-13 md:h-13 rounded-full bg-black/70 hover:bg-black/90 text-white border border-white/20 flex items-center justify-center backdrop-blur-md transition-all active:scale-90 shadow-2xl cursor-pointer"
+              className="absolute right-2 md:right-4 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-black/60 hover:bg-black/85 text-white border border-white/25 flex items-center justify-center backdrop-blur-md transition-all active:scale-90 shadow-2xl cursor-pointer"
               title="Próxima"
             >
               <ChevronRight className="w-6 h-6 stroke-[2.5]" />
             </button>
           </div>
 
-          {/* Bottom Info Card & Add to Booking CTA */}
-          <div className="w-full max-w-2xl mx-auto bg-neutral-900/95 backdrop-blur-xl p-4 md:p-5 rounded-2xl border border-neutral-800 space-y-3 z-10 shadow-2xl">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-base md:text-lg font-extrabold text-white leading-tight">
-                    {galleryFeaturedItems[selectedGalleryIndex].title}
-                  </h3>
-                  <span className="text-[10px] font-black text-[#C8A96A] bg-[#C8A96A]/20 border border-[#C8A96A]/40 px-2 py-0.5 rounded-md">
-                    {galleryFeaturedItems[selectedGalleryIndex].badge}
-                  </span>
-                </div>
-                <p className="text-xs text-neutral-400 mt-1 line-clamp-2">
+          {/* Bottom Info Card & Actions: Galeria > Agendar (Light Theme Coherent with App Palette) */}
+          <div className="w-full max-w-2xl mx-auto bg-white/95 backdrop-blur-xl p-4 md:p-5 rounded-2xl border border-neutral-200/90 space-y-3 z-10 shadow-2xl">
+            <div className="flex items-center justify-between gap-3 border-b border-neutral-100 pb-2.5">
+              <div className="min-w-0 flex-1">
+                <h3 className="text-base md:text-lg font-extrabold text-neutral-900 tracking-tight leading-tight truncate">
+                  {galleryFeaturedItems[selectedGalleryIndex].title}
+                </h3>
+                <p className="text-xs md:text-sm text-neutral-500 font-normal leading-normal line-clamp-2 mt-0.5">
                   {galleryFeaturedItems[selectedGalleryIndex].description}
                 </p>
               </div>
 
-              <div className="text-right shrink-0">
-                <span className="text-lg font-black text-[#C8A96A] block">
+              <div className="text-right shrink-0 pl-2">
+                <span className="text-base md:text-lg font-black text-[#C8A96A] block leading-none">
                   R$ {galleryFeaturedItems[selectedGalleryIndex].price.toFixed(2)}
                 </span>
-                <span className="text-[11px] text-neutral-400 font-medium">
+                <span className="text-[10px] md:text-xs text-neutral-400 font-medium mt-1 block">
                   ⏱️ {galleryFeaturedItems[selectedGalleryIndex].duration} min
                 </span>
               </div>
             </div>
 
-            <button
-              onClick={() => {
-                hapticMedium();
-                const selectedService = galleryFeaturedItems[selectedGalleryIndex].service;
-                setSelectedGalleryIndex(null);
-                onGoToBooking(selectedService);
-              }}
-              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-400 via-[#C8A96A] to-amber-500 hover:opacity-95 text-neutral-950 font-black text-xs md:text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-xl shadow-[#C8A96A]/20 active:scale-[0.98] transition-all cursor-pointer"
-            >
-              <Plus className="w-4 h-4 stroke-[3]" />
-              <span>Adicionar ao Agendamento (R$ {galleryFeaturedItems[selectedGalleryIndex].price.toFixed(2)})</span>
-            </button>
+            {/* Buttons in order: Galeria > Agendar */}
+            <div className="flex items-center gap-2.5 pt-0.5">
+              <button
+                onClick={() => {
+                  hapticLight();
+                  setSelectedGalleryIndex(null);
+                }}
+                className="px-4 md:px-6 py-3 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold text-xs md:text-sm uppercase tracking-wider transition-all active:scale-95 border border-neutral-200 flex items-center justify-center gap-2 cursor-pointer shrink-0"
+                title="Voltar para a Galeria"
+              >
+                <ArrowLeft className="w-4 h-4 stroke-[2.5]" />
+                <span>Galeria</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  hapticMedium();
+                  const selectedService = galleryFeaturedItems[selectedGalleryIndex].service;
+                  setSelectedGalleryIndex(null);
+                  onGoToBooking(selectedService);
+                }}
+                className="flex-1 py-3 rounded-xl bg-[#d4a853] hover:bg-[#c49a4a] text-[#0a0a0a] font-bold text-xs md:text-sm uppercase tracking-wider transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-lg shadow-[#d4a853]/20 cursor-pointer"
+                title="Agendar este serviço"
+              >
+                <CalendarCheck className="w-4 h-4 stroke-[2.5]" />
+                <span>Agendar</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
