@@ -257,7 +257,7 @@ export const WaitingQueue: React.FC = () => {
 
         <button
           onClick={() => setIsAddModalOpen(true)}
-          className="bg-gold-base text-surface-base px-3.5 py-1.5 rounded-none text-xs font-extrabold flex items-center gap-1.5 hover:bg-gold-base/80 transition-all shadow-md active:scale-95 shrink-0"
+          className="bg-gold-base text-surface-base px-3.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 hover:bg-gold-base/80 transition-all shadow-md active:scale-95 shrink-0"
         >
           <Plus className="w-4 h-4" />
           <span>Adicionar Encaixe (Walk-In)</span>
@@ -266,7 +266,7 @@ export const WaitingQueue: React.FC = () => {
 
       {/* TOAST MESSAGE */}
       {lastNotification && (
-        <div className="bg-status-success/10 border border-status-success/30 text-status-success p-3 rounded-none flex items-center gap-2 text-xs font-bold animate-fade-in">
+        <div className="bg-status-success/10 border border-status-success/30 text-status-success p-3 rounded-xl flex items-center gap-2 text-xs font-bold animate-fade-in">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>{lastNotification}</span>
         </div>
@@ -274,10 +274,10 @@ export const WaitingQueue: React.FC = () => {
 
       {/* COMPACT KPI METRICS */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-none flex flex-col justify-between">
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
             <span className="text-[10px] font-bold uppercase tracking-wider">Cadeiras Ocupadas</span>
-            <div className="w-6 h-6 rounded-sm bg-status-success/10 text-status-success flex items-center justify-center">
+            <div className="w-6 h-6 rounded-lg bg-status-success/10 text-status-success flex items-center justify-center">
               <Scissors className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -285,10 +285,10 @@ export const WaitingQueue: React.FC = () => {
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Atendimentos em andamento</p>
         </div>
 
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-none flex flex-col justify-between">
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
             <span className="text-[10px] font-bold uppercase tracking-wider">Na Recepção</span>
-            <div className="w-6 h-6 rounded-sm bg-gold-base/10 text-gold-hover flex items-center justify-center">
+            <div className="w-6 h-6 rounded-lg bg-gold-base/10 text-gold-hover flex items-center justify-center">
               <Clock className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -296,10 +296,10 @@ export const WaitingQueue: React.FC = () => {
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Aguardando atendimento</p>
         </div>
 
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-none flex flex-col justify-between">
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
             <span className="text-[10px] font-bold uppercase tracking-wider">Espera Estimada</span>
-            <div className="w-6 h-6 rounded-sm bg-blue-500/10 text-blue-400 flex items-center justify-center">
+            <div className="w-6 h-6 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center">
               <TrendingUp className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -307,10 +307,10 @@ export const WaitingQueue: React.FC = () => {
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Tempo estimado de fila</p>
         </div>
 
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-none flex flex-col justify-between">
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
             <span className="text-[10px] font-bold uppercase tracking-wider">Atendidos Hoje</span>
-            <div className="w-6 h-6 rounded-sm bg-purple-500/10 text-purple-400 flex items-center justify-center">
+            <div className="w-6 h-6 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center">
               <CheckCircle2 className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -320,7 +320,7 @@ export const WaitingQueue: React.FC = () => {
       </div>
 
       {/* FILTER & TABS BAR */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 bg-surface-card p-2.5 rounded-none border border-border-subtle">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 bg-surface-card p-2.5 rounded-xl border border-border-subtle">
         <div className="relative flex-1">
           <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-content-muted" />
           <input
@@ -328,13 +328,13 @@ export const WaitingQueue: React.FC = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Buscar cliente, serviço ou barbeiro..."
-            className="w-full bg-surface-card border border-border-subtle rounded-none pl-8 pr-3 py-1.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+            className="w-full bg-surface-card border border-border-subtle rounded-xl pl-8 pr-3 py-1.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
           />
         </div>
 
         <div className="flex items-center gap-2 justify-between sm:justify-end">
           {/* BARBER FILTER SELECT */}
-          <div className="flex items-center gap-1.5 bg-surface-card px-2.5 py-1 rounded-none border border-border-subtle shrink-0">
+          <div className="flex items-center gap-1.5 bg-surface-card px-2.5 py-1 rounded-xl border border-border-subtle shrink-0">
             <Filter className="w-3 h-3 text-gold-hover" />
             <select
               value={selectedBarberFilter}
@@ -353,7 +353,7 @@ export const WaitingQueue: React.FC = () => {
           </div>
 
           {/* TAB SWITCHER */}
-          <div className="flex items-center bg-surface-card p-0.5 rounded-none border border-border-subtle shrink-0">
+          <div className="flex items-center bg-surface-card p-0.5 rounded-xl border border-border-subtle shrink-0">
             <button
               onClick={() => setActiveTab('kanban')}
               className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors ${
@@ -379,7 +379,7 @@ export const WaitingQueue: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
           {/* COLUMN 1: IN CHAIR */}
           <div className="space-y-2.5">
-            <div className="bg-surface-card p-2.5 rounded-none border border-status-success/30 flex items-center justify-between">
+            <div className="bg-surface-card p-2.5 rounded-xl border border-status-success/30 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-status-success animate-ping" />
                 <span className="text-xs font-bold text-status-success uppercase tracking-wider">
@@ -392,11 +392,11 @@ export const WaitingQueue: React.FC = () => {
             </div>
 
             {loading ? (
-              <div className="p-6 text-center text-xs text-content-muted bg-surface-card rounded-none border border-border-subtle">
+              <div className="p-6 text-center text-xs text-content-muted bg-surface-card rounded-2xl border border-border-subtle">
                 Carregando cadeiras...
               </div>
             ) : inChairList.length === 0 ? (
-              <div className="p-6 text-center text-xs text-content-muted bg-surface-card rounded-none border border-border-subtle border-dashed space-y-1">
+              <div className="p-6 text-center text-xs text-content-muted bg-surface-card rounded-2xl border border-border-subtle border-dashed space-y-1">
                 <Scissors className="w-6 h-6 text-content-muted mx-auto" />
                 <p className="font-semibold text-content-base">Nenhuma cadeira ocupada</p>
                 <p className="text-[10px] text-content-muted">
@@ -407,7 +407,7 @@ export const WaitingQueue: React.FC = () => {
               inChairList.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-surface-card p-3 rounded-none border border-status-success/40 shadow-lg space-y-2.5 relative"
+                  className="bg-surface-card p-3 rounded-2xl border border-status-success/40 shadow-lg space-y-2.5 relative"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div>
@@ -421,7 +421,7 @@ export const WaitingQueue: React.FC = () => {
                     )}
                   </div>
 
-                  <div className="p-2 bg-surface-card rounded-none border border-border-subtle space-y-1 text-[10px]">
+                  <div className="p-2 bg-surface-card rounded-xl border border-border-subtle space-y-1 text-[10px]">
                     <div className="flex justify-between text-content-muted">
                       <span>Barbeiro:</span>
                       <strong className="text-content-base">{item.professional_name}</strong>
@@ -447,7 +447,7 @@ export const WaitingQueue: React.FC = () => {
                     </button>
                     <button
                       onClick={() => handleFinishService(item.id)}
-                      className="flex-1 py-1.5 rounded-none bg-status-success text-surface-base font-extrabold text-xs flex items-center justify-center gap-1 shadow hover:bg-status-success active:scale-95"
+                      className="flex-1 py-1.5 rounded-xl bg-status-success text-surface-base font-extrabold text-xs flex items-center justify-center gap-1 shadow hover:bg-status-success active:scale-95"
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" />
                       <span>Finalizar Corte</span>
@@ -460,7 +460,7 @@ export const WaitingQueue: React.FC = () => {
 
           {/* COLUMN 2 & 3: WAITING QUEUE */}
           <div className="lg:col-span-2 space-y-2.5">
-            <div className="bg-surface-card p-2.5 rounded-none border border-border-subtle flex items-center justify-between">
+            <div className="bg-surface-card p-2.5 rounded-xl border border-border-subtle flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-gold-hover" />
                 <span className="text-xs font-bold text-gold-hover uppercase tracking-wider">
@@ -473,11 +473,11 @@ export const WaitingQueue: React.FC = () => {
             </div>
 
             {loading ? (
-              <div className="p-6 text-center text-xs text-content-muted bg-surface-card rounded-none border border-border-subtle">
+              <div className="p-6 text-center text-xs text-content-muted bg-surface-card rounded-2xl border border-border-subtle">
                 Carregando fila...
               </div>
             ) : waitingList.length === 0 ? (
-              <div className="p-8 text-center text-xs text-content-muted bg-surface-card rounded-none border border-border-subtle space-y-2">
+              <div className="p-8 text-center text-xs text-content-muted bg-surface-card rounded-2xl border border-border-subtle space-y-2">
                 <UserCheck className="w-8 h-8 text-content-muted mx-auto" />
                 <p className="font-bold text-content-base">Nenhum cliente na recepção</p>
                 <p className="text-[10px] text-content-muted max-w-xs mx-auto">
@@ -485,7 +485,7 @@ export const WaitingQueue: React.FC = () => {
                 </p>
                 <button
                   onClick={() => setIsAddModalOpen(true)}
-                  className="bg-gold-base text-surface-base px-3 py-1.5 rounded-none text-xs font-extrabold inline-flex items-center gap-1"
+                  className="bg-gold-base text-surface-base px-3 py-1.5 rounded-xl text-xs font-extrabold inline-flex items-center gap-1"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Adicionar Cliente</span>
@@ -496,7 +496,7 @@ export const WaitingQueue: React.FC = () => {
                 {waitingList.map((item, index) => (
                   <div
                     key={item.id}
-                    className="bg-surface-card p-3 rounded-none border border-border-subtle hover:border-border-subtle transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 group"
+                    className="bg-surface-card p-3 rounded-2xl border border-border-subtle hover:border-border-subtle transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 group"
                   >
                     <div className="flex items-center gap-3">
                       <div className="flex flex-col items-center shrink-0">
@@ -579,7 +579,7 @@ export const WaitingQueue: React.FC = () => {
         </div>
       ) : (
         /* HISTORY TAB */
-        <div className="bg-surface-card border border-border-subtle rounded-none overflow-hidden p-3 space-y-3">
+        <div className="bg-surface-card border border-border-subtle rounded-2xl overflow-hidden p-3 space-y-3">
           <h2 className="text-xs font-bold text-content-base flex items-center gap-1.5">
             <CheckCircle2 className="w-4 h-4 text-status-success" />
             <span>Atendimentos Concluídos Hoje ({completedList.length})</span>
@@ -625,7 +625,7 @@ export const WaitingQueue: React.FC = () => {
       {/* MODAL: ADD WALK-IN */}
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 bg-surface-base/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4">
-          <div className="bg-surface-card border border-border-subtle sm:border-[#FFFFFF]/30 rounded-none w-full max-w-md overflow-hidden shadow-2xl flex flex-col animate-fade-in">
+          <div className="bg-surface-card border border-border-subtle sm:border-[#FFFFFF]/30 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col animate-fade-in">
             <div className="p-3.5 bg-surface-base border-b border-border-subtle flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-lg bg-gold-base/10 text-gold-hover flex items-center justify-center">
@@ -651,7 +651,7 @@ export const WaitingQueue: React.FC = () => {
                   value={newClientName}
                   onChange={(e) => setNewClientName(e.target.value)}
                   placeholder="Ex: Gabriel Santos"
-                  className="w-full bg-surface-card border border-border-subtle rounded-none p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                  className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                   required
                 />
               </div>
@@ -665,7 +665,7 @@ export const WaitingQueue: React.FC = () => {
                   value={newClientPhone}
                   onChange={(e) => setNewClientPhone(e.target.value)}
                   placeholder="(11) 99887-1122"
-                  className="w-full bg-surface-card border border-border-subtle rounded-none p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                  className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                 />
               </div>
 
@@ -682,7 +682,7 @@ export const WaitingQueue: React.FC = () => {
                       const found = services.find((s) => s.title === title);
                       if (found) setNewServicePrice(found.price);
                     }}
-                    className="w-full bg-surface-card border border-border-subtle rounded-none p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF] cursor-pointer"
+                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF] cursor-pointer"
                   >
                     {services.map((svc) => (
                       <option key={svc.id} value={svc.title} className="bg-surface-card">
@@ -704,7 +704,7 @@ export const WaitingQueue: React.FC = () => {
                       const found = professionals.find((p) => p.id === id);
                       if (found) setNewProfessionalName(found.name);
                     }}
-                    className="w-full bg-surface-card border border-border-subtle rounded-none p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF] cursor-pointer"
+                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF] cursor-pointer"
                   >
                     {professionals.map((p) => (
                       <option key={p.id} value={p.id} className="bg-surface-card">
@@ -724,7 +724,7 @@ export const WaitingQueue: React.FC = () => {
                   value={newNotes}
                   onChange={(e) => setNewNotes(e.target.value)}
                   placeholder="Ex: Aceitou aguardar 15 min"
-                  className="w-full bg-surface-card border border-border-subtle rounded-none p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                  className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                 />
               </div>
 
@@ -732,13 +732,13 @@ export const WaitingQueue: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="px-3 py-1.5 rounded-none bg-surface-card text-content-muted hover:text-content-base font-bold"
+                  className="px-3 py-1.5 rounded-xl bg-surface-card text-content-muted hover:text-content-base font-bold"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 rounded-none bg-gold-base text-surface-base font-black shadow"
+                  className="px-4 py-1.5 rounded-xl bg-gold-base text-surface-base font-black shadow"
                 >
                   Inserir na Fila
                 </button>
@@ -751,7 +751,7 @@ export const WaitingQueue: React.FC = () => {
       {/* MODAL: WHATSAPP ALERT */}
       {isWhatsAppModalOpen && selectedQueueItemForWa && (
         <div className="fixed inset-0 z-50 bg-surface-base/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4">
-          <div className="bg-surface-card border border-[#25D366]/40 rounded-none w-full max-w-md overflow-hidden shadow-2xl flex flex-col animate-fade-in">
+          <div className="bg-surface-card border border-[#25D366]/40 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col animate-fade-in">
             <div className="p-3.5 bg-surface-base border-b border-border-subtle flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-lg bg-[#25D366]/10 text-[#25D366] flex items-center justify-center">
@@ -771,7 +771,7 @@ export const WaitingQueue: React.FC = () => {
             </div>
 
             <div className="p-4 space-y-3 text-xs">
-              <div className="p-2.5 rounded-none bg-[#25D366]/10 border border-[#25D366]/20 text-[11px] text-[#25D366] flex items-center gap-2">
+              <div className="p-2.5 rounded-xl bg-[#25D366]/10 border border-[#25D366]/20 text-[11px] text-[#25D366] flex items-center gap-2">
                 <Zap className="w-4 h-4 shrink-0" />
                 <span>Integração de Notificação WhatsApp via API Web/wa.me ativa. O cliente receberá a mensagem diretamente.</span>
               </div>
@@ -780,13 +780,13 @@ export const WaitingQueue: React.FC = () => {
                 rows={4}
                 value={customWaMessage}
                 onChange={(e) => setCustomWaMessage(e.target.value)}
-                className="w-full bg-surface-card border border-border-subtle rounded-none p-2.5 text-xs text-content-base focus:outline-none focus:border-[#25D366] resize-none"
+                className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#25D366] resize-none"
               />
 
               <div className="flex items-center justify-between pt-1">
                 <button
                   onClick={handleCopyWaMessage}
-                  className="px-3 py-1.5 bg-surface-card text-content-base rounded-none text-xs font-bold flex items-center gap-1"
+                  className="px-3 py-1.5 bg-surface-card text-content-base rounded-xl text-xs font-bold flex items-center gap-1"
                 >
                   {copiedNotice ? <Check className="w-3.5 h-3.5 text-status-success" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copiedNotice ? 'Copiado!' : 'Copiar Texto'}</span>
@@ -794,7 +794,7 @@ export const WaitingQueue: React.FC = () => {
 
                 <button
                   onClick={handleSendWhatsAppDirect}
-                  className="px-4 py-1.5 bg-[#25D366] text-surface-base rounded-none text-xs font-black flex items-center gap-1 shadow"
+                  className="px-4 py-1.5 bg-[#25D366] text-surface-base rounded-xl text-xs font-black flex items-center gap-1 shadow"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>Enviar no WhatsApp</span>

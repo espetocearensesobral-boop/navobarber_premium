@@ -318,7 +318,7 @@ export const ServicesManagement: React.FC = () => {
     <div className="space-y-4">
       {/* Success Notification Banner */}
       {successMsg && (
-        <div className="p-3 bg-status-success/15 border border-status-success/30 text-status-success rounded-none text-xs font-bold flex items-center justify-between animate-fade-in">
+        <div className="p-3 bg-status-success/15 border border-status-success/30 text-status-success rounded-xl text-xs font-bold flex items-center justify-between animate-fade-in">
           <div className="flex items-center space-x-2">
             <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
             <span>{successMsg}</span>
@@ -334,7 +334,7 @@ export const ServicesManagement: React.FC = () => {
       {/* ========================================================= */}
       <div className="md:hidden space-y-3">
         {/* Compact Top Action Bar */}
-        <div className="bg-surface-card p-3 rounded-none border border-border-subtle flex items-center justify-between gap-2">
+        <div className="bg-surface-card p-3 rounded-2xl border border-border-subtle flex items-center justify-between gap-2">
           {/* Search Bar */}
           <div className="relative flex-1">
             <Search className="w-3.5 h-3.5 text-content-muted absolute left-3 top-1/2 -translate-y-1/2" />
@@ -343,14 +343,14 @@ export const ServicesManagement: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar serviço..."
-              className="w-full bg-surface-base border border-border-subtle rounded-none pl-8 pr-2.5 py-1.5 text-xs text-content-base placeholder-[#666666] outline-none focus:border-[#FFFFFF]"
+              className="w-full bg-surface-base border border-border-subtle rounded-xl pl-8 pr-2.5 py-1.5 text-xs text-content-base placeholder-[#666666] outline-none focus:border-[#FFFFFF]"
             />
           </div>
 
           {/* New Service Button */}
           <button
             onClick={handleOpenCreate}
-            className="px-3 py-1.5 rounded-none bg-gold-base text-surface-base font-bold text-xs flex items-center gap-1 shadow-sm shrink-0 active:scale-95 transition-transform"
+            className="px-3 py-1.5 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center gap-1 shadow-sm shrink-0 active:scale-95 transition-transform"
           >
             <Plus className="w-3.5 h-3.5 stroke-[3]" />
             <span>Novo</span>
@@ -410,12 +410,12 @@ export const ServicesManagement: React.FC = () => {
         {/* Compact Services List Feed */}
         <div className="space-y-2">
           {loading ? (
-            <div className="p-8 text-center bg-surface-card rounded-none border border-border-subtle text-content-muted text-xs">
+            <div className="p-8 text-center bg-surface-card rounded-2xl border border-border-subtle text-content-muted text-xs">
               <Scissors className="w-5 h-5 text-gold-hover animate-spin mx-auto mb-2" />
               <span>Carregando serviços...</span>
             </div>
           ) : filteredServices.length === 0 ? (
-            <div className="p-8 text-center bg-surface-card rounded-none border border-border-subtle text-content-muted text-xs">
+            <div className="p-8 text-center bg-surface-card rounded-2xl border border-border-subtle text-content-muted text-xs">
               Nenhum serviço encontrado.
             </div>
           ) : (
@@ -428,12 +428,12 @@ export const ServicesManagement: React.FC = () => {
               return (
                 <div
                   key={service.id}
-                  className="bg-surface-card p-3 rounded-none border border-border-subtle flex items-center justify-between gap-3"
+                  className="bg-surface-card p-3 rounded-2xl border border-border-subtle flex items-center justify-between gap-3"
                 >
                   {/* Photo & Main Info */}
                   <div className="flex items-center gap-3 min-w-0 flex-1">
                     <div
-                      className="relative w-12 h-12 rounded-none bg-surface-base border border-border-subtle overflow-hidden shrink-0"
+                      className="relative w-12 h-12 rounded-xl bg-surface-base border border-border-subtle overflow-hidden shrink-0"
                     >
                       {service.image_url || servicePhotos[0] ? (
                         <img
@@ -472,14 +472,14 @@ export const ServicesManagement: React.FC = () => {
                   <div className="flex items-center gap-1 shrink-0">
                     <button
                       onClick={() => handleOpenEdit(service)}
-                      className="p-2 rounded-none bg-surface-card text-gold-hover hover:bg-surface-card border border-border-subtle"
+                      className="p-2 rounded-xl bg-surface-card text-gold-hover hover:bg-surface-card border border-border-subtle"
                       title="Editar"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => handleDelete(service.id)}
-                      className="p-2 rounded-none bg-red-500/10 text-red-400 border border-red-500/20"
+                      className="p-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20"
                       title="Excluir"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -497,7 +497,7 @@ export const ServicesManagement: React.FC = () => {
       {/* ========================================================= */}
       <div className="hidden md:block space-y-6">
         {/* Header & KPI Summary */}
-        <div className="bg-surface-card p-5 sm:p-6 rounded-none border border-border-subtle shadow-xl space-y-5">
+        <div className="bg-surface-card p-5 sm:p-6 rounded-2xl border border-border-subtle shadow-xl space-y-5">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="flex items-center space-x-2 text-gold-base text-xs font-bold uppercase tracking-widest mb-1">
@@ -514,7 +514,7 @@ export const ServicesManagement: React.FC = () => {
 
             <button
               onClick={handleOpenCreate}
-              className="px-5 py-3 rounded-none bg-gold-base text-surface-base font-black text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(212,175,55,0.3)] flex items-center justify-center space-x-2 hover:brightness-110 active:scale-95 transition-all self-start md:self-auto"
+              className="px-5 py-3 rounded-xl bg-gold-base text-surface-base font-black text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(212,175,55,0.3)] flex items-center justify-center space-x-2 hover:brightness-110 active:scale-95 transition-all self-start md:self-auto"
             >
               <Plus className="w-4 h-4 stroke-[3]" />
               <span>Cadastrar Novo Serviço</span>
@@ -523,7 +523,7 @@ export const ServicesManagement: React.FC = () => {
 
           {/* Stats Grid */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-border-subtle">
-            <div className="bg-surface-card p-3.5 rounded-none border border-border-subtle flex items-center space-x-3">
+            <div className="bg-surface-card p-3.5 rounded-xl border border-border-subtle flex items-center space-x-3">
               <div className="w-10 h-10 rounded-lg bg-gold-base/10 text-gold-base flex items-center justify-center border border-gold-base/20">
                 <Scissors className="w-5 h-5" />
               </div>
@@ -533,7 +533,7 @@ export const ServicesManagement: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-surface-card p-3.5 rounded-none border border-border-subtle flex items-center space-x-3">
+            <div className="bg-surface-card p-3.5 rounded-xl border border-border-subtle flex items-center space-x-3">
               <div className="w-10 h-10 rounded-lg bg-status-success/10 text-status-success flex items-center justify-center border border-[#00A86B]/20">
                 <Flame className="w-5 h-5" />
               </div>
@@ -543,7 +543,7 @@ export const ServicesManagement: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-surface-card p-3.5 rounded-none border border-border-subtle flex items-center space-x-3">
+            <div className="bg-surface-card p-3.5 rounded-xl border border-border-subtle flex items-center space-x-3">
               <div className="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center border border-blue-500/20">
                 <Clock className="w-5 h-5" />
               </div>
@@ -553,7 +553,7 @@ export const ServicesManagement: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-surface-card p-3.5 rounded-none border border-border-subtle flex items-center space-x-3">
+            <div className="bg-surface-card p-3.5 rounded-xl border border-border-subtle flex items-center space-x-3">
               <div className="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center border border-amber-500/20">
                 <DollarSign className="w-5 h-5" />
               </div>
@@ -567,7 +567,7 @@ export const ServicesManagement: React.FC = () => {
 
       {/* Success Notification Banner */}
       {successMsg && (
-        <div className="p-3.5 bg-status-success/20 border border-[#00A86B]/40 text-status-success rounded-none text-xs font-bold flex items-center justify-between shadow-lg animate-fade-in">
+        <div className="p-3.5 bg-status-success/20 border border-[#00A86B]/40 text-status-success rounded-xl text-xs font-bold flex items-center justify-between shadow-lg animate-fade-in">
           <div className="flex items-center space-x-2">
             <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
             <span>{successMsg}</span>
@@ -579,7 +579,7 @@ export const ServicesManagement: React.FC = () => {
       )}
 
       {/* Search, Category & Type Filters */}
-      <div className="bg-surface-card p-4 rounded-none border border-border-subtle flex flex-col lg:flex-row items-center justify-between gap-4 shadow-lg">
+      <div className="bg-surface-card p-4 rounded-2xl border border-border-subtle flex flex-col lg:flex-row items-center justify-between gap-4 shadow-lg">
         {/* Search */}
         <div className="relative w-full lg:w-72">
           <Search className="w-4 h-4 text-[#8B8B8B] absolute left-3 top-1/2 -translate-y-1/2" />
@@ -588,7 +588,7 @@ export const ServicesManagement: React.FC = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Buscar por nome ou descrição..."
-            className="w-full bg-surface-card border border-border-subtle rounded-none pl-9 pr-3 py-2 text-xs text-content-base placeholder-[#8B8B8B] outline-none focus:border-gold-base transition-colors"
+            className="w-full bg-surface-card border border-border-subtle rounded-xl pl-9 pr-3 py-2 text-xs text-content-base placeholder-[#8B8B8B] outline-none focus:border-gold-base transition-colors"
           />
         </div>
 
@@ -600,7 +600,7 @@ export const ServicesManagement: React.FC = () => {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="bg-surface-card border border-border-subtle text-xs text-content-base rounded-none px-3 py-2 outline-none focus:border-gold-base"
+              className="bg-surface-card border border-border-subtle text-xs text-content-base rounded-xl px-3 py-2 outline-none focus:border-gold-base"
             >
               <option value="all">Todas as Categorias</option>
               {DEFAULT_CATEGORIES.map((cat) => (
@@ -610,7 +610,7 @@ export const ServicesManagement: React.FC = () => {
           </div>
 
           {/* Type Filter Buttons */}
-          <div className="flex items-center bg-surface-card p-1 rounded-none border border-border-subtle">
+          <div className="flex items-center bg-surface-card p-1 rounded-xl border border-border-subtle">
             <button
               onClick={() => setFilterType('all')}
               className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
@@ -646,7 +646,7 @@ export const ServicesManagement: React.FC = () => {
           </div>
 
           {/* View Mode Toggle */}
-          <div className="flex items-center bg-surface-card p-1 rounded-none border border-border-subtle">
+          <div className="flex items-center bg-surface-card p-1 rounded-xl border border-border-subtle">
             <button
               onClick={() => setViewMode('table')}
               className={`p-1.5 rounded-lg text-xs transition-all ${
@@ -671,7 +671,7 @@ export const ServicesManagement: React.FC = () => {
 
       {/* Main Content Area: Table Mode */}
       {viewMode === 'table' ? (
-        <div className="w-full overflow-x-auto rounded-none border border-border-subtle bg-surface-card shadow-xl">
+        <div className="w-full overflow-x-auto rounded-2xl border border-border-subtle bg-surface-card shadow-xl">
           <table className="w-full text-left border-collapse min-w-[950px]">
             <thead>
               <tr className="bg-surface-card border-b border-border-subtle text-[11px] font-extrabold text-gold-base uppercase tracking-wider whitespace-nowrap">
@@ -714,7 +714,7 @@ export const ServicesManagement: React.FC = () => {
                         <div
                           className="relative group/img inline-block"
                         >
-                          <div className="w-12 h-12 rounded-none bg-surface-card border-2 border-content-base/60 overflow-hidden shadow-md relative flex items-center justify-center">
+                          <div className="w-12 h-12 rounded-xl bg-surface-card border-2 border-content-base/60 overflow-hidden shadow-md relative flex items-center justify-center">
                             {service.image_url || servicePhotos[0] ? (
                               <img
                                 src={service.image_url || servicePhotos[0]}
@@ -869,11 +869,11 @@ export const ServicesManagement: React.FC = () => {
             return (
               <div
                 key={service.id}
-                className="bg-surface-card rounded-none border border-border-subtle p-3 hover:border-gold-base/50 transition-all group flex flex-col justify-between shadow-lg"
+                className="bg-surface-card rounded-2xl border border-border-subtle p-3 hover:border-gold-base/50 transition-all group flex flex-col justify-between shadow-lg"
               >
                 <div className="flex items-center gap-3">
                   {/* Compact Header Image */}
-                  <div className="relative w-20 h-20 rounded-none bg-surface-base overflow-hidden shrink-0 border border-border-subtle flex items-center justify-center">
+                  <div className="relative w-20 h-20 rounded-xl bg-surface-base overflow-hidden shrink-0 border border-border-subtle flex items-center justify-center">
                     {service.image_url || servicePhotos[0] ? (
                       <img
                         src={service.image_url || servicePhotos[0]}
@@ -928,7 +928,7 @@ export const ServicesManagement: React.FC = () => {
                   <div className="flex items-center space-x-1.5">
                     <button
                       onClick={() => handleDuplicate(service)}
-                      className="p-1.5 rounded-none bg-surface-base hover:bg-surface-card text-content-base border border-border-subtle"
+                      className="p-1.5 rounded-xl bg-surface-base hover:bg-surface-card text-content-base border border-border-subtle"
                       title="Duplicar"
                     >
                       <Copy className="w-3.5 h-3.5" />
@@ -936,7 +936,7 @@ export const ServicesManagement: React.FC = () => {
 
                     <button
                       onClick={() => handleOpenEdit(service)}
-                      className="px-3 py-1.5 rounded-none bg-gold-base text-surface-base text-xs font-extrabold flex items-center space-x-1 hover:opacity-95 shadow-sm"
+                      className="px-3 py-1.5 rounded-xl bg-gold-base text-surface-base text-xs font-extrabold flex items-center space-x-1 hover:opacity-95 shadow-sm"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
                       <span>Editar</span>
@@ -953,11 +953,11 @@ export const ServicesManagement: React.FC = () => {
       {/* Advanced Compact & Modular Create / Edit Service Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-surface-base/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-hidden">
-          <div className="bg-surface-card border border-border-subtle sm:border-gold-base/40 rounded-none w-full max-w-3xl h-[92vh] max-h-[680px] overflow-hidden shadow-2xl flex flex-col animate-fade-in">
+          <div className="bg-surface-card border border-border-subtle sm:border-gold-base/40 rounded-2xl w-full max-w-3xl h-[92vh] max-h-[680px] overflow-hidden shadow-2xl flex flex-col animate-fade-in">
             {/* Modal Top Header */}
             <div className="p-3.5 sm:p-4 bg-surface-base border-b border-border-subtle flex justify-between items-center shrink-0">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-none bg-gold-base/10 border border-[#FFFFFF]/30 flex items-center justify-center text-gold-hover">
+                <div className="w-8 h-8 rounded-xl bg-gold-base/10 border border-[#FFFFFF]/30 flex items-center justify-center text-gold-hover">
                   <Scissors className="w-4 h-4" />
                 </div>
                 <div>
@@ -973,7 +973,7 @@ export const ServicesManagement: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="w-7 h-7 rounded-none bg-surface-card text-content-muted hover:text-content-base flex items-center justify-center transition-colors"
+                className="w-7 h-7 rounded-xl bg-surface-card text-content-muted hover:text-content-base flex items-center justify-center transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -986,7 +986,7 @@ export const ServicesManagement: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setActiveFormTab('general')}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-none text-xs font-bold transition-all whitespace-nowrap text-left ${
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap text-left ${
                     activeFormTab === 'general'
                       ? 'bg-gold-base text-surface-base'
                       : 'text-content-muted hover:bg-surface-card hover:text-content-base'
@@ -999,7 +999,7 @@ export const ServicesManagement: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setActiveFormTab('pricing')}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-none text-xs font-bold transition-all whitespace-nowrap text-left ${
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap text-left ${
                     activeFormTab === 'pricing'
                       ? 'bg-gold-base text-surface-base'
                       : 'text-content-muted hover:bg-surface-card hover:text-content-base'
@@ -1012,7 +1012,7 @@ export const ServicesManagement: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setActiveFormTab('gallery')}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-none text-xs font-bold transition-all whitespace-nowrap text-left ${
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap text-left ${
                     activeFormTab === 'gallery'
                       ? 'bg-gold-base text-surface-base'
                       : 'text-content-muted hover:bg-surface-card hover:text-content-base'
@@ -1038,7 +1038,7 @@ export const ServicesManagement: React.FC = () => {
                           value={formData.title}
                           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                           placeholder="Ex: Corte Degradê Navalhado + Barba"
-                          className="w-full bg-surface-base border border-border-subtle rounded-none px-3 py-2.5 text-xs text-content-base focus:border-[#FFFFFF] outline-none"
+                          className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2.5 text-xs text-content-base focus:border-[#FFFFFF] outline-none"
                           required
                         />
                       </div>
@@ -1051,7 +1051,7 @@ export const ServicesManagement: React.FC = () => {
                           <select
                             value={formData.category_id}
                             onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
-                            className="w-full bg-surface-base border border-border-subtle rounded-none px-3 py-2.5 text-xs text-content-base focus:border-[#FFFFFF] outline-none"
+                            className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2.5 text-xs text-content-base focus:border-[#FFFFFF] outline-none"
                           >
                             {DEFAULT_CATEGORIES.map((cat) => (
                               <option key={cat.id} value={cat.id}>{cat.name}</option>
@@ -1070,7 +1070,7 @@ export const ServicesManagement: React.FC = () => {
                               value={formData.duration_minutes}
                               onChange={(e) => setFormData({ ...formData, duration_minutes: Number(e.target.value) })}
                               placeholder="35"
-                              className="w-full bg-surface-base border border-border-subtle rounded-none pl-8 pr-3 py-2.5 text-xs text-content-base focus:border-[#FFFFFF] outline-none"
+                              className="w-full bg-surface-base border border-border-subtle rounded-xl pl-8 pr-3 py-2.5 text-xs text-content-base focus:border-[#FFFFFF] outline-none"
                               required
                             />
                           </div>
@@ -1086,15 +1086,15 @@ export const ServicesManagement: React.FC = () => {
                           value={formData.description}
                           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                           placeholder="Descreva as etapas, produtos e o resultado..."
-                          className="w-full bg-surface-base border border-border-subtle rounded-none px-3 py-2 text-xs text-content-base focus:border-[#FFFFFF] outline-none resize-none"
+                          className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:border-[#FFFFFF] outline-none resize-none"
                         />
                       </div>
 
                       {/* Destaques */}
-                      <div className="p-3 bg-surface-base rounded-none border border-border-subtle space-y-2">
+                      <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-2">
                         <p className="text-[10px] font-bold text-gold-hover uppercase tracking-wider">Configuração de Destaque</p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          <label className="flex items-center gap-2 p-2 rounded-none bg-surface-card border border-border-subtle cursor-pointer hover:border-status-success/40">
+                          <label className="flex items-center gap-2 p-2 rounded-xl bg-surface-card border border-border-subtle cursor-pointer hover:border-status-success/40">
                             <input
                               type="checkbox"
                               checked={formData.is_combo}
@@ -1107,7 +1107,7 @@ export const ServicesManagement: React.FC = () => {
                             </div>
                           </label>
 
-                          <label className="flex items-center gap-2 p-2 rounded-none bg-surface-card border border-border-subtle cursor-pointer hover:border-[#FFFFFF]/40">
+                          <label className="flex items-center gap-2 p-2 rounded-xl bg-surface-card border border-border-subtle cursor-pointer hover:border-[#FFFFFF]/40">
                             <input
                               type="checkbox"
                               checked={formData.popular}
@@ -1140,7 +1140,7 @@ export const ServicesManagement: React.FC = () => {
                               value={formData.price}
                               onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
                               placeholder="60.00"
-                              className="w-full bg-surface-base border border-border-subtle rounded-none pl-8 pr-3 py-2.5 text-xs font-bold text-content-base focus:border-[#FFFFFF] outline-none"
+                              className="w-full bg-surface-base border border-border-subtle rounded-xl pl-8 pr-3 py-2.5 text-xs font-bold text-content-base focus:border-[#FFFFFF] outline-none"
                               required
                             />
                           </div>
@@ -1158,14 +1158,14 @@ export const ServicesManagement: React.FC = () => {
                               value={formData.original_price || ''}
                               onChange={(e) => setFormData({ ...formData, original_price: e.target.value ? Number(e.target.value) : undefined })}
                               placeholder="75.00"
-                              className="w-full bg-surface-base border border-border-subtle rounded-none pl-8 pr-3 py-2.5 text-xs text-content-base focus:border-[#FFFFFF] outline-none"
+                              className="w-full bg-surface-base border border-border-subtle rounded-xl pl-8 pr-3 py-2.5 text-xs text-content-base focus:border-[#FFFFFF] outline-none"
                             />
                           </div>
                         </div>
                       </div>
 
                       {formData.original_price && formData.original_price > (formData.price || 0) && (
-                        <div className="p-3 bg-status-success/10 border border-status-success/30 rounded-none flex items-center justify-between">
+                        <div className="p-3 bg-status-success/10 border border-status-success/30 rounded-xl flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Flame className="w-4 h-4 text-status-success" />
                             <span className="text-xs font-bold text-status-success">
@@ -1178,7 +1178,7 @@ export const ServicesManagement: React.FC = () => {
                         </div>
                       )}
 
-                      <div className="p-3 bg-surface-base rounded-none border border-border-subtle text-xs text-content-muted space-y-1">
+                      <div className="p-3 bg-surface-base rounded-xl border border-border-subtle text-xs text-content-muted space-y-1">
                         <p className="font-bold text-content-base flex items-center gap-1.5">
                           <Info className="w-3.5 h-3.5 text-gold-hover" />
                           <span>Efeito de Preço Riscado</span>
@@ -1202,11 +1202,11 @@ export const ServicesManagement: React.FC = () => {
                           value={formData.image_url || ''}
                           onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
                           placeholder="https://..."
-                          className="w-full bg-surface-base border border-border-subtle rounded-none px-3 py-2 text-xs text-content-base focus:border-[#FFFFFF] outline-none"
+                          className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:border-[#FFFFFF] outline-none"
                         />
                       </div>
 
-                      <div className="p-3 bg-surface-base rounded-none border border-border-subtle space-y-2">
+                      <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-2">
                         <label className="text-[10px] font-bold text-gold-hover uppercase tracking-wider block">
                           Adicionar Foto por URL
                         </label>
@@ -1216,12 +1216,12 @@ export const ServicesManagement: React.FC = () => {
                             value={newGalleryUrlInput}
                             onChange={(e) => setNewGalleryUrlInput(e.target.value)}
                             placeholder="Cole URL da foto..."
-                            className="flex-1 bg-surface-card border border-border-subtle rounded-none px-2.5 py-1.5 text-xs text-content-base outline-none focus:border-[#FFFFFF]"
+                            className="flex-1 bg-surface-card border border-border-subtle rounded-xl px-2.5 py-1.5 text-xs text-content-base outline-none focus:border-[#FFFFFF]"
                           />
                           <button
                             type="button"
                             onClick={handleAddGalleryUrl}
-                            className="px-3 py-1.5 rounded-none bg-gold-base text-surface-base font-bold text-xs shrink-0"
+                            className="px-3 py-1.5 rounded-xl bg-gold-base text-surface-base font-bold text-xs shrink-0"
                           >
                             Adicionar
                           </button>
@@ -1255,7 +1255,7 @@ export const ServicesManagement: React.FC = () => {
                             {formData.gallery_urls.map((imgUrl, index) => {
                               const isCover = formData.image_url === imgUrl;
                               return (
-                                <div key={index} className="relative aspect-square rounded-none overflow-hidden bg-surface-base border border-border-subtle">
+                                <div key={index} className="relative aspect-square rounded-xl overflow-hidden bg-surface-base border border-border-subtle">
                                   <img src={imgUrl} alt="Galeria" className="w-full h-full object-cover" />
                                   {isCover && (
                                     <span className="absolute top-1 left-1 bg-gold-base text-surface-base text-[8px] font-black px-1 rounded">Capa</span>
@@ -1295,7 +1295,7 @@ export const ServicesManagement: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="px-3.5 py-2 rounded-none bg-surface-card text-content-muted hover:text-content-base text-xs font-bold transition-colors"
+                    className="px-3.5 py-2 rounded-xl bg-surface-card text-content-muted hover:text-content-base text-xs font-bold transition-colors"
                   >
                     Cancelar
                   </button>
@@ -1308,7 +1308,7 @@ export const ServicesManagement: React.FC = () => {
                           if (activeFormTab === 'general') setActiveFormTab('pricing');
                           else if (activeFormTab === 'pricing') setActiveFormTab('gallery');
                         }}
-                        className="px-3 py-2 rounded-none bg-surface-card text-gold-hover text-xs font-bold flex items-center gap-1 border border-border-subtle"
+                        className="px-3 py-2 rounded-xl bg-surface-card text-gold-hover text-xs font-bold flex items-center gap-1 border border-border-subtle"
                       >
                         <span>Avançar</span>
                         <ArrowRight className="w-3.5 h-3.5" />
@@ -1317,7 +1317,7 @@ export const ServicesManagement: React.FC = () => {
 
                     <button
                       type="submit"
-                      className="px-4 py-2 rounded-none bg-gold-base text-surface-base text-xs font-extrabold shadow-md flex items-center gap-1.5 active:scale-95 transition-all"
+                      className="px-4 py-2 rounded-xl bg-gold-base text-surface-base text-xs font-extrabold shadow-md flex items-center gap-1.5 active:scale-95 transition-all"
                     >
                       <Save className="w-3.5 h-3.5" />
                       <span>Salvar</span>

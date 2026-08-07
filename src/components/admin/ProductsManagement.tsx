@@ -143,7 +143,7 @@ export const ProductsManagement: React.FC = () => {
 
         <button
           onClick={handleOpenCreate}
-          className="bg-gold-base text-surface-base px-3.5 py-1.5 rounded-none text-xs font-extrabold flex items-center gap-1.5 hover:bg-gold-base/80 transition-all shadow-md active:scale-95 shrink-0"
+          className="bg-gold-base text-surface-base px-3.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 hover:bg-gold-base/80 transition-all shadow-md active:scale-95 shrink-0"
         >
           <Plus className="w-4 h-4" />
           <span>Cadastrar Produto</span>
@@ -152,7 +152,7 @@ export const ProductsManagement: React.FC = () => {
 
       {/* SUCCESS NOTIFICATION */}
       {successMsg && (
-        <div className="bg-status-success/10 border border-status-success/30 text-status-success p-3 rounded-none flex items-center gap-2 text-xs font-bold animate-fade-in">
+        <div className="bg-status-success/10 border border-status-success/30 text-status-success p-3 rounded-xl flex items-center gap-2 text-xs font-bold animate-fade-in">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>{successMsg}</span>
         </div>
@@ -160,7 +160,7 @@ export const ProductsManagement: React.FC = () => {
 
       {/* KPI METRICS GRID */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-none flex flex-col justify-between">
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
             <span className="text-[10px] font-bold uppercase tracking-wider">Itens no Estoque</span>
             <div className="w-6 h-6 rounded-lg bg-gold-base/10 text-gold-hover flex items-center justify-center">
@@ -171,7 +171,7 @@ export const ProductsManagement: React.FC = () => {
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">{products.length} produtos cadastrados</p>
         </div>
 
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-none flex flex-col justify-between">
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
             <span className="text-[10px] font-bold uppercase tracking-wider">Valor em Estoque</span>
             <div className="w-6 h-6 rounded-lg bg-status-success/10 text-status-success flex items-center justify-center">
@@ -182,7 +182,7 @@ export const ProductsManagement: React.FC = () => {
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Preço total de venda</p>
         </div>
 
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-none flex flex-col justify-between">
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
             <span className="text-[10px] font-bold uppercase tracking-wider">Estoque Baixo</span>
             <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${lowStockCount > 0 ? 'bg-amber-500/10 text-amber-400' : 'bg-gray-500/10 text-gray-400'}`}>
@@ -193,7 +193,7 @@ export const ProductsManagement: React.FC = () => {
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Abaixo do limite mínimo</p>
         </div>
 
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-none flex flex-col justify-between">
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
             <span className="text-[10px] font-bold uppercase tracking-wider">Margem Média</span>
             <div className="w-6 h-6 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center">
@@ -207,7 +207,7 @@ export const ProductsManagement: React.FC = () => {
 
       {/* LOW STOCK ALERT BANNER IF APPLICABLE */}
       {lowStockCount > 0 && (
-        <div className="bg-amber-500/10 border border-amber-500/30 p-3 rounded-none flex items-center justify-between text-xs text-amber-300">
+        <div className="bg-amber-500/10 border border-amber-500/30 p-3 rounded-xl flex items-center justify-between text-xs text-amber-300">
           <div className="flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
             <span>
@@ -218,7 +218,7 @@ export const ProductsManagement: React.FC = () => {
       )}
 
       {/* FILTER & SEARCH BAR */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 bg-surface-card p-2.5 rounded-none border border-border-subtle">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 bg-surface-card p-2.5 rounded-xl border border-border-subtle">
         <div className="relative flex-1">
           <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-content-muted" />
           <input
@@ -226,12 +226,12 @@ export const ProductsManagement: React.FC = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Buscar por nome ou marca..."
-            className="w-full bg-surface-card border border-border-subtle rounded-none pl-8 pr-3 py-1.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+            className="w-full bg-surface-card border border-border-subtle rounded-xl pl-8 pr-3 py-1.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
           />
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 bg-surface-card px-2.5 py-1 rounded-none border border-border-subtle shrink-0">
+          <div className="flex items-center gap-1.5 bg-surface-card px-2.5 py-1 rounded-xl border border-border-subtle shrink-0">
             <Filter className="w-3 h-3 text-gold-hover" />
             <select
               value={selectedCategory}
@@ -250,11 +250,11 @@ export const ProductsManagement: React.FC = () => {
       {/* MOBILE PRODUCTS CARDS FEED */}
       <div className="block md:hidden space-y-2.5">
         {loading ? (
-          <div className="p-8 text-center bg-surface-card rounded-none border border-border-subtle text-content-muted text-xs">
+          <div className="p-8 text-center bg-surface-card rounded-2xl border border-border-subtle text-content-muted text-xs">
             Carregando produtos...
           </div>
         ) : filteredProducts.length === 0 ? (
-          <div className="p-8 text-center bg-surface-card rounded-none border border-border-subtle text-content-muted text-xs">
+          <div className="p-8 text-center bg-surface-card rounded-2xl border border-border-subtle text-content-muted text-xs">
             Nenhum produto encontrado.
           </div>
         ) : (
@@ -263,17 +263,17 @@ export const ProductsManagement: React.FC = () => {
             const profitMargin = prod.price > 0 ? (((prod.price - prod.cost_price) / prod.price) * 100).toFixed(0) : '0';
 
             return (
-              <div key={prod.id} className="bg-surface-card border border-border-subtle rounded-none p-3.5 space-y-3">
+              <div key={prod.id} className="bg-surface-card border border-border-subtle rounded-2xl p-3.5 space-y-3">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2.5 min-w-0">
                     {prod.image_url ? (
                       <img
                         src={prod.image_url}
                         alt={prod.name}
-                        className="w-10 h-10 rounded-none object-cover border border-border-subtle shrink-0"
+                        className="w-10 h-10 rounded-xl object-cover border border-border-subtle shrink-0"
                       />
                     ) : (
-                      <div className="w-10 h-10 rounded-none bg-surface-card border border-border-subtle flex items-center justify-center text-gold-hover shrink-0">
+                      <div className="w-10 h-10 rounded-xl bg-surface-card border border-border-subtle flex items-center justify-center text-gold-hover shrink-0">
                         <Package className="w-5 h-5" />
                       </div>
                     )}
@@ -299,7 +299,7 @@ export const ProductsManagement: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 bg-surface-card p-2.5 rounded-none border border-border-subtle text-center">
+                <div className="grid grid-cols-3 gap-2 bg-surface-card p-2.5 rounded-xl border border-border-subtle text-center">
                   <div>
                     <span className="text-[9px] text-content-muted font-bold uppercase block">Venda</span>
                     <span className="text-xs font-serif text-content-base font-semibold">R$ {prod.price.toFixed(2)}</span>
@@ -346,7 +346,7 @@ export const ProductsManagement: React.FC = () => {
       </div>
 
       {/* PRODUCTS DESKTOP TABLE */}
-      <div className="hidden md:block bg-surface-card border border-border-subtle rounded-none overflow-hidden p-1 shadow-lg">
+      <div className="hidden md:block bg-surface-card border border-border-subtle rounded-2xl overflow-hidden p-1 shadow-lg">
         <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full text-left text-xs whitespace-nowrap">
             <thead className="bg-surface-base text-content-muted border-b border-border-subtle">
@@ -499,7 +499,7 @@ export const ProductsManagement: React.FC = () => {
       {/* CREATE / EDIT MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-surface-base/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4">
-          <div className="bg-surface-card border border-border-subtle sm:border-[#FFFFFF]/30 rounded-none w-full max-w-lg overflow-hidden shadow-2xl flex flex-col animate-fade-in">
+          <div className="bg-surface-card border border-border-subtle sm:border-[#FFFFFF]/30 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col animate-fade-in">
             <div className="p-3.5 bg-surface-base border-b border-border-subtle flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-lg bg-gold-base/10 text-gold-hover flex items-center justify-center">
@@ -527,7 +527,7 @@ export const ProductsManagement: React.FC = () => {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="Ex: Pomada Efeito Matte BarberX"
-                  className="w-full bg-surface-card border border-border-subtle rounded-none p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                  className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                   required
                 />
               </div>
@@ -542,7 +542,7 @@ export const ProductsManagement: React.FC = () => {
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     placeholder="Finalizadores, Barba..."
-                    className="w-full bg-surface-card border border-border-subtle rounded-none p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                   />
                 </div>
 
@@ -555,7 +555,7 @@ export const ProductsManagement: React.FC = () => {
                     value={formData.brand}
                     onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
                     placeholder="BarberX Pro"
-                    className="w-full bg-surface-card border border-border-subtle rounded-none p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                   />
                 </div>
               </div>
@@ -571,7 +571,7 @@ export const ProductsManagement: React.FC = () => {
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
                     placeholder="45.00"
-                    className="w-full bg-surface-card border border-border-subtle rounded-none p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                     required
                   />
                 </div>
@@ -586,7 +586,7 @@ export const ProductsManagement: React.FC = () => {
                     value={formData.cost_price}
                     onChange={(e) => setFormData({ ...formData, cost_price: Number(e.target.value) })}
                     placeholder="20.00"
-                    className="w-full bg-surface-card border border-border-subtle rounded-none p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                   />
                 </div>
               </div>
@@ -601,7 +601,7 @@ export const ProductsManagement: React.FC = () => {
                     value={formData.stock_quantity}
                     onChange={(e) => setFormData({ ...formData, stock_quantity: Number(e.target.value) })}
                     placeholder="25"
-                    className="w-full bg-surface-card border border-border-subtle rounded-none p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                     required
                   />
                 </div>
@@ -615,7 +615,7 @@ export const ProductsManagement: React.FC = () => {
                     value={formData.min_stock_alert}
                     onChange={(e) => setFormData({ ...formData, min_stock_alert: Number(e.target.value) })}
                     placeholder="5"
-                    className="w-full bg-surface-card border border-border-subtle rounded-none p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                   />
                 </div>
 
@@ -628,7 +628,7 @@ export const ProductsManagement: React.FC = () => {
                     value={formData.commission_percentage}
                     onChange={(e) => setFormData({ ...formData, commission_percentage: Number(e.target.value) })}
                     placeholder="15"
-                    className="w-full bg-surface-card border border-border-subtle rounded-none p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                   />
                 </div>
               </div>
@@ -642,7 +642,7 @@ export const ProductsManagement: React.FC = () => {
                   value={formData.image_url || ''}
                   onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
                   placeholder="https://images.unsplash.com/..."
-                  className="w-full bg-surface-card border border-border-subtle rounded-none p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                  className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                 />
               </div>
 
@@ -650,14 +650,14 @@ export const ProductsManagement: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-3 py-1.5 rounded-none bg-surface-card text-content-muted hover:text-content-base text-xs font-bold"
+                  className="px-3 py-1.5 rounded-xl bg-surface-card text-content-muted hover:text-content-base text-xs font-bold"
                 >
                   Cancelar
                 </button>
 
                 <button
                   type="submit"
-                  className="px-4 py-1.5 rounded-none bg-gold-base text-surface-base text-xs font-extrabold flex items-center gap-1.5 shadow hover:bg-gold-base/80"
+                  className="px-4 py-1.5 rounded-xl bg-gold-base text-surface-base text-xs font-extrabold flex items-center gap-1.5 shadow hover:bg-gold-base/80"
                 >
                   <Save className="w-3.5 h-3.5" />
                   <span>Salvar Produto</span>

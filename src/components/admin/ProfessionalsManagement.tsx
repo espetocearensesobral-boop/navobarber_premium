@@ -303,7 +303,7 @@ export const ProfessionalsManagement: React.FC = () => {
 
         <button
           onClick={handleOpenCreate}
-          className="bg-gold-base text-surface-base px-3.5 py-1.5 rounded-none text-xs font-extrabold flex items-center gap-1.5 hover:bg-gold-base/80 transition-all shadow-md active:scale-95 shrink-0"
+          className="bg-gold-base text-surface-base px-3.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 hover:bg-gold-base/80 transition-all shadow-md active:scale-95 shrink-0"
         >
           <Plus className="w-4 h-4" />
           <span>Cadastrar Barbeiro</span>
@@ -312,7 +312,7 @@ export const ProfessionalsManagement: React.FC = () => {
 
       {/* TOAST MESSAGE */}
       {toastMsg && (
-        <div className="bg-status-success/10 border border-status-success/30 text-status-success p-3 rounded-none flex items-center gap-2 text-xs font-bold animate-fade-in">
+        <div className="bg-status-success/10 border border-status-success/30 text-status-success p-3 rounded-xl flex items-center gap-2 text-xs font-bold animate-fade-in">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>{toastMsg}</span>
         </div>
@@ -320,10 +320,10 @@ export const ProfessionalsManagement: React.FC = () => {
 
       {/* COMPACT KPI CARDS */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-none flex flex-col justify-between">
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
             <span className="text-[10px] font-bold uppercase tracking-wider">Total Equipe</span>
-            <div className="w-6 h-6 rounded-sm bg-gold-base/10 text-gold-hover flex items-center justify-center">
+            <div className="w-6 h-6 rounded-lg bg-gold-base/10 text-gold-hover flex items-center justify-center">
               <Users className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -331,10 +331,10 @@ export const ProfessionalsManagement: React.FC = () => {
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Profissionais cadastrados</p>
         </div>
 
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-none flex flex-col justify-between">
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
             <span className="text-[10px] font-bold uppercase tracking-wider">Ativos na Agenda</span>
-            <div className="w-6 h-6 rounded-sm bg-status-success/10 text-status-success flex items-center justify-center">
+            <div className="w-6 h-6 rounded-lg bg-status-success/10 text-status-success flex items-center justify-center">
               <UserCheck className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -342,10 +342,10 @@ export const ProfessionalsManagement: React.FC = () => {
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Cadeiras disponíveis</p>
         </div>
 
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-none flex flex-col justify-between">
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
             <span className="text-[10px] font-bold uppercase tracking-wider">Média Avaliação</span>
-            <div className="w-6 h-6 rounded-sm bg-amber-500/10 text-amber-400 flex items-center justify-center">
+            <div className="w-6 h-6 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center">
               <Star className="w-3.5 h-3.5 fill-amber-400" />
             </div>
           </div>
@@ -353,10 +353,10 @@ export const ProfessionalsManagement: React.FC = () => {
           <p className="text-[9px] text-content-muted mt-1 font-medium truncate">Sua equipe em destaque</p>
         </div>
 
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-none flex flex-col justify-between">
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
             <span className="text-[10px] font-bold uppercase tracking-wider">Comissão Média</span>
-            <div className="w-6 h-6 rounded-sm bg-blue-500/10 text-blue-400 flex items-center justify-center">
+            <div className="w-6 h-6 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center">
               <DollarSign className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -366,7 +366,7 @@ export const ProfessionalsManagement: React.FC = () => {
       </div>
 
       {/* SEARCH AND FILTERS BAR */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 bg-surface-card p-2.5 rounded-none border border-border-subtle">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 bg-surface-card p-2.5 rounded-xl border border-border-subtle">
         <div className="relative flex-1">
           <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-content-muted" />
           <input
@@ -374,7 +374,7 @@ export const ProfessionalsManagement: React.FC = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Buscar por nome, apelido, cargo ou especialidade..."
-            className="w-full bg-surface-card border border-border-subtle rounded-none pl-8 pr-3 py-1.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+            className="w-full bg-surface-card border border-border-subtle rounded-xl pl-8 pr-3 py-1.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
           />
         </div>
 
@@ -439,11 +439,11 @@ export const ProfessionalsManagement: React.FC = () => {
       {viewMode === 'cards' ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {loading ? (
-            <div className="col-span-full py-8 text-center text-xs text-content-muted bg-surface-card rounded-none border border-border-subtle">
+            <div className="col-span-full py-8 text-center text-xs text-content-muted bg-surface-card rounded-xl border border-border-subtle">
               Carregando barbeiros...
             </div>
           ) : filteredBarbers.length === 0 ? (
-            <div className="col-span-full py-8 text-center text-xs text-content-muted bg-surface-card rounded-none border border-border-subtle">
+            <div className="col-span-full py-8 text-center text-xs text-content-muted bg-surface-card rounded-xl border border-border-subtle">
               Nenhum profissional encontrado.
             </div>
           ) : (
@@ -454,7 +454,7 @@ export const ProfessionalsManagement: React.FC = () => {
               return (
                 <div
                   key={barber.id}
-                  className={`bg-surface-card rounded-none border p-3.5 flex flex-col justify-between transition-all space-y-3 ${
+                  className={`bg-surface-card rounded-2xl border p-3.5 flex flex-col justify-between transition-all space-y-3 ${
                     isActive ? 'border-border-subtle hover:border-border-subtle' : 'border-red-500/20 opacity-70'
                   }`}
                 >
@@ -466,7 +466,7 @@ export const ProfessionalsManagement: React.FC = () => {
                           <img
                             src={barber.photo_url}
                             alt={barber.name}
-                            className="w-12 h-12 rounded-none object-cover border border-[#FFFFFF]/40"
+                            className="w-12 h-12 rounded-xl object-cover border border-[#FFFFFF]/40"
                           />
                           <button
                             onClick={() => handleToggleStatus(barber)}
@@ -531,7 +531,7 @@ export const ProfessionalsManagement: React.FC = () => {
                     </div>
 
                     {/* Schedule */}
-                    <div className="p-2 bg-surface-card border border-border-subtle rounded-none text-[10px] text-content-muted flex items-center justify-between">
+                    <div className="p-2 bg-surface-card border border-border-subtle rounded-xl text-[10px] text-content-muted flex items-center justify-between">
                       <div className="flex items-center gap-1">
                         <Clock className="w-3 h-3 text-gold-hover" />
                         <span>{barber.working_hours?.start || '08:00'} - {barber.working_hours?.end || '19:00'}</span>
@@ -598,7 +598,7 @@ export const ProfessionalsManagement: React.FC = () => {
         </div>
       ) : (
         /* TABLE VIEW */
-        <div className="bg-surface-card border border-border-subtle rounded-none overflow-hidden shadow-xl">
+        <div className="bg-surface-card border border-border-subtle rounded-2xl overflow-hidden shadow-xl">
           <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full text-left text-xs whitespace-nowrap">
               <thead className="bg-surface-base text-content-muted border-b border-border-subtle">
@@ -687,11 +687,11 @@ export const ProfessionalsManagement: React.FC = () => {
       {/* CREATE/EDIT MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-surface-base/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-hidden">
-          <div className="bg-surface-card border border-border-subtle sm:border-[#FFFFFF]/30 rounded-none w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-fade-in">
+          <div className="bg-surface-card border border-border-subtle sm:border-[#FFFFFF]/30 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-fade-in">
             {/* Header */}
             <div className="p-3.5 bg-surface-base border-b border-border-subtle flex justify-between items-center shrink-0">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-none bg-gold-base/10 border border-[#FFFFFF]/30 flex items-center justify-center text-gold-hover">
+                <div className="w-8 h-8 rounded-xl bg-gold-base/10 border border-[#FFFFFF]/30 flex items-center justify-center text-gold-hover">
                   <Users className="w-4 h-4" />
                 </div>
                 <div>
@@ -704,7 +704,7 @@ export const ProfessionalsManagement: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="w-7 h-7 rounded-none bg-surface-card text-content-muted hover:text-content-base flex items-center justify-center transition-colors"
+                className="w-7 h-7 rounded-xl bg-surface-card text-content-muted hover:text-content-base flex items-center justify-center transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -777,7 +777,7 @@ export const ProfessionalsManagement: React.FC = () => {
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         placeholder="Ex: Carlos Eduardo Silva"
-                        className="w-full bg-surface-base border border-border-subtle rounded-none px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                        className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                       />
                     </div>
 
@@ -790,7 +790,7 @@ export const ProfessionalsManagement: React.FC = () => {
                         value={formData.nickname}
                         onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
                         placeholder="Ex: Carlão Fade"
-                        className="w-full bg-surface-base border border-border-subtle rounded-none px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                        className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                       />
                     </div>
                   </div>
@@ -805,7 +805,7 @@ export const ProfessionalsManagement: React.FC = () => {
                         value={formData.role}
                         onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                         placeholder="Master Barber"
-                        className="w-full bg-surface-base border border-border-subtle rounded-none px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                        className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                       />
                     </div>
 
@@ -818,7 +818,7 @@ export const ProfessionalsManagement: React.FC = () => {
                         value={formData.phone || ''}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                         placeholder="(11) 99887-6655"
-                        className="w-full bg-surface-base border border-border-subtle rounded-none px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                        className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                       />
                     </div>
                   </div>
@@ -832,12 +832,12 @@ export const ProfessionalsManagement: React.FC = () => {
                       value={formData.bio || ''}
                       onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                       placeholder="Descreva a experiência do profissional..."
-                      className="w-full bg-surface-base border border-border-subtle rounded-none p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF] resize-none"
+                      className="w-full bg-surface-base border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF] resize-none"
                     />
                   </div>
 
                   {/* Photo selection */}
-                  <div className="p-3 bg-surface-base rounded-none border border-border-subtle space-y-2">
+                  <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-2">
                     <label className="text-[10px] font-bold text-gold-hover block uppercase">
                       Foto de Perfil
                     </label>
@@ -846,14 +846,14 @@ export const ProfessionalsManagement: React.FC = () => {
                       <img
                         src={formData.photo_url}
                         alt="Preview"
-                        className="w-10 h-10 rounded-none object-cover border border-[#FFFFFF]"
+                        className="w-10 h-10 rounded-xl object-cover border border-[#FFFFFF]"
                       />
                       <input
                         type="url"
                         value={formData.photo_url || ''}
                         onChange={(e) => setFormData({ ...formData, photo_url: e.target.value })}
                         placeholder="URL da imagem..."
-                        className="flex-1 bg-surface-card border border-border-subtle rounded-none px-3 py-1.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                        className="flex-1 bg-surface-card border border-border-subtle rounded-xl px-3 py-1.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                       />
                     </div>
 
@@ -887,11 +887,11 @@ export const ProfessionalsManagement: React.FC = () => {
                       value={specialtiesText}
                       onChange={(e) => setSpecialtiesText(e.target.value)}
                       placeholder="Degradê / Fade, Barboterapia Imperial"
-                      className="w-full bg-surface-base border border-border-subtle rounded-none px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                      className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                     />
                   </div>
 
-                  <div className="p-3 bg-surface-base rounded-none border border-border-subtle space-y-2">
+                  <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-2">
                     <p className="text-[10px] font-bold text-gold-hover flex items-center gap-1 uppercase">
                       <Sparkles className="w-3.5 h-3.5" />
                       <span>Especialidades populares:</span>
@@ -928,7 +928,7 @@ export const ProfessionalsManagement: React.FC = () => {
                         required
                         value={formData.commission_rate}
                         onChange={(e) => setFormData({ ...formData, commission_rate: Number(e.target.value) })}
-                        className="w-full bg-surface-base border border-border-subtle rounded-none px-3 py-2 text-xs font-bold text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                        className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs font-bold text-content-base focus:outline-none focus:border-[#FFFFFF]"
                       />
                     </div>
 
@@ -941,12 +941,12 @@ export const ProfessionalsManagement: React.FC = () => {
                         value={formData.pix_key || ''}
                         onChange={(e) => setFormData({ ...formData, pix_key: e.target.value })}
                         placeholder="CPF, e-mail ou telefone"
-                        className="w-full bg-surface-base border border-border-subtle rounded-none px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                        className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                       />
                     </div>
                   </div>
 
-                  <div className="p-3 bg-surface-base rounded-none border border-border-subtle space-y-1 text-xs">
+                  <div className="p-3 bg-surface-base rounded-xl border border-border-subtle space-y-1 text-xs">
                     <p className="text-[10px] text-content-muted font-bold uppercase">Simulador de Divisão</p>
                     <p className="font-extrabold text-status-success">
                       Em R$ 100,00 → Barbeiro recebe R$ {((formData.commission_rate || 0.45) * 100).toFixed(2)}
@@ -958,12 +958,12 @@ export const ProfessionalsManagement: React.FC = () => {
               {/* TAB 4: SCHEDULE */}
               {activeFormTab === 'schedule' && (
                 <div className="space-y-3">
-                  <div className="p-3 bg-surface-base border border-border-subtle rounded-none flex items-center justify-between">
+                  <div className="p-3 bg-surface-base border border-border-subtle rounded-xl flex items-center justify-between">
                     <span className="text-xs font-bold text-content-base">Disponível na Agenda</span>
                     <button
                       type="button"
                       onClick={() => setFormData({ ...formData, is_active: !(formData.is_active ?? true) })}
-                      className={`px-3 py-1 rounded-none text-xs font-bold ${
+                      className={`px-3 py-1 rounded-xl text-xs font-bold ${
                         (formData.is_active ?? true) ? 'bg-status-success text-surface-base' : 'bg-red-500/20 text-red-400'
                       }`}
                     >
@@ -986,7 +986,7 @@ export const ProfessionalsManagement: React.FC = () => {
                             }
                           })
                         }
-                        className="w-full bg-surface-base border border-border-subtle rounded-none p-2 text-xs text-content-base"
+                        className="w-full bg-surface-base border border-border-subtle rounded-xl p-2 text-xs text-content-base"
                       />
                     </div>
 
@@ -1004,7 +1004,7 @@ export const ProfessionalsManagement: React.FC = () => {
                             }
                           })
                         }
-                        className="w-full bg-surface-base border border-border-subtle rounded-none p-2 text-xs text-content-base"
+                        className="w-full bg-surface-base border border-border-subtle rounded-xl p-2 text-xs text-content-base"
                       />
                     </div>
                   </div>
@@ -1037,14 +1037,14 @@ export const ProfessionalsManagement: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-3 py-1.5 rounded-none bg-surface-card text-content-muted hover:text-content-base text-xs font-bold"
+                  className="px-3 py-1.5 rounded-xl bg-surface-card text-content-muted hover:text-content-base text-xs font-bold"
                 >
                   Cancelar
                 </button>
 
                 <button
                   type="submit"
-                  className="bg-gold-base text-surface-base px-4 py-1.5 rounded-none text-xs font-extrabold flex items-center gap-1.5 hover:bg-gold-base/80 transition-all"
+                  className="bg-gold-base text-surface-base px-4 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 hover:bg-gold-base/80 transition-all"
                 >
                   <Save className="w-3.5 h-3.5" />
                   <span>Salvar Barbeiro</span>

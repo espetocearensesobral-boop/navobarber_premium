@@ -154,7 +154,7 @@ export const ClientsManagement: React.FC = () => {
         </div>
         <button
           onClick={() => handleOpenModal()}
-          className="bg-gold-base text-surface-base px-4 py-2 rounded-none text-xs font-extrabold flex items-center gap-1.5 hover:bg-gold-base/80 transition-all shadow-md active:scale-95"
+          className="bg-gold-base text-surface-base px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1.5 hover:bg-gold-base/80 transition-all shadow-md active:scale-95"
         >
           <Plus className="w-4 h-4" />
           <span>Novo Cliente</span>
@@ -163,32 +163,32 @@ export const ClientsManagement: React.FC = () => {
 
       {/* DESKTOP KPI STATS (MD AND UP) */}
       <div className="hidden md:grid grid-cols-3 gap-3">
-        <div className="p-3.5 bg-surface-card border border-border-subtle rounded-none flex items-center justify-between">
+        <div className="p-3.5 bg-surface-card border border-border-subtle rounded-2xl flex items-center justify-between">
           <div>
             <p className="text-[10px] font-bold text-content-muted uppercase tracking-wider">Total de Clientes</p>
             <p className="text-xl font-serif text-content-base font-semibold mt-0.5">{safeClients.length}</p>
           </div>
-          <div className="w-9 h-9 rounded-none bg-gold-base/10 border border-[#FFFFFF]/30 flex items-center justify-center text-gold-hover">
+          <div className="w-9 h-9 rounded-xl bg-gold-base/10 border border-[#FFFFFF]/30 flex items-center justify-center text-gold-hover">
             <Users className="w-4 h-4" />
           </div>
         </div>
 
-        <div className="p-3.5 bg-surface-card border border-border-subtle rounded-none flex items-center justify-between">
+        <div className="p-3.5 bg-surface-card border border-border-subtle rounded-2xl flex items-center justify-between">
           <div>
             <p className="text-[10px] font-bold text-content-muted uppercase tracking-wider">Clientes VIP</p>
             <p className="text-xl font-extrabold text-gold-hover mt-0.5">{vipCount}</p>
           </div>
-          <div className="w-9 h-9 rounded-none bg-gold-base/10 border border-[#FFFFFF]/30 flex items-center justify-center text-gold-hover">
+          <div className="w-9 h-9 rounded-xl bg-gold-base/10 border border-[#FFFFFF]/30 flex items-center justify-center text-gold-hover">
             <Star className="w-4 h-4" />
           </div>
         </div>
 
-        <div className="p-3.5 bg-surface-card border border-border-subtle rounded-none flex items-center justify-between">
+        <div className="p-3.5 bg-surface-card border border-border-subtle rounded-2xl flex items-center justify-between">
           <div>
             <p className="text-[10px] font-bold text-content-muted uppercase tracking-wider">Pontos Totais</p>
             <p className="text-xl font-serif text-content-base font-semibold mt-0.5">{totalPoints} pts</p>
           </div>
-          <div className="w-9 h-9 rounded-none bg-gold-base/10 border border-[#FFFFFF]/30 flex items-center justify-center text-gold-hover">
+          <div className="w-9 h-9 rounded-xl bg-gold-base/10 border border-[#FFFFFF]/30 flex items-center justify-center text-gold-hover">
             <Award className="w-4 h-4" />
           </div>
         </div>
@@ -203,13 +203,13 @@ export const ClientsManagement: React.FC = () => {
             placeholder="Buscar por nome, email ou telefone..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-surface-card border border-border-subtle rounded-none pl-8 pr-3 py-2 text-xs text-content-base placeholder-[#666666] focus:outline-none focus:border-[#FFFFFF]"
+            className="w-full bg-surface-card border border-border-subtle rounded-xl pl-8 pr-3 py-2 text-xs text-content-base placeholder-[#666666] focus:outline-none focus:border-[#FFFFFF]"
           />
         </div>
 
         <button
           onClick={() => handleOpenModal()}
-          className="bg-gold-base text-surface-base px-3 py-2 rounded-none text-xs font-extrabold flex items-center gap-1 shrink-0 shadow-sm active:scale-95"
+          className="bg-gold-base text-surface-base px-3 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1 shrink-0 shadow-sm active:scale-95"
         >
           <Plus className="w-3.5 h-3.5" />
           <span>Novo</span>
@@ -230,7 +230,7 @@ export const ClientsManagement: React.FC = () => {
           <button
             key={pill.id}
             onClick={() => setSelectedTier(pill.id)}
-            className={`px-3 py-1.5 rounded-none text-xs font-bold whitespace-nowrap transition-all border ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${
               selectedTier === pill.id
                 ? 'bg-gold-base text-surface-base border-[#FFFFFF]'
                 : 'bg-surface-card text-content-muted border-border-subtle hover:text-content-base hover:border-border-subtle'
@@ -249,7 +249,7 @@ export const ClientsManagement: React.FC = () => {
       </div>
 
       {/* DESKTOP SEARCH BAR (MD AND UP) */}
-      <div className="hidden md:flex bg-surface-card p-3 rounded-none border border-border-subtle justify-between items-center">
+      <div className="hidden md:flex bg-surface-card p-3 rounded-xl border border-border-subtle justify-between items-center">
         <div className="relative w-72">
           <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-content-muted" />
           <input
@@ -257,7 +257,7 @@ export const ClientsManagement: React.FC = () => {
             placeholder="Buscar por nome, email ou telefone..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-surface-card border border-border-subtle rounded-none pl-8 pr-3 py-1.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+            className="w-full bg-surface-card border border-border-subtle rounded-xl pl-8 pr-3 py-1.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
           />
         </div>
         <p className="text-xs text-content-muted font-bold">
@@ -266,7 +266,7 @@ export const ClientsManagement: React.FC = () => {
       </div>
 
       {successMsg && (
-        <div className="bg-status-success/10 border border-status-success/30 text-status-success p-3 rounded-none flex items-center gap-2 text-xs font-bold">
+        <div className="bg-status-success/10 border border-status-success/30 text-status-success p-3 rounded-xl flex items-center gap-2 text-xs font-bold">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>{successMsg}</span>
         </div>
@@ -283,7 +283,7 @@ export const ClientsManagement: React.FC = () => {
             {filteredClients.map((client) => (
               <div
                 key={client.id}
-                className="bg-surface-card border border-border-subtle rounded-none p-3 flex items-center justify-between gap-3 hover:border-border-subtle transition-all"
+                className="bg-surface-card border border-border-subtle rounded-xl p-3 flex items-center justify-between gap-3 hover:border-border-subtle transition-all"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div className="w-9 h-9 rounded-full bg-surface-card border border-border-subtle flex items-center justify-center text-gold-hover font-bold text-xs shrink-0 overflow-hidden">
@@ -327,14 +327,14 @@ export const ClientsManagement: React.FC = () => {
             ))}
 
             {filteredClients.length === 0 && (
-              <div className="p-8 text-center text-xs text-content-muted bg-surface-card border border-border-subtle rounded-none">
+              <div className="p-8 text-center text-xs text-content-muted bg-surface-card border border-border-subtle rounded-xl">
                 Nenhum cliente encontrado.
               </div>
             )}
           </div>
 
           {/* DESKTOP RICH TABLE (HIDDEN MD:BLOCK) */}
-          <div className="hidden md:block bg-surface-card border border-border-subtle rounded-none overflow-hidden shadow-xl">
+          <div className="hidden md:block bg-surface-card border border-border-subtle rounded-2xl overflow-hidden shadow-xl">
             <div className="overflow-x-auto custom-scrollbar">
               <table className="w-full text-left text-xs whitespace-nowrap">
                 <thead className="bg-surface-base text-content-muted border-b border-border-subtle">
@@ -428,11 +428,11 @@ export const ClientsManagement: React.FC = () => {
       {/* COMPACT MODULAR CLIENT MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-surface-base/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-hidden">
-          <div className="bg-surface-card border border-border-subtle sm:border-[#FFFFFF]/30 rounded-none w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-fade-in">
+          <div className="bg-surface-card border border-border-subtle sm:border-[#FFFFFF]/30 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-fade-in">
             {/* Header */}
             <div className="p-3.5 bg-surface-base border-b border-border-subtle flex justify-between items-center shrink-0">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-none bg-gold-base/10 border border-[#FFFFFF]/30 flex items-center justify-center text-gold-hover">
+                <div className="w-8 h-8 rounded-xl bg-gold-base/10 border border-[#FFFFFF]/30 flex items-center justify-center text-gold-hover">
                   <Users className="w-4 h-4" />
                 </div>
                 <div>
@@ -445,7 +445,7 @@ export const ClientsManagement: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="w-7 h-7 rounded-none bg-surface-card text-content-muted hover:text-content-base flex items-center justify-center transition-colors"
+                className="w-7 h-7 rounded-xl bg-surface-card text-content-muted hover:text-content-base flex items-center justify-center transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -454,7 +454,7 @@ export const ClientsManagement: React.FC = () => {
             {/* Scrollable Form Body */}
             <div className="p-4 overflow-y-auto space-y-3 custom-scrollbar flex-1">
               {errorMsg && (
-                <div className="p-2.5 bg-red-500/10 border border-red-500/30 text-red-400 rounded-none text-xs font-bold">
+                <div className="p-2.5 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-xs font-bold">
                   {errorMsg}
                 </div>
               )}
@@ -468,7 +468,7 @@ export const ClientsManagement: React.FC = () => {
                     value={formData.name}
                     onChange={e => setFormData({ ...formData, name: e.target.value })}
                     placeholder="Ex: Carlos Silva"
-                    className="w-full bg-surface-base border border-border-subtle rounded-none px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                    className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                   />
                 </div>
 
@@ -481,7 +481,7 @@ export const ClientsManagement: React.FC = () => {
                       value={formData.email}
                       onChange={e => setFormData({ ...formData, email: e.target.value })}
                       placeholder="carlos@email.com"
-                      className="w-full bg-surface-base border border-border-subtle rounded-none px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                      className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                     />
                   </div>
                   <div>
@@ -491,7 +491,7 @@ export const ClientsManagement: React.FC = () => {
                       value={formData.phone}
                       onChange={e => setFormData({ ...formData, phone: e.target.value })}
                       placeholder="(11) 99999-9999"
-                      className="w-full bg-surface-base border border-border-subtle rounded-none px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                      className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                     />
                   </div>
                 </div>
@@ -506,11 +506,11 @@ export const ClientsManagement: React.FC = () => {
                     value={formData.password}
                     onChange={e => setFormData({ ...formData, password: e.target.value })}
                     placeholder="••••••••"
-                    className="w-full bg-surface-base border border-border-subtle rounded-none px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                    className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                   />
                 </div>
 
-                <div className="p-3 bg-surface-base border border-border-subtle rounded-none space-y-2.5">
+                <div className="p-3 bg-surface-base border border-border-subtle rounded-xl space-y-2.5">
                   <p className="text-[10px] font-bold text-gold-hover uppercase tracking-wider">Fidelidade & Permissões</p>
 
                   <div className="grid grid-cols-2 gap-2">
@@ -519,7 +519,7 @@ export const ClientsManagement: React.FC = () => {
                       <select
                         value={formData.role}
                         onChange={e => setFormData({ ...formData, role: e.target.value })}
-                        className="w-full bg-surface-card border border-border-subtle rounded-none px-2.5 py-1.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                        className="w-full bg-surface-card border border-border-subtle rounded-xl px-2.5 py-1.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                       >
                         <option value="client">Cliente</option>
                         <option value="admin">Administrador</option>
@@ -531,7 +531,7 @@ export const ClientsManagement: React.FC = () => {
                       <select
                         value={formData.loyaltyTier}
                         onChange={e => setFormData({ ...formData, loyaltyTier: e.target.value })}
-                        className="w-full bg-surface-card border border-border-subtle rounded-none px-2.5 py-1.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                        className="w-full bg-surface-card border border-border-subtle rounded-xl px-2.5 py-1.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                       >
                         <option value="Bronze">Bronze</option>
                         <option value="Prata">Prata</option>
@@ -548,7 +548,7 @@ export const ClientsManagement: React.FC = () => {
                       min="0"
                       value={formData.loyaltyPoints}
                       onChange={e => setFormData({ ...formData, loyaltyPoints: parseInt(e.target.value) || 0 })}
-                      className="w-full bg-surface-card border border-border-subtle rounded-none px-2.5 py-1.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                      className="w-full bg-surface-card border border-border-subtle rounded-xl px-2.5 py-1.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                     />
                   </div>
                 </div>
@@ -560,14 +560,14 @@ export const ClientsManagement: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="px-3 py-1.5 rounded-none text-xs font-bold text-content-muted hover:text-content-base bg-surface-card transition-colors"
+                className="px-3 py-1.5 rounded-xl text-xs font-bold text-content-muted hover:text-content-base bg-surface-card transition-colors"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
                 form="clientForm"
-                className="px-4 py-1.5 rounded-none text-xs font-extrabold text-surface-base bg-gold-base hover:bg-gold-base/80 transition-all"
+                className="px-4 py-1.5 rounded-xl text-xs font-extrabold text-surface-base bg-gold-base hover:bg-gold-base/80 transition-all"
               >
                 Salvar
               </button>
