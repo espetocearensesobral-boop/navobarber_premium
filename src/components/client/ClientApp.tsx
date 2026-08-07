@@ -53,6 +53,14 @@ export const ClientApp: React.FC = () => {
   const touchEndX = useRef<number | null>(null);
 
   useEffect(() => {
+    // Check URL for referral code ?ref=NAV-XXX
+    const params = new URLSearchParams(window.location.search);
+    const refCode = params.get('ref');
+    if (refCode) {
+      localStorage.setItem('pending_referral_code', refCode.trim().toUpperCase());
+      showToast(`Código de indicação ${refCode.toUpperCase()} ativado! Cadastre-se para ganhar 50 pontos bônus.`, 'info');
+    }
+
     // Pre-fetch services and professionals in background for instant UI rendering
     fetchServicesFromSupabase();
     fetchProfessionalsFromSupabase();

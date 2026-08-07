@@ -11,6 +11,9 @@ export const profiles = pgTable('profiles', {
   avatarUrl: text('avatar_url'),
   loyaltyPoints: integer('loyalty_points').notNull().default(0),
   loyaltyTier: text('loyalty_tier').notNull().default('Bronze'),
+  referralCode: text('referral_code').unique(),
+  referredBy: text('referred_by'),
+  birthday: text('birthday'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
@@ -109,10 +112,47 @@ export const waitingQueue = pgTable('waiting_queue', {
 
 export const reviews = pgTable('reviews', {
   id: text('id').primaryKey(),
-  appointmentId: text('appointment_id').notNull().references(() => appointments.id, { onDelete: 'cascade' }),
+  appointmentId: text('appointment_id').references(() => appointments.id, { onDelete: 'cascade' }),
+  clientId: text('client_id').references(() => profiles.id, { onDelete: 'cascade' }),
   professionalId: text('professional_id').notNull().references(() => professionals.id, { onDelete: 'cascade' }),
   rating: integer('rating').notNull(),
+  understoodRequest: text('understood_request'),
+  waitTimeAcceptable: text('wait_time_acceptable'),
+  wouldRecommend: text('would_recommend'),
   comment: text('comment'),
+  hasPhoto: boolean('has_photo').default(false),
+  photoUrl: text('photo_url'),
+  pointsAwarded: integer('points_awarded').default(0),
+  adminResponse: text('admin_response'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const pointTransactions = pgTable('point_transactions', {
+  id: text('id').primaryKey(),
+  clientId: text('client_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  amount: integer('amount').notNull(),
+  type: text('type').notNull(),
+  description: text('description').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const referrals = pgTable('referrals', {
+  id: text('id').primaryKey(),
+  referrerId: text('referrer_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  referredId: text('referred_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  status: text('status').notNull().default('pending'),
+  pointsAwarded: integer('points_awarded').notNull().default(0),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const rewards = pgTable('rewards', {
+  id: text('id').primaryKey(),
+  title: text('title').notNull(),
+  pointsRequired: integer('points_required').notNull(),
+  rewardType: text('reward_type').notNull(),
+  valueDescription: text('value_description').notNull(),
+  icon: text('icon'),
+  isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 

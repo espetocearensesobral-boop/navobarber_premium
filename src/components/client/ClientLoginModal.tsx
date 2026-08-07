@@ -159,6 +159,7 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
       }
       // Create profile
       try {
+        const pendingRef = localStorage.getItem('pending_referral_code');
         const res = await authFetch('/api/profiles', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -168,7 +169,8 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
             phone: formData.phone,
             password: formData.password,
             lgpdConsent: formData.lgpdConsent,
-            lgpdConsentDate: new Date().toISOString()
+            lgpdConsentDate: new Date().toISOString(),
+            referralCode: pendingRef || undefined
           })
         });
 
@@ -177,6 +179,16 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
           throw new Error(errData.error || 'Erro ao cadastrar. Tente novamente.');
         }
         const data = await res.json();
+        if (pendingRef) {
+          try {
+            await authFetch('/api/referrals/apply-code', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ referralCode: pendingRef })
+            });
+            localStorage.removeItem('pending_referral_code');
+          } catch (e) {}
+        }
         onLoginSuccess(data);
       } catch (err: any) {
         console.warn('Registration failed:', err);

@@ -7,6 +7,7 @@ import { ProfessionalsManagement } from './ProfessionalsManagement';
 import { ClientsManagement } from './ClientsManagement';
 import { WaitingQueue } from './WaitingQueue';
 import { SettingsManagement } from './SettingsManagement';
+import { NavoRewardsAdmin } from './NavoRewardsAdmin';
 import { 
   LayoutDashboard,
   Calendar,
@@ -20,7 +21,8 @@ import {
   ChevronRight,
   TrendingUp,
   LogOut,
-  Receipt
+  Receipt,
+  Award
 } from 'lucide-react';
 
 export type AdminTab = 
@@ -28,6 +30,7 @@ export type AdminTab =
   | 'agenda' 
   | 'pdv'
   | 'queue' 
+  | 'rewards'
   | 'servicos' 
   | 'profissionais' 
   | 'clientes' 
@@ -101,6 +104,12 @@ export const AdminLayout: React.FC = () => {
       description: 'Clientes aguardando'
     },
     { 
+      id: 'rewards' as AdminTab, 
+      label: 'Navo Rewards & NPS', 
+      icon: Award,
+      description: 'Fidelidade, indicações e pesquisas'
+    },
+    { 
       id: 'servicos' as AdminTab, 
       label: 'Serviços', 
       icon: Scissors,
@@ -136,6 +145,8 @@ export const AdminLayout: React.FC = () => {
         return <ScheduleGrid />;
       case 'queue':
         return <WaitingQueue />;
+      case 'rewards':
+        return <NavoRewardsAdmin />;
       case 'servicos':
         return <ServicesManagement />;
       case 'profissionais':

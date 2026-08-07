@@ -561,3 +561,195 @@ export async function deleteCashTransactionInSupabase(id: string): Promise<CashT
   return fetchCashTransactionsFromSupabase();
 }
 
+// =====================================
+// NAVO REWARDS SERVICES
+// =====================================
+
+export interface LoyaltyInfo {
+  loyaltyPoints: number;
+  loyaltyTier: 'Bronze' | 'Prata' | 'Ouro' | 'Diamante';
+  referralCode: string;
+  birthday?: string | null;
+  transactions: {
+    id: string;
+    amount: number;
+    type: string;
+    description: string;
+    createdAt: string;
+  }[];
+  pendingReviews: Appointment[];
+  referralStats: {
+    totalInvited: number;
+    completedCount: number;
+    pointsEarned: number;
+  };
+}
+
+export interface NavoRewardItem {
+  id: string;
+  title: string;
+  pointsRequired: number;
+  rewardType: 'upgrade' | 'product' | 'free_cut' | 'vip_status';
+  valueDescription: string;
+  icon?: string;
+  isActive?: boolean;
+}
+
+export async function fetchLoyaltyInfo(): Promise<LoyaltyInfo> {
+  try {
+    const res = await authFetch(`${API_BASE}/loyalty/me`);
+    if (!res.ok) throw new Error('Falha ao carregar dados de fidelidade');
+    return await res.json();
+  } catch (err) {
+    console.error('Erro ao buscar fidelidade:', err);
+    return {
+      loyaltyPoints: 0,
+      loyaltyTier: 'Bronze',
+      referralCode: 'NAV-CLIENT',
+      transactions: [],
+      pendingReviews: [],
+      referralStats: { totalInvited: 0, completedCount: 0, pointsEarned: 0 }
+    };
+  }
+}
+
+export async function fetchRewardsList(): Promise<NavoRewardItem[]> {
+  try {
+    const res = await authFetch(`${API_BASE}/rewards`);
+    if (!res.ok) throw new Error('Falha ao carregar catálogo de prêmios');
+    return await res.json();
+  } catch (err) {
+    console.error('Erro ao buscar catálogo de prêmios:', err);
+    return [
+      {
+        id: 'rw_500',
+        title: 'Upgrade VIP de Experiência',
+        pointsRequired: 500,
+        rewardType: 'upgrade',
+        valueDescription: 'Corte + Barba ganham Hidratação Capilar e Toalha Quente grátis',
+        icon: 'Sparkles'
+      },
+      {
+        id: 'rw_1000',
+        title: 'Produto Premium Grátis',
+        pointsRequired: 1000,
+        rewardType: 'product',
+        valueDescription: 'Pomada Modeladora Efeito Matte Extra Forte (R$ 60,00)',
+        icon: 'Package'
+      },
+      {
+        id: 'rw_2000',
+        title: 'Corte Tradicional Grátis',
+        pointsRequired: 2000,
+        rewardType: 'free_cut',
+        valueDescription: '1 Corte de Cabelo Completo totalmente grátis (1x por mês)',
+        icon: 'Scissors'
+      },
+      {
+        id: 'rw_5000',
+        title: 'Status Cliente VIP Navo',
+        pointsRequired: 5000,
+        rewardType: 'vip_status',
+        valueDescription: 'Status permanente + Prioridade total na fila + 10% OFF em tudo',
+        icon: 'Crown'
+      }
+    ];
+  }
+}
+
+export async function redeemReward(rewardId: string) {
+  const res = await authFetch(`${API_BASE}/loyalty/redeem`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ rewardId })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Falha ao resgatar recompensa');
+  return data;
+}
+
+export async function submitPostServiceReview(reviewData: {
+  appointmentId?: string;
+  professionalId: string;
+  rating: number;
+  understoodRequest?: string;
+  waitTimeAcceptable?: string;
+  wouldRecommend?: string;
+  comment?: string;
+  hasPhoto?: boolean;
+  photoUrl?: string;
+}) {
+  const res = await authFetch(`${API_BASE}/reviews`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(reviewData)
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Falha ao enviar avaliação');
+  return data;
+}
+
+export async function fetchPublicReviews() {
+  try {
+    const res = await authFetch(`${API_BASE}/reviews/public`);
+    if (!res.ok) return [];
+    return await res.json();
+  } catch (err) {
+    console.error('Erro ao buscar avaliações públicas:', err);
+    return [];
+  }
+}
+
+export async function fetchReferralInfo() {
+  try {
+    const res = await authFetch(`${API_BASE}/referrals/my-info`);
+    if (!res.ok) throw new Error('Falha ao buscar dados de indicação');
+    return await res.json();
+  } catch (err) {
+    console.error('Erro ao buscar dados de indicação:', err);
+    return {
+      referralCode: 'NAV-GUEST',
+      referralUrl: 'https://navo.com.br/ref/NAV-GUEST',
+      friends: [],
+      totalPointsEarned: 0
+    };
+  }
+}
+
+export async function applyReferralCode(referralCode: string) {
+  const res = await authFetch(`${API_BASE}/referrals/apply-code`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ referralCode })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Falha ao aplicar código');
+  return data;
+}
+
+export async function performInstagramCheckin() {
+  const res = await authFetch(`${API_BASE}/loyalty/checkin-instagram`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Falha ao realizar check-in');
+  return data;
+}
+
+export async function fetchNavoRewardsAdminDashboard() {
+  const res = await authFetch(`${API_BASE}/loyalty/admin/dashboard`);
+  if (!res.ok) throw new Error('Falha ao carregar dashboard de recompensas');
+  return await res.json();
+}
+
+export async function triggerInactiveClientsCampaign() {
+  const res = await authFetch(`${API_BASE}/loyalty/admin/campaign-inactives`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Falha ao disparar campanha');
+  return data;
+}
+

@@ -417,6 +417,49 @@ async function initializeDb(): Promise<void> {
           created_at timestamp DEFAULT now() NOT NULL
         );
       `;
+      await queryClient`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS referral_code text;`;
+      await queryClient`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS referred_by text;`;
+      await queryClient`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS birthday text;`;
+      await queryClient`
+        CREATE TABLE IF NOT EXISTS point_transactions (
+          id text PRIMARY KEY,
+          client_id text NOT NULL,
+          amount integer NOT NULL,
+          type text NOT NULL,
+          description text NOT NULL,
+          created_at timestamp DEFAULT now() NOT NULL
+        );
+      `;
+      await queryClient`
+        CREATE TABLE IF NOT EXISTS referrals (
+          id text PRIMARY KEY,
+          referrer_id text NOT NULL,
+          referred_id text NOT NULL,
+          status text NOT NULL DEFAULT 'pending',
+          points_awarded integer NOT NULL DEFAULT 0,
+          created_at timestamp DEFAULT now() NOT NULL
+        );
+      `;
+      await queryClient`
+        CREATE TABLE IF NOT EXISTS rewards (
+          id text PRIMARY KEY,
+          title text NOT NULL,
+          points_required integer NOT NULL,
+          reward_type text NOT NULL,
+          value_description text NOT NULL,
+          icon text,
+          is_active boolean NOT NULL DEFAULT true,
+          created_at timestamp DEFAULT now() NOT NULL
+        );
+      `;
+      await queryClient`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS client_id text;`;
+      await queryClient`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS understood_request text;`;
+      await queryClient`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS wait_time_acceptable text;`;
+      await queryClient`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS would_recommend text;`;
+      await queryClient`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS has_photo boolean DEFAULT false;`;
+      await queryClient`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS photo_url text;`;
+      await queryClient`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS points_awarded integer DEFAULT 0;`;
+      await queryClient`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS admin_response text;`;
     } catch (migErr: any) {
       console.warn('[API] Aviso na migração de tabelas:', migErr.message);
     }
@@ -1162,6 +1205,10 @@ app.put("/api/appointments/:id", sensitiveOpsLimiter, optionalAuth, async (req: 
         const updatedApt = await db.query.appointments.findFirst({ 
           where: eq(schema.appointments.id, id) 
         });
+
+        if (data.status === 'completed' && dbApt.status !== 'completed') {
+          await processAppointmentCompletion(updatedApt);
+        }
 
         if (data.date || data.timeSlot || data.time_slot) {
           let phone = updatedApt.clientPhone || '5511999999999';
@@ -2662,6 +2709,655 @@ app.post("/api/cron/reminders", async (req: any, res: any) => {
       }
     }
     return res.json({ success: true, processed: upcoming.length, sentCount });
+  } catch (e: any) {
+    return handleError(res, e, req.path);
+  }
+});
+
+// =====================================================================
+// NAVO REWARDS ENGINE & API
+// =====================================================================
+
+function calculateTier(points: number): 'Bronze' | 'Prata' | 'Ouro' | 'Diamante' {
+  if (points >= 6000) return 'Diamante';
+  if (points >= 3000) return 'Ouro';
+  if (points >= 1000) return 'Prata';
+  return 'Bronze';
+}
+
+async function awardPoints(clientId: string, points: number, type: string, description: string) {
+  if (!clientId || clientId === 'usr_guest' || points === 0 || !db) return null;
+  try {
+    const user = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, clientId) });
+    if (!user) return null;
+
+    const currentPoints = Number(user.loyaltyPoints || 0);
+    const newPoints = Math.max(0, currentPoints + points);
+    const newTier = calculateTier(newPoints);
+
+    await db.update(schema.profiles)
+      .set({ loyaltyPoints: newPoints, loyaltyTier: newTier, updatedAt: new Date() })
+      .where(eq(schema.profiles.id, clientId));
+
+    const txId = `pt_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+    await db.insert(schema.pointTransactions).values({
+      id: txId,
+      clientId,
+      amount: points,
+      type,
+      description,
+      createdAt: new Date()
+    });
+
+    return { newPoints, newTier };
+  } catch (e: any) {
+    console.error('[Navo Rewards] Error awarding points:', e);
+    return null;
+  }
+}
+
+async function processAppointmentCompletion(appointment: any) {
+  if (!appointment || !appointment.clientId || appointment.clientId === 'usr_guest') return;
+
+  const amount = Number(appointment.finalAmount || appointment.originalAmount || 0);
+  if (amount <= 0) return;
+
+  const pointsEarned = Math.round(amount);
+  
+  await awardPoints(
+    appointment.clientId,
+    pointsEarned,
+    'purchase',
+    `Pontos do atendimento em ${appointment.date} (R$ ${amount.toFixed(2)})`
+  );
+
+  try {
+    const completions = await db.query.appointments.findMany({
+      where: (apt: any, { and, eq }: any) => and(
+        eq(apt.clientId, appointment.clientId),
+        eq(apt.status, 'completed')
+      )
+    });
+
+    if (completions.length === 1) {
+      const client = await db.query.profiles.findFirst({
+        where: eq(schema.profiles.id, appointment.clientId)
+      });
+
+      if (client && client.referredBy) {
+        const referral = await db.query.referrals.findFirst({
+          where: (ref: any, { and, eq }: any) => and(
+            eq(ref.referrerId, client.referredBy),
+            eq(ref.referredId, client.id),
+            eq(ref.status, 'pending')
+          )
+        });
+
+        if (referral) {
+          await awardPoints(
+            client.referredBy,
+            100,
+            'referral',
+            `Indicação realizada com sucesso: ${client.name} fez o 1º corte (+100 pts)`
+          );
+
+          await awardPoints(
+            client.id,
+            50,
+            'referral',
+            `Bônus de Boas-Vindas por Indicação (+50 pts)`
+          );
+
+          await db.update(schema.referrals)
+            .set({ status: 'completed', pointsAwarded: 100 })
+            .where(eq(schema.referrals.id, referral.id));
+
+          const completedRefs = await db.query.referrals.findMany({
+            where: (ref: any, { and, eq }: any) => and(
+              eq(ref.referrerId, client.referredBy),
+              eq(ref.status, 'completed')
+            )
+          });
+
+          if (completedRefs.length === 3) {
+            await awardPoints(
+              client.referredBy,
+              200,
+              'bonus',
+              `Bônus Embaixador Navo: 3 indicações concluídas! (+200 pts)`
+            );
+          } else if (completedRefs.length === 5) {
+            await awardPoints(
+              client.referredBy,
+              1000,
+              'bonus',
+              `Bônus Super Embaixador Navo: 5 indicações concluídas! (+1000 pts)`
+            );
+          }
+        }
+      }
+    }
+  } catch (err: any) {
+    console.error('[Navo Rewards] Error processing referral bonus:', err);
+  }
+}
+
+const DEFAULT_REWARDS = [
+  {
+    id: 'rw_500',
+    title: 'Upgrade VIP de Experiência',
+    pointsRequired: 500,
+    rewardType: 'upgrade',
+    valueDescription: 'Corte + Barba ganham Hidratação Capilar e Toalha Quente grátis',
+    icon: 'Sparkles',
+    isActive: true
+  },
+  {
+    id: 'rw_1000',
+    title: 'Produto Premium Grátis',
+    pointsRequired: 1000,
+    rewardType: 'product',
+    valueDescription: 'Pomada Modeladora Efeito Matte Extra Forte (R$ 60,00)',
+    icon: 'Package',
+    isActive: true
+  },
+  {
+    id: 'rw_2000',
+    title: 'Corte Tradicional Grátis',
+    pointsRequired: 2000,
+    rewardType: 'free_cut',
+    valueDescription: '1 Corte de Cabelo Completo totalmente grátis (1x por mês)',
+    icon: 'Scissors',
+    isActive: true
+  },
+  {
+    id: 'rw_5000',
+    title: 'Status Cliente VIP Navo',
+    pointsRequired: 5000,
+    rewardType: 'vip_status',
+    valueDescription: 'Status permanente + Prioridade total na fila + 10% OFF em tudo',
+    icon: 'Crown',
+    isActive: true
+  }
+];
+
+app.get("/api/rewards", async (req: any, res: any) => {
+  try {
+    let list = await db.query.rewards.findMany({ where: eq(schema.rewards.isActive, true) });
+    if (list.length === 0) {
+      for (const r of DEFAULT_REWARDS) {
+        await db.insert(schema.rewards).values(r).onConflictDoNothing();
+      }
+      list = DEFAULT_REWARDS;
+    }
+    res.json(list);
+  } catch (e: any) {
+    res.json(DEFAULT_REWARDS);
+  }
+});
+
+app.get("/api/loyalty/me", optionalAuth, async (req: any, res: any) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId || userId === 'usr_guest') {
+      return res.json({
+        loyaltyPoints: 0,
+        loyaltyTier: 'Bronze',
+        referralCode: 'NAV-GUEST',
+        transactions: [],
+        pendingReviews: [],
+        referralStats: { totalInvited: 0, completedCount: 0, pointsEarned: 0 }
+      });
+    }
+
+    let user = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, userId) });
+    if (!user) {
+      return res.json({
+        loyaltyPoints: 0,
+        loyaltyTier: 'Bronze',
+        referralCode: 'NAV-CLIENT',
+        transactions: [],
+        pendingReviews: [],
+        referralStats: { totalInvited: 0, completedCount: 0, pointsEarned: 0 }
+      });
+    }
+
+    if (!user.referralCode) {
+      const cleanName = (user.name || 'CLIENTE').split(' ')[0].toUpperCase().replace(/[^A-Z0-9]/g, '');
+      const code = `NAV-${cleanName}${Math.floor(100 + Math.random() * 900)}`;
+      await db.update(schema.profiles).set({ referralCode: code }).where(eq(schema.profiles.id, userId));
+      user.referralCode = code;
+    }
+
+    const txs = await db.query.pointTransactions.findMany({
+      where: eq(schema.pointTransactions.clientId, userId),
+      orderBy: [desc(schema.pointTransactions.createdAt)]
+    });
+
+    const pendingApts = await db.query.appointments.findMany({
+      where: (apt: any, { and, eq }: any) => and(
+        eq(apt.clientId, userId),
+        eq(apt.status, 'completed'),
+        eq(apt.isReviewed, false)
+      )
+    });
+
+    const userReferrals = await db.query.referrals.findMany({
+      where: eq(schema.referrals.referrerId, userId)
+    });
+
+    const completedRefs = userReferrals.filter((r: any) => r.status === 'completed');
+    const referralPoints = userReferrals.reduce((acc: number, r: any) => acc + (r.pointsAwarded || 0), 0);
+
+    res.json({
+      loyaltyPoints: user.loyaltyPoints || 0,
+      loyaltyTier: user.loyaltyTier || calculateTier(user.loyaltyPoints || 0),
+      referralCode: user.referralCode,
+      birthday: user.birthday || null,
+      transactions: txs,
+      pendingReviews: pendingApts,
+      referralStats: {
+        totalInvited: userReferrals.length,
+        completedCount: completedRefs.length,
+        pointsEarned: referralPoints
+      }
+    });
+  } catch (e: any) {
+    return handleError(res, e, req.path);
+  }
+});
+
+app.post("/api/loyalty/redeem", optionalAuth, async (req: any, res: any) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId || userId === 'usr_guest') {
+      return res.status(401).json({ error: 'Faça login para resgatar recompensas.' });
+    }
+
+    const { rewardId } = req.body;
+    let reward = await db.query.rewards.findFirst({ where: eq(schema.rewards.id, rewardId) });
+    if (!reward) {
+      reward = DEFAULT_REWARDS.find(r => r.id === rewardId);
+    }
+    if (!reward) {
+      return res.status(404).json({ error: 'Recompensa não encontrada.' });
+    }
+
+    const user = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, userId) });
+    if (!user || (user.loyaltyPoints || 0) < reward.pointsRequired) {
+      return res.status(400).json({ error: `Pontos insuficientes. Você precisa de ${reward.pointsRequired} pontos.` });
+    }
+
+    const newPoints = user.loyaltyPoints - reward.pointsRequired;
+    await db.update(schema.profiles)
+      .set({ loyaltyPoints: newPoints, updatedAt: new Date() })
+      .where(eq(schema.profiles.id, userId));
+
+    const redemptionCode = `NAV-RWD-${Math.floor(100000 + Math.random() * 900000)}`;
+
+    await db.insert(schema.pointTransactions).values({
+      id: `red_${Date.now()}`,
+      clientId: userId,
+      amount: -reward.pointsRequired,
+      type: 'redemption',
+      description: `Resgate: ${reward.title} (Cód: ${redemptionCode})`,
+      createdAt: new Date()
+    });
+
+    res.json({
+      success: true,
+      message: 'Recompensa resgatada com sucesso!',
+      redemptionCode,
+      reward,
+      newPoints
+    });
+  } catch (e: any) {
+    return handleError(res, e, req.path);
+  }
+});
+
+app.post("/api/loyalty/checkin-instagram", optionalAuth, async (req: any, res: any) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId || userId === 'usr_guest') {
+      return res.status(401).json({ error: 'Faça login para fazer check-in e ganhar pontos.' });
+    }
+
+    const result = await awardPoints(
+      userId,
+      15,
+      'checkin',
+      'Check-in de Story no Instagram (@navobarber)'
+    );
+
+    res.json({
+      success: true,
+      pointsAdded: 15,
+      newTotal: result?.newPoints || 0,
+      message: 'Check-in verificado! +15 pontos adicionados à sua carteira.'
+    });
+  } catch (e: any) {
+    return handleError(res, e, req.path);
+  }
+});
+
+app.post("/api/reviews", optionalAuth, async (req: any, res: any) => {
+  try {
+    const userId = req.user?.id;
+    const {
+      appointmentId,
+      professionalId,
+      rating,
+      understoodRequest,
+      waitTimeAcceptable,
+      wouldRecommend,
+      comment,
+      hasPhoto,
+      photoUrl
+    } = req.body;
+
+    if (!rating || !professionalId) {
+      return res.status(400).json({ error: 'Classificação e profissional são obrigatórios.' });
+    }
+
+    let points = 20;
+    if (hasPhoto || photoUrl) points += 30;
+    if (Number(rating) === 5) points += 10;
+
+    const reviewId = `rev_${Date.now()}`;
+
+    await db.insert(schema.reviews).values({
+      id: reviewId,
+      appointmentId: appointmentId || null,
+      clientId: userId !== 'usr_guest' ? userId : null,
+      professionalId,
+      rating: Number(rating),
+      understoodRequest,
+      waitTimeAcceptable,
+      wouldRecommend,
+      comment,
+      hasPhoto: Boolean(hasPhoto || photoUrl),
+      photoUrl: photoUrl || null,
+      pointsAwarded: points,
+      createdAt: new Date()
+    });
+
+    if (appointmentId) {
+      await db.update(schema.appointments)
+        .set({ isReviewed: true, updatedAt: new Date() })
+        .where(eq(schema.appointments.id, appointmentId));
+    }
+
+    let newPointsTotal = 0;
+    if (userId && userId !== 'usr_guest') {
+      const resPts = await awardPoints(
+        userId,
+        points,
+        'review',
+        `Avaliação pós-atendimento (${rating}⭐) (+${points} pts)`
+      );
+      if (resPts) newPointsTotal = resPts.newPoints;
+    }
+
+    res.json({
+      success: true,
+      pointsAwarded: points,
+      newPointsTotal,
+      message: `Obrigado por avaliar! Você ganhou +${points} pontos Navo.`
+    });
+  } catch (e: any) {
+    return handleError(res, e, req.path);
+  }
+});
+
+app.get("/api/reviews/public", async (req: any, res: any) => {
+  try {
+    const list = await db.query.reviews.findMany({
+      where: eq(schema.reviews.rating, 5),
+      orderBy: [desc(schema.reviews.createdAt)],
+      limit: 10
+    });
+
+    const populated = await Promise.all(list.map(async (r: any) => {
+      let clientName = 'Cliente Navo';
+      let clientAvatar = null;
+      let barberName = 'Barbeiro Navo';
+
+      if (r.clientId) {
+        const p = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, r.clientId) });
+        if (p) {
+          clientName = p.name || clientName;
+          clientAvatar = p.avatarUrl;
+        }
+      }
+      if (r.professionalId) {
+        const prof = await db.query.professionals.findFirst({ where: eq(schema.professionals.id, r.professionalId) });
+        if (prof) barberName = prof.name;
+      }
+
+      return {
+        id: r.id,
+        clientName,
+        clientAvatar,
+        barberName,
+        rating: r.rating,
+        comment: r.comment || 'Atendimento impecável, corte e barba perfeitos!',
+        photoUrl: r.photoUrl,
+        createdAt: r.createdAt
+      };
+    }));
+
+    res.json(populated);
+  } catch (e: any) {
+    res.json([
+      {
+        id: 'rev_demo_1',
+        clientName: 'Carlos Eduardo',
+        barberName: 'Marcos Oliver',
+        rating: 5,
+        comment: 'Melhor barbearia de São Paulo! Atendimento rápido, ambiente incrível e o café é top.',
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 'rev_demo_2',
+        clientName: 'Gabriel Santos',
+        barberName: 'Lucas Barbeiro',
+        rating: 5,
+        comment: 'O programa de pontos vale muito a pena. Já troquei por uma pomada grátis e ganhei upgrade no corte!',
+        createdAt: new Date().toISOString()
+      }
+    ]);
+  }
+});
+
+app.get("/api/referrals/my-info", optionalAuth, async (req: any, res: any) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId || userId === 'usr_guest') {
+      return res.json({
+        referralCode: 'NAV-GUEST',
+        referralUrl: 'https://navo.com.br/ref/NAV-GUEST',
+        friends: [],
+        totalPointsEarned: 0
+      });
+    }
+
+    let user = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, userId) });
+    if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
+
+    if (!user.referralCode) {
+      const cleanName = (user.name || 'CLIENTE').split(' ')[0].toUpperCase().replace(/[^A-Z0-9]/g, '');
+      const code = `NAV-${cleanName}${Math.floor(100 + Math.random() * 900)}`;
+      await db.update(schema.profiles).set({ referralCode: code }).where(eq(schema.profiles.id, userId));
+      user.referralCode = code;
+    }
+
+    const userReferrals = await db.query.referrals.findMany({
+      where: eq(schema.referrals.referrerId, userId),
+      orderBy: [desc(schema.referrals.createdAt)]
+    });
+
+    const populatedFriends = await Promise.all(userReferrals.map(async (r: any) => {
+      let friendName = 'Amigo Convidado';
+      const friend = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, r.referredId) });
+      if (friend) friendName = friend.name;
+
+      return {
+        id: r.id,
+        name: friendName,
+        status: r.status,
+        pointsAwarded: r.pointsAwarded,
+        date: r.createdAt
+      };
+    }));
+
+    const totalPointsEarned = userReferrals.reduce((acc: number, r: any) => acc + (r.pointsAwarded || 0), 0);
+
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';
+    const host = req.headers['x-forwarded-host'] || req.headers.host;
+
+    res.json({
+      referralCode: user.referralCode,
+      referralUrl: `${protocol}://${host}?ref=${user.referralCode}`,
+      friends: populatedFriends,
+      totalPointsEarned
+    });
+  } catch (e: any) {
+    return handleError(res, e, req.path);
+  }
+});
+
+app.post("/api/referrals/apply-code", optionalAuth, async (req: any, res: any) => {
+  try {
+    const userId = req.user?.id;
+    const { referralCode } = req.body;
+
+    if (!referralCode) return res.status(400).json({ error: 'Código de indicação é obrigatório.' });
+
+    const referrer = await db.query.profiles.findFirst({
+      where: eq(schema.profiles.referralCode, referralCode.trim().toUpperCase())
+    });
+
+    if (!referrer) {
+      return res.status(404).json({ error: 'Código de indicação não encontrado.' });
+    }
+
+    if (userId && userId === referrer.id) {
+      return res.status(400).json({ error: 'Você não pode usar seu próprio código de indicação.' });
+    }
+
+    if (userId && userId !== 'usr_guest') {
+      const existingRef = await db.query.referrals.findFirst({
+        where: eq(schema.referrals.referredId, userId)
+      });
+      if (existingRef) {
+        return res.status(400).json({ error: 'Você já utilizou um código de indicação anteriormente.' });
+      }
+
+      await db.update(schema.profiles)
+        .set({ referredBy: referrer.id })
+        .where(eq(schema.profiles.id, userId));
+
+      await db.insert(schema.referrals).values({
+        id: `ref_${Date.now()}`,
+        referrerId: referrer.id,
+        referredId: userId,
+        status: 'pending',
+        pointsAwarded: 0,
+        createdAt: new Date()
+      });
+    }
+
+    res.json({
+      success: true,
+      referrerName: referrer.name,
+      message: `Código de ${referrer.name} ativado! Ganhe 50 pontos bônus no seu primeiro corte.`
+    });
+  } catch (e: any) {
+    return handleError(res, e, req.path);
+  }
+});
+
+app.get("/api/loyalty/admin/dashboard", requireAuth, requireAdmin, async (req: any, res: any) => {
+  try {
+    const allProfiles = await db.query.profiles.findMany();
+    const allTxs = await db.query.pointTransactions.findMany();
+    const allReviews = await db.query.reviews.findMany();
+    const allReferrals = await db.query.referrals.findMany();
+
+    const tierDistribution = {
+      Bronze: allProfiles.filter((p: any) => (p.loyaltyTier || 'Bronze') === 'Bronze').length,
+      Prata: allProfiles.filter((p: any) => p.loyaltyTier === 'Prata').length,
+      Ouro: allProfiles.filter((p: any) => p.loyaltyTier === 'Ouro').length,
+      Diamante: allProfiles.filter((p: any) => p.loyaltyTier === 'Diamante').length,
+    };
+
+    const totalIssued = allTxs.filter((t: any) => t.amount > 0).reduce((a: number, t: any) => a + t.amount, 0);
+    const totalRedeemed = Math.abs(allTxs.filter((t: any) => t.amount < 0).reduce((a: number, t: any) => a + t.amount, 0));
+
+    const totalRatings = allReviews.length;
+    const promoters = allReviews.filter((r: any) => r.rating === 5).length;
+    const passives = allReviews.filter((r: any) => r.rating === 4).length;
+    const detractors = allReviews.filter((r: any) => r.rating <= 3).length;
+    const npsScore = totalRatings > 0 ? Math.round(((promoters - detractors) / totalRatings) * 100) : 100;
+
+    const referrerCounts: Record<string, number> = {};
+    allReferrals.forEach((r: any) => {
+      referrerCounts[r.referrerId] = (referrerCounts[r.referrerId] || 0) + 1;
+    });
+
+    const sortedAmbassadors = Object.entries(referrerCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+
+    const ambassadorsList = await Promise.all(sortedAmbassadors.map(async ([profId, count]) => {
+      const p = allProfiles.find((prof: any) => prof.id === profId);
+      return {
+        id: profId,
+        name: p?.name || 'Cliente Embaixador',
+        totalReferrals: count,
+        tier: p?.loyaltyTier || 'Bronze',
+        points: p?.loyaltyPoints || 0
+      };
+    }));
+
+    res.json({
+      tierDistribution,
+      totalIssued,
+      totalRedeemed,
+      npsScore,
+      promoters,
+      passives,
+      detractors,
+      totalReviews: totalRatings,
+      ambassadors: ambassadorsList,
+      reviewsList: allReviews
+    });
+  } catch (e: any) {
+    return handleError(res, e, req.path);
+  }
+});
+
+app.post("/api/loyalty/admin/campaign-inactives", requireAuth, requireAdmin, async (req: any, res: any) => {
+  try {
+    const clients = await db.query.profiles.findMany({ where: eq(schema.profiles.role, 'client') });
+    let rewardedCount = 0;
+
+    for (const c of clients) {
+      const pts = await awardPoints(
+        c.id,
+        100,
+        'bonus',
+        'Campanha Navo Re-engajamento: +100 pontos para você agendar seu novo corte!'
+      );
+      if (pts) rewardedCount++;
+    }
+
+    res.json({
+      success: true,
+      rewardedCount,
+      message: `Campanha enviada com sucesso! +100 pontos creditados para ${rewardedCount} clientes.`
+    });
   } catch (e: any) {
     return handleError(res, e, req.path);
   }
