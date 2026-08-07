@@ -7,10 +7,6 @@ import {
   CheckCircle2,
   CalendarDays,
   PlusCircle,
-  Clock,
-  User,
-  ArrowRight,
-  Scissors,
   Ticket,
   Copy,
   Check
@@ -28,11 +24,6 @@ interface BookingStep5Props {
 }
 
 export const BookingStep5Confirmation: React.FC<BookingStep5Props> = ({
-  selectedServices,
-  selectedBarber,
-  selectedDate,
-  selectedTimeSlot,
-  totalPaid,
   bookingCode,
   onResetBooking,
   onViewAppointments
@@ -60,16 +51,6 @@ export const BookingStep5Confirmation: React.FC<BookingStep5Props> = ({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const totalDuration = selectedServices.reduce((acc, curr) => acc + curr.duration_minutes, 0);
-
-  // Format Date
-  const dateObj = new Date(`${selectedDate}T12:00:00`);
-  const formattedDate = dateObj.toLocaleDateString('pt-BR', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
-  });
 
   return (
     <div className="space-y-5 text-center pb-8 px-4 max-w-md mx-auto animate-in fade-in duration-300 mt-6">
@@ -124,66 +105,6 @@ export const BookingStep5Confirmation: React.FC<BookingStep5Props> = ({
           </p>
         </div>
       )}
-
-      {/* Quick Appointment Summary Card */}
-      <div className="bg-border-subtle backdrop-blur-[10px] p-4 rounded-2xl border border-border-subtle text-left space-y-3">
-        <div className="flex items-center justify-between border-b border-border-subtle pb-3">
-          <div className="flex items-center space-x-2 text-xs text-content-muted">
-            <User className="w-4 h-4 text-gold-base" />
-            <span>Profissional:</span>
-          </div>
-          <span className="text-sm font-extrabold text-content-base">{selectedBarber?.name || 'Profissional'}</span>
-        </div>
-
-        <div className="border-b border-border-subtle pb-3 space-y-2">
-          <div className="flex items-center justify-between text-xs text-content-muted">
-            <div className="flex items-center space-x-2">
-              <Scissors className="w-4 h-4 text-gold-base" />
-              <span className="font-bold text-content-base">Serviços Selecionados:</span>
-            </div>
-            <span className="text-[10px] bg-white/10 px-2 py-0.5 rounded-full text-gold-base font-bold">
-              {selectedServices.length} {selectedServices.length === 1 ? 'item' : 'itens'}
-            </span>
-          </div>
-          <div className="space-y-1.5 pt-1">
-            {selectedServices.map(srv => (
-              <div key={srv.id} className="flex justify-between items-center text-xs bg-surface-base/60 p-2.5 rounded-xl border border-border-subtle/40">
-                <div className="flex flex-col min-w-0 pr-2">
-                  <span className="text-content-base font-bold truncate">{srv.title}</span>
-                  <span className="text-[10px] text-content-muted flex items-center gap-1 mt-0.5">
-                    <Clock className="w-3 h-3 text-gold-base" />
-                    {srv.duration_minutes} min
-                  </span>
-                </div>
-                <span className="text-gold-base font-black shrink-0">R$ {srv.price.toFixed(2)}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between border-b border-border-subtle pb-3">
-          <div className="flex items-center space-x-2 text-xs text-content-muted">
-            <CalendarDays className="w-4 h-4 text-gold-base" />
-            <span>Data e Horário:</span>
-          </div>
-          <span className="text-xs sm:text-sm font-bold text-content-base capitalize">
-            {formattedDate} às <strong className="text-gold-base font-black">{selectedTimeSlot}</strong>
-          </span>
-        </div>
-
-        <div className="flex items-center justify-between border-b border-border-subtle pb-3">
-          <div className="flex items-center space-x-2 text-xs text-content-muted">
-            <Clock className="w-4 h-4 text-gold-base" />
-            <span>Duração Estimada:</span>
-          </div>
-          <span className="text-xs sm:text-sm font-bold text-content-base">{totalDuration} min</span>
-        </div>
-
-        <div className="flex items-center justify-between pt-0.5">
-          <span className="text-xs text-content-muted font-medium">Valor Total:</span>
-          <span className="text-base font-black text-status-success">R$ {totalPaid.toFixed(2)}</span>
-        </div>
-      </div>
 
       {/* Uncontained Notice */}
       <div className="space-y-1.5 py-1 text-center text-xs text-content-muted leading-relaxed max-w-xs mx-auto">

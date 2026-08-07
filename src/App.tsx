@@ -3,17 +3,14 @@ import { ToastProvider } from './components/ui/Toast';
 
 const ClientApp = lazy(() => import('./components/client/ClientApp').then(m => ({ default: m.ClientApp })));
 const AdminLayout = lazy(() => import('./components/admin/AdminLayout').then(m => ({ default: m.AdminLayout })));
-const DesignSystem = lazy(() => import('./components/client/DesignSystem').then(m => ({ default: m.DesignSystem })));
 
 export default function App() {
-  const [route, setRoute] = useState<'client' | 'admin' | 'design-system'>('client');
+  const [route, setRoute] = useState<'client' | 'admin'>('client');
 
   useEffect(() => {
     const path = window.location.pathname;
     if (path.startsWith('/admin')) {
       setRoute('admin');
-    } else if (path.startsWith('/design-system')) {
-      setRoute('design-system');
     } else {
       setRoute('client');
     }
@@ -27,7 +24,7 @@ export default function App() {
             <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
           </div>
         }>
-          {route === 'admin' ? <AdminLayout /> : route === 'design-system' ? <DesignSystem /> : <ClientApp />}
+          {route === 'admin' ? <AdminLayout /> : <ClientApp />}
         </Suspense>
       </div>
     </ToastProvider>
