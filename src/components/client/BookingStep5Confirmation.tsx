@@ -10,7 +10,10 @@ import {
   Clock,
   User,
   ArrowRight,
-  Scissors
+  Scissors,
+  Ticket,
+  Copy,
+  Check
 } from 'lucide-react';
 
 interface BookingStep5Props {
@@ -19,6 +22,7 @@ interface BookingStep5Props {
   selectedDate: string;
   selectedTimeSlot: string;
   totalPaid: number;
+  bookingCode?: string;
   onResetBooking: () => void;
   onViewAppointments: () => void;
 }
@@ -29,9 +33,12 @@ export const BookingStep5Confirmation: React.FC<BookingStep5Props> = ({
   selectedDate,
   selectedTimeSlot,
   totalPaid,
+  bookingCode,
   onResetBooking,
   onViewAppointments
 }) => {
+  const [copied, setCopied] = React.useState(false);
+
   useEffect(() => {
     try {
       playConfirmationChime();
@@ -45,6 +52,13 @@ export const BookingStep5Confirmation: React.FC<BookingStep5Props> = ({
       console.log('Confetti failed to run', e);
     }
   }, []);
+
+  const handleCopyVoucher = () => {
+    if (!bookingCode) return;
+    navigator.clipboard.writeText(bookingCode);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const totalDuration = selectedServices.reduce((acc, curr) => acc + curr.duration_minutes, 0);
 
@@ -72,6 +86,44 @@ export const BookingStep5Confirmation: React.FC<BookingStep5Props> = ({
           Agendamento Confirmado!
         </span>
       </div>
+
+      {/* VOUCHER / CÓDIGO DE RESERVA CARD */}
+      {bookingCode && (
+        <div className="bg-gradient-to-br from-gold-base/15 via-gold-base/10 to-gold-base/5 border border-gold-base/40 rounded-2xl p-4 text-center space-y-1.5 shadow-md animate-in zoom-in-95 duration-300">
+          <div className="flex items-center justify-center gap-1.5 text-gold-base text-[11px] font-bold uppercase tracking-wider">
+            <Ticket className="w-3.5 h-3.5" />
+            <span>Código do Voucher / Agendamento</span>
+          </div>
+
+          <div className="flex items-center justify-center gap-2 pt-0.5">
+            <span className="text-2xl font-black text-content-base tracking-widest font-mono select-all">
+              {bookingCode}
+            </span>
+            <button
+              type="button"
+              onClick={handleCopyVoucher}
+              className="p-2 rounded-xl bg-gold-base/20 hover:bg-gold-base/30 text-gold-base active:scale-95 transition-all flex items-center gap-1 text-xs font-bold"
+              title="Copiar Código"
+            >
+              {copied ? (
+                <>
+                  <Check className="w-4 h-4 text-status-success" />
+                  <span className="text-status-success text-[10px]">Copiado</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="w-4 h-4" />
+                  <span className="text-[10px]">Copiar</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          <p className="text-[11px] text-content-muted font-medium pt-1">
+            🔑 Guarde este código! Ele será solicitado para consultar seu agendamento como visitante.
+          </p>
+        </div>
+      )}
 
       {/* Quick Appointment Summary Card */}
       <div className="bg-border-subtle backdrop-blur-[10px] p-4 rounded-2xl border border-border-subtle text-left space-y-3">

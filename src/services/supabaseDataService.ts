@@ -147,6 +147,7 @@ export async function fetchAppointmentsFromSupabase(phone?: string): Promise<App
       final_amount: Number(a.finalAmount || a.final_amount || 0),
       payment_method: a.paymentMethod || a.payment_method || 'PIX',
       loyalty_points_used: Number(a.loyaltyPointsUsed || a.loyalty_points_used || 0),
+      booking_code: a.bookingCode || a.booking_code || a.id?.replace('apt_', '').substring(0, 8).toUpperCase() || '',
       created_at: a.createdAt || a.created_at || new Date().toISOString(),
       services: a.services || []
     }));
@@ -175,6 +176,7 @@ export async function createAppointmentInSupabase(apt: Appointment): Promise<App
       discountAmount: (apt.discount_amount ?? 0).toString(),
       finalAmount: (apt.final_amount ?? 0).toString(),
       paymentMethod: apt.payment_method,
+      bookingCode: apt.booking_code,
       services: apt.services
     })
   });
@@ -186,6 +188,7 @@ export async function createAppointmentInSupabase(apt: Appointment): Promise<App
   return {
     ...apt,
     id: created.id || apt.id,
+    booking_code: created.bookingCode || created.booking_code || apt.booking_code || '',
     status: created.status || apt.status
   };
 }

@@ -20,7 +20,11 @@ import {
   RefreshCw,
   Sparkles,
   Phone,
-  ShieldCheck
+  ShieldCheck,
+  Lock,
+  Ticket,
+  KeyRound,
+  Check
 } from 'lucide-react';
 import { AppointmentDetailsModal } from './AppointmentDetailsModal';
 import { ReviewModal } from './ReviewModal';
@@ -202,22 +206,34 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
 
   const [guestPhoneInput, setGuestPhoneInput] = useState(() => {
     try {
-      const saved = localStorage.getItem('barberx_guest_phone');
-      return saved || '';
+      return localStorage.getItem('barberx_guest_phone') || '';
     } catch {
       return '';
     }
   });
   const [searchedPhone, setSearchedPhone] = useState(() => {
     try {
-      const saved = localStorage.getItem('barberx_guest_phone');
-      return saved || '';
+      return localStorage.getItem('barberx_guest_phone') || '';
     } catch {
       return '';
     }
   });
+  const [verifiedVoucher, setVerifiedVoucher] = useState(() => {
+    try {
+      return localStorage.getItem('barberx_guest_voucher') || '';
+    } catch {
+      return '';
+    }
+  });
+
   const [isSearchingGuest, setIsSearchingGuest] = useState(false);
   const [guestPhoneError, setGuestPhoneError] = useState('');
+
+  // Voucher verification mode for visitors
+  const [isVoucherVerificationMode, setIsVoucherVerificationMode] = useState(false);
+  const [pendingGuestAppointments, setPendingGuestAppointments] = useState<Appointment[]>([]);
+  const [voucherInput, setVoucherInput] = useState('');
+  const [voucherError, setVoucherError] = useState('');
 
   const formatPhone = (value: string) => {
     const numbers = value.replace(/\D/g, '');
@@ -242,6 +258,8 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
 
     setIsSearchingGuest(true);
     setGuestPhoneError('');
+    setVoucherError('');
+    setVoucherInput('');
 
     try {
       const [allAppointments] = await Promise.all([
@@ -257,15 +275,20 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
         const sorted = userAppointments.sort(
           (a, b) => new Date(b.date || b.created_at || '').getTime() - new Date(a.date || a.created_at || '').getTime()
         );
-        setAppointments(sorted);
+
+        setPendingGuestAppointments(sorted);
         setSearchedPhone(phoneToUse);
+        setIsVoucherVerificationMode(true); // Enter voucher verification step!
+        setAppointments([]); // Hide appointments until voucher is validated
         try {
           localStorage.setItem('barberx_guest_phone', phoneToUse);
         } catch (e) {}
       } else {
         setGuestPhoneError('Nenhum agendamento encontrado para este número de telefone.');
         setAppointments([]);
+        setPendingGuestAppointments([]);
         setSearchedPhone('');
+        setIsVoucherVerificationMode(false);
       }
     } catch (err) {
       setGuestPhoneError('Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.');
@@ -274,13 +297,50 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
     }
   };
 
+  const handleVerifyVoucher = () => {
+    if (!voucherInput.trim()) {
+      setVoucherError('Digite o código do voucher informado no comprovante de agendamento.');
+      return;
+    }
+
+    const cleanInput = voucherInput.trim().toUpperCase().replace(/^#/, '');
+
+    const isMatch = pendingGuestAppointments.some(apt => {
+      const code = (apt.booking_code || (apt as any).bookingCode || '').toUpperCase().replace(/^#/, '');
+      const shortCode = apt.id.replace('apt_', '').substring(0, 8).toUpperCase();
+      const fullId = apt.id.toUpperCase();
+      return code === cleanInput || shortCode === cleanInput || fullId === cleanInput || (code && (code.includes(cleanInput) || cleanInput.includes(code)));
+    });
+
+    if (isMatch) {
+      hapticSuccess();
+      setAppointments(pendingGuestAppointments);
+      setVerifiedVoucher(cleanInput);
+      setIsVoucherVerificationMode(false);
+      setVoucherError('');
+      try {
+        localStorage.setItem('barberx_guest_phone', searchedPhone);
+        localStorage.setItem('barberx_guest_voucher', cleanInput);
+      } catch (e) {}
+    } else {
+      hapticMedium();
+      setVoucherError('Código do Voucher incorreto para o telefone informado.\nVerifique o código impresso no seu comprovante.');
+    }
+  };
+
   const handleClearSearch = () => {
     setAppointments([]);
+    setPendingGuestAppointments([]);
     setSearchedPhone('');
+    setVerifiedVoucher('');
     setGuestPhoneInput('');
     setGuestPhoneError('');
+    setVoucherInput('');
+    setVoucherError('');
+    setIsVoucherVerificationMode(false);
     try {
       localStorage.removeItem('barberx_guest_phone');
+      localStorage.removeItem('barberx_guest_voucher');
     } catch (e) {}
   };
 
@@ -404,9 +464,9 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
         </div>
       )}
 
-      {/* Guest Phone Search Bar (When no appointments are displayed yet) */}
-      {isGuest && appointments.length === 0 && (
-        <div className="w-full max-w-[350px] aspect-square mx-auto bg-surface-card/30 backdrop-blur-md p-6 rounded-3xl border border-border-subtle/70 text-center flex flex-col items-center justify-center space-y-4 shadow-lg my-auto">
+      {/* Guest Step 1: Phone Search Bar (When no voucher verification or appointments active) */}
+      {isGuest && !isVoucherVerificationMode && appointments.length === 0 && (
+        <div className="w-full max-w-[360px] mx-auto bg-surface-card/30 backdrop-blur-md p-6 rounded-3xl border border-border-subtle/70 text-center flex flex-col items-center justify-center space-y-4 shadow-lg my-auto">
           <div className="w-14 h-14 rounded-2xl bg-gold-base text-surface-base flex items-center justify-center text-surface-base shadow-lg shadow-[0_0_20px_rgba(201,169,110,0.25)] shrink-0">
             {isSearchingGuest ? (
               <Loader2 className="w-7 h-7 animate-spin" />
@@ -419,12 +479,12 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
             <h3 className="text-base font-serif text-content-base font-semibold">Consultar Meus Agendamentos</h3>
             <p className="text-xs text-content-base max-w-xs mx-auto leading-relaxed">
               {isSearchingGuest
-                ? 'Buscando seus agendamentos no sistema...'
-                : 'Digite seu telefone para visualizar seu agendamento e histórico.'}
+                ? 'Buscando cadastro no sistema...'
+                : 'Digite seu telefone para localizar seu agendamento e histórico.'}
             </p>
           </div>
 
-          <div className="flex flex-col space-y-2 w-full max-w-[280px] mx-auto shrink-0">
+          <div className="flex flex-col space-y-2 w-full max-w-[290px] mx-auto shrink-0">
             <div className="flex items-center space-x-2">
               <div className="relative flex-1">
                 {isSearchingGuest ? (
@@ -460,7 +520,7 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
 
               <button
                 type="button"
-                onClick={handleGuestSearch}
+                onClick={() => handleGuestSearch()}
                 disabled={isSearchingGuest || !guestPhoneInput}
                 className="h-10 px-4 rounded-2xl bg-gold-base text-surface-base font-extrabold text-xs flex items-center justify-center space-x-1 shadow-lg active:scale-95 transition-all disabled:opacity-50 shrink-0"
               >
@@ -484,23 +544,100 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
         </div>
       )}
 
-      {/* SEARCHED PHONE BARNER (When guest has found appointments) */}
+      {/* Guest Step 2: Voucher / Booking Code Validation Modal Card */}
+      {isGuest && isVoucherVerificationMode && appointments.length === 0 && (
+        <div className="w-full max-w-[360px] mx-auto bg-gradient-to-b from-surface-card/60 via-surface-card/40 to-surface-card/20 backdrop-blur-md p-6 rounded-3xl border border-gold-base/50 text-center flex flex-col items-center justify-center space-y-4 shadow-2xl my-auto animate-in zoom-in-95 duration-300">
+          <div className="w-14 h-14 rounded-2xl bg-gold-base/20 border border-gold-base/40 text-gold-base flex items-center justify-center shadow-lg shrink-0">
+            <Lock className="w-7 h-7 stroke-[2.5]" />
+          </div>
+
+          <div className="space-y-1.5">
+            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-gold-base/15 border border-gold-base/30 text-[10px] font-bold text-gold-base uppercase tracking-wider mb-1">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>Telefone Encontrado</span>
+            </div>
+            <h3 className="text-base font-serif text-content-base font-bold">Validar Código do Voucher</h3>
+            <p className="text-xs text-content-muted max-w-xs mx-auto leading-relaxed">
+              Encontramos agendamento(s) para o telefone <strong className="text-content-base">{searchedPhone}</strong>. Por segurança, digite o código do voucher gerado no comprovante.
+            </p>
+          </div>
+
+          <div className="flex flex-col space-y-3 w-full max-w-[290px] mx-auto shrink-0">
+            <div className="relative">
+              <Ticket className="w-4 h-4 text-gold-base absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                autoFocus
+                placeholder="Ex: BRX-A1B2C"
+                value={voucherInput}
+                onChange={e => {
+                  setVoucherInput(e.target.value.toUpperCase());
+                  if (voucherError) setVoucherError('');
+                }}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleVerifyVoucher();
+                  }
+                }}
+                className={`w-full bg-surface-base border ${
+                  voucherError
+                    ? 'border-red-500/60 focus:border-red-500'
+                    : 'border-gold-base/40 focus:border-gold-base'
+                } rounded-2xl pl-10 pr-3 py-3 text-sm font-extrabold font-mono tracking-widest text-content-base uppercase placeholder-neutral-500 focus:outline-none transition-all shadow-inner`}
+              />
+            </div>
+
+            {voucherError && (
+              <p className="text-[11px] text-red-400 font-medium text-center whitespace-pre-line leading-tight">
+                {voucherError}
+              </p>
+            )}
+
+            <button
+              type="button"
+              onClick={handleVerifyVoucher}
+              disabled={!voucherInput.trim()}
+              className="w-full py-3 rounded-2xl bg-gold-base hover:opacity-95 text-surface-base font-black text-xs uppercase tracking-wider flex items-center justify-center space-x-2 shadow-lg shadow-gold-base/20 active:scale-[0.98] transition-all disabled:opacity-50"
+            >
+              <KeyRound className="w-4 h-4 stroke-[2.5]" />
+              <span>Validar e Acessar</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleClearSearch}
+              className="text-xs text-content-muted hover:text-gold-base font-semibold pt-1 transition-colors flex items-center justify-center gap-1 mx-auto"
+            >
+              <span>← Alterar número de telefone</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* SEARCHED PHONE & VOUCHER VERIFIED BANNER (When guest has authenticated appointments) */}
       {isGuest && searchedPhone && appointments.length > 0 && !isSearchingGuest && (
-        <div className="bg-surface-card/30 backdrop-blur-md p-3.5 rounded-2xl border border-border-subtle/70 flex items-center justify-between text-xs animate-in fade-in shadow-lg">
-          <div className="flex items-center space-x-2 text-content-base">
-            <Phone className="w-4 h-4 text-content-base" />
-            <span>
-              Resultados para: <strong className="text-content-base font-bold">{searchedPhone}</strong>
-            </span>
+        <div className="bg-surface-card/40 backdrop-blur-md p-3.5 rounded-2xl border border-gold-base/40 flex items-center justify-between text-xs animate-in fade-in shadow-lg">
+          <div className="flex items-center space-x-2 text-content-base min-w-0">
+            <div className="w-7 h-7 rounded-lg bg-gold-base/20 text-gold-base flex items-center justify-center shrink-0 border border-gold-base/30">
+              <ShieldCheck className="w-4 h-4" />
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="text-[10px] text-gold-base font-extrabold uppercase tracking-wider">Consulta Autenticada</span>
+              <span className="truncate text-xs font-bold text-content-base">
+                {searchedPhone} {verifiedVoucher && <span className="text-content-muted font-normal">• Voucher #{verifiedVoucher}</span>}
+              </span>
+            </div>
           </div>
 
           <button
             type="button"
             onClick={handleClearSearch}
-            title="Nova Busca"
-            className="p-2 rounded-xl bg-surface-card hover:bg-neutral-700 text-content-base hover:text-content-base transition-all border border-border-subtle active:scale-95 shadow-sm flex items-center justify-center shrink-0"
+            title="Sair da consulta"
+            className="px-3 py-1.5 rounded-xl bg-surface-base hover:bg-neutral-800 text-content-muted hover:text-red-400 text-[11px] font-bold transition-all border border-border-subtle active:scale-95 shadow-sm flex items-center justify-center gap-1 shrink-0 ml-2"
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw className="w-3.5 h-3.5" />
+            <span>Sair</span>
           </button>
         </div>
       )}

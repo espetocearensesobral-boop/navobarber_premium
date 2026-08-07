@@ -124,6 +124,7 @@ export const ClientApp: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>('');
   const [totalPaid, setTotalPaid] = useState<number>(0);
+  const [createdBookingCode, setCreatedBookingCode] = useState<string>('');
   const [reviewDetails, setReviewDetails] = useState({ loyaltyDiscount: 0, couponDiscount: 0 });
   const [userCreatedAppointments, setUserCreatedAppointments] = useState<Appointment[]>(() => {
     try {
@@ -171,10 +172,12 @@ export const ClientApp: React.FC = () => {
 
     const clientName = paymentDetails.clientName || currentUser.name || 'Cliente';
     const clientPhone = paymentDetails.clientPhone || currentUser.phone || '';
+    const generatedVoucher = `BRX-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
 
     // Create appointment object
     const newApt: Appointment = {
       id: `apt_${Date.now()}`,
+      booking_code: generatedVoucher,
       client_id: currentUser.id || `guest_${Date.now()}`,
       client_name: clientName,
       client_phone: clientPhone,
@@ -196,6 +199,16 @@ export const ClientApp: React.FC = () => {
     try {
       // Save into real Supabase Database
       const savedApt = await createAppointmentInSupabase(newApt);
+      const finalVoucherCode = savedApt.booking_code || generatedVoucher;
+      setCreatedBookingCode(finalVoucherCode);
+
+      // Save phone and voucher for guests
+      if (isGuest && clientPhone) {
+        try {
+          localStorage.setItem('barberx_guest_phone', clientPhone);
+          localStorage.setItem('barberx_guest_voucher', finalVoucherCode);
+        } catch (e) {}
+      }
 
       setUserCreatedAppointments(prev => [savedApt, ...prev]);
       showToast('Agendamento realizado com sucesso!', 'success');
@@ -528,6 +541,7 @@ export const ClientApp: React.FC = () => {
                       selectedDate={selectedDate}
                       selectedTimeSlot={selectedTimeSlot}
                       totalPaid={totalPaid}
+                      bookingCode={createdBookingCode}
                       onResetBooking={() => handleBookingFinished(executeResetBooking)}
                       onViewAppointments={() => handleBookingFinished(() => {
                         executeResetBooking();

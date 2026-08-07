@@ -82,6 +82,8 @@ export interface Appointment {
   payment_method: 'credit_card' | 'pix' | 'loyalty_balance' | 'pay_at_venue' | 'in_store';
   cancellation_reason?: string;
   is_reviewed?: boolean;
+  booking_code?: string;
+  voucher_code?: string;
   created_at: string;
 }
 
