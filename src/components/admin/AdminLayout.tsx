@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { NavoHomeView } from './NavoHomeView';
 import { ScheduleGrid } from './ScheduleGrid';
+import { PdvInteligente } from './PdvInteligente';
 import { ServicesManagement } from './ServicesManagement';
 import { ProfessionalsManagement } from './ProfessionalsManagement';
 import { ClientsManagement } from './ClientsManagement';
@@ -18,12 +19,14 @@ import {
   X,
   ChevronRight,
   TrendingUp,
-  LogOut
+  LogOut,
+  Receipt
 } from 'lucide-react';
 
 export type AdminTab = 
   | 'dashboard' 
   | 'agenda' 
+  | 'pdv'
   | 'queue' 
   | 'servicos' 
   | 'profissionais' 
@@ -80,6 +83,12 @@ export const AdminLayout: React.FC = () => {
       description: 'Métricas e análises'
     },
     { 
+      id: 'pdv' as AdminTab, 
+      label: 'PDV / Caixa', 
+      icon: Receipt,
+      description: 'Checkout de serviços & vendas'
+    },
+    { 
       id: 'agenda' as AdminTab, 
       label: 'Agenda', 
       icon: Calendar,
@@ -121,6 +130,8 @@ export const AdminLayout: React.FC = () => {
     switch (activeTab) {
       case 'dashboard':
         return <NavoHomeView onNavigateToAgenda={() => setActiveTab('agenda')} />;
+      case 'pdv':
+        return <PdvInteligente />;
       case 'agenda':
         return <ScheduleGrid />;
       case 'queue':
