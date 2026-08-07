@@ -802,3 +802,20 @@ export async function manuallyAdjustPoints(clientId: string, points: number, des
   return data;
 }
 
+export async function fetchLoyaltyConfig() {
+  const res = await authFetch(`${API_BASE}/loyalty/config`);
+  if (!res.ok) throw new Error('Falha ao obter configurações de fidelidade');
+  return await res.json();
+}
+
+export async function saveLoyaltyConfig(configData: any) {
+  const res = await authFetch(`${API_BASE}/loyalty/config`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(configData)
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Falha ao salvar configurações de fidelidade');
+  return data;
+}
+

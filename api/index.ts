@@ -2718,6 +2718,51 @@ app.post("/api/cron/reminders", async (req: any, res: any) => {
 // NAVO REWARDS ENGINE & API
 // =====================================================================
 
+let loyaltyConfig = {
+  currencyPerPoint: 1.0, // R$ 1.00 = 1 ponto
+  pointsValidityDays: 365, // 0 = permanente, >0 = dias
+  tierMultipliers: {
+    Bronze: 1.0,
+    Prata: 1.2,
+    Ouro: 1.5,
+    Diamante: 2.0
+  },
+  referralPoints: {
+    referrerBonus: 100,
+    referredBonus: 50,
+    milestoneCount: 5,
+    milestoneBonus: 1000
+  },
+  reviewPoints: {
+    baseReview: 20,
+    withPhotoBonus: 30,
+    fiveStarBonus: 10
+  },
+  birthdayBonus: 100
+};
+
+app.get("/api/loyalty/config", async (req: any, res: any) => {
+  res.json(loyaltyConfig);
+});
+
+app.post("/api/loyalty/config", requireAuth, requireAdmin, async (req: any, res: any) => {
+  try {
+    const newCfg = req.body;
+    if (newCfg) {
+      loyaltyConfig = {
+        ...loyaltyConfig,
+        ...newCfg,
+        tierMultipliers: { ...loyaltyConfig.tierMultipliers, ...newCfg.tierMultipliers },
+        referralPoints: { ...loyaltyConfig.referralPoints, ...newCfg.referralPoints },
+        reviewPoints: { ...loyaltyConfig.reviewPoints, ...newCfg.reviewPoints }
+      };
+    }
+    res.json({ success: true, config: loyaltyConfig, message: 'Configurações de fidelidade salvas com sucesso!' });
+  } catch (e: any) {
+    return handleError(res, e, req.path);
+  }
+});
+
 function calculateTier(points: number): 'Bronze' | 'Prata' | 'Ouro' | 'Diamante' {
   if (points >= 6000) return 'Diamante';
   if (points >= 3000) return 'Ouro';
@@ -2762,13 +2807,21 @@ async function processAppointmentCompletion(appointment: any) {
   const amount = Number(appointment.finalAmount || appointment.originalAmount || 0);
   if (amount <= 0) return;
 
-  const pointsEarned = Math.round(amount);
+  let tier: 'Bronze' | 'Prata' | 'Ouro' | 'Diamante' = 'Bronze';
+  const clientUser = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, appointment.clientId) });
+  if (clientUser && clientUser.loyaltyTier) {
+    tier = clientUser.loyaltyTier as any;
+  }
+
+  const basePts = Math.round(amount / (loyaltyConfig.currencyPerPoint || 1.0));
+  const mult = loyaltyConfig.tierMultipliers[tier] || 1.0;
+  const pointsEarned = Math.round(basePts * mult);
   
   await awardPoints(
     appointment.clientId,
     pointsEarned,
     'purchase',
-    `Pontos do atendimento em ${appointment.date} (R$ ${amount.toFixed(2)})`
+    `Pontos do atendimento em ${appointment.date} (R$ ${amount.toFixed(2)} - Multiplicador ${tier} ${mult}x)`
   );
 
   try {
@@ -2780,7 +2833,7 @@ async function processAppointmentCompletion(appointment: any) {
     });
 
     if (completions.length === 1) {
-      const client = await db.query.profiles.findFirst({
+      const client = clientUser || await db.query.profiles.findFirst({
         where: eq(schema.profiles.id, appointment.clientId)
       });
 
@@ -2794,22 +2847,25 @@ async function processAppointmentCompletion(appointment: any) {
         });
 
         if (referral) {
+          const referrerPts = loyaltyConfig.referralPoints.referrerBonus || 100;
+          const referredPts = loyaltyConfig.referralPoints.referredBonus || 50;
+
           await awardPoints(
             client.referredBy,
-            100,
+            referrerPts,
             'referral',
-            `Indicação realizada com sucesso: ${client.name} fez o 1º corte (+100 pts)`
+            `Indicação realizada com sucesso: ${client.name} fez o 1º corte (+${referrerPts} pts)`
           );
 
           await awardPoints(
             client.id,
-            50,
+            referredPts,
             'referral',
-            `Bônus de Boas-Vindas por Indicação (+50 pts)`
+            `Bônus de Boas-Vindas por Indicação (+${referredPts} pts)`
           );
 
           await db.update(schema.referrals)
-            .set({ status: 'completed', pointsAwarded: 100 })
+            .set({ status: 'completed', pointsAwarded: referrerPts })
             .where(eq(schema.referrals.id, referral.id));
 
           const completedRefs = await db.query.referrals.findMany({
@@ -2819,19 +2875,15 @@ async function processAppointmentCompletion(appointment: any) {
             )
           });
 
-          if (completedRefs.length === 3) {
+          const mCount = loyaltyConfig.referralPoints.milestoneCount || 5;
+          const mBonus = loyaltyConfig.referralPoints.milestoneBonus || 1000;
+
+          if (completedRefs.length === mCount) {
             await awardPoints(
               client.referredBy,
-              200,
+              mBonus,
               'bonus',
-              `Bônus Embaixador Navo: 3 indicações concluídas! (+200 pts)`
-            );
-          } else if (completedRefs.length === 5) {
-            await awardPoints(
-              client.referredBy,
-              1000,
-              'bonus',
-              `Bônus Super Embaixador Navo: 5 indicações concluídas! (+1000 pts)`
+              `Bônus Super Embaixador Navo: ${mCount} indicações concluídas! (+${mBonus} pts)`
             );
           }
         }
@@ -3060,9 +3112,9 @@ app.post("/api/reviews", optionalAuth, async (req: any, res: any) => {
       return res.status(400).json({ error: 'Classificação e profissional são obrigatórios.' });
     }
 
-    let points = 20;
-    if (hasPhoto || photoUrl) points += 30;
-    if (Number(rating) === 5) points += 10;
+    let points = loyaltyConfig.reviewPoints.baseReview || 20;
+    if (hasPhoto || photoUrl) points += (loyaltyConfig.reviewPoints.withPhotoBonus || 30);
+    if (Number(rating) === 5) points += (loyaltyConfig.reviewPoints.fiveStarBonus || 10);
 
     const reviewId = `rev_${Date.now()}`;
 
