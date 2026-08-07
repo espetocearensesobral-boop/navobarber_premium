@@ -460,6 +460,26 @@ async function initializeDb(): Promise<void> {
       await queryClient`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS photo_url text;`;
       await queryClient`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS points_awarded integer DEFAULT 0;`;
       await queryClient`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS admin_response text;`;
+      await queryClient`
+        CREATE TABLE IF NOT EXISTS shop_settings (
+          id text PRIMARY KEY DEFAULT 'default',
+          name text NOT NULL DEFAULT 'Navo Barber & Club',
+          unit_name text NOT NULL DEFAULT 'Unidade Jardins',
+          slogan text NOT NULL DEFAULT 'Estilo, Tradição e Excelência na Medida Certa',
+          address text NOT NULL DEFAULT 'Rua Augusta, 1420 - Jardins, São Paulo - SP',
+          phone text NOT NULL DEFAULT '(11) 99999-8888',
+          whatsapp text NOT NULL DEFAULT '5511999998888',
+          open_time text NOT NULL DEFAULT '09:00',
+          close_time text NOT NULL DEFAULT '20:00',
+          operating_days jsonb NOT NULL DEFAULT '[1,2,3,4,5,6]'::jsonb,
+          operating_schedule jsonb NOT NULL DEFAULT '{"sunday":{"active":false,"open":"10:00","close":"16:00"},"monday":{"active":true,"open":"09:00","close":"20:00"},"tuesday":{"active":true,"open":"09:00","close":"20:00"},"wednesday":{"active":true,"open":"09:00","close":"20:00"},"thursday":{"active":true,"open":"09:00","close":"20:00"},"friday":{"active":true,"open":"09:00","close":"21:00"},"saturday":{"active":true,"open":"09:00","close":"20:00"}}'::jsonb,
+          maps_url text DEFAULT 'https://maps.google.com/?q=Rua+Augusta+1420+Jardins+Sao+Paulo',
+          instagram text DEFAULT '@barbearianavo',
+          logo_url text,
+          description text DEFAULT 'Barbearia premium com foco em experiência do cliente, cortes modernos e tradicionais.',
+          updated_at timestamp DEFAULT NOW()
+        );
+      `;
     } catch (migErr: any) {
       console.warn('[API] Aviso na migração de tabelas:', migErr.message);
     }
@@ -2762,6 +2782,110 @@ app.post("/api/loyalty/config", requireAuth, requireAdmin, async (req: any, res:
     return handleError(res, e, req.path);
   }
 });
+
+// =====================================================================
+// SHOP PROFILE & SETTINGS ENDPOINTS
+// =====================================================================
+let inMemoryShopProfile: any = {
+  id: 'default',
+  name: 'Navo Barber & Club',
+  unitName: 'Unidade Jardins',
+  slogan: 'Estilo, Tradição e Excelência na Medida Certa',
+  address: 'Rua Augusta, 1420 - Jardins, São Paulo - SP',
+  phone: '(11) 99999-8888',
+  whatsapp: '5511999998888',
+  openTime: '09:00',
+  closeTime: '20:00',
+  operatingDays: [1, 2, 3, 4, 5, 6],
+  operatingSchedule: {
+    sunday: { active: false, open: '10:00', close: '16:00' },
+    monday: { active: true, open: '09:00', close: '20:00' },
+    tuesday: { active: true, open: '09:00', close: '20:00' },
+    wednesday: { active: true, open: '09:00', close: '20:00' },
+    thursday: { active: true, open: '09:00', close: '20:00' },
+    friday: { active: true, open: '09:00', close: '21:00' },
+    saturday: { active: true, open: '09:00', close: '20:00' }
+  },
+  mapsUrl: 'https://maps.google.com/?q=Rua+Augusta+1420+Jardins+Sao+Paulo',
+  instagram: '@barbearianavo',
+  logoUrl: '',
+  description: 'Barbearia premium com foco em experiência do cliente, cortes modernos e tradicionais.'
+};
+
+app.get("/api/shop-profile", async (req: any, res: any) => {
+  try {
+    if (db && isDbConnected) {
+      const rows = await db.select().from(schema.shopSettings).where(eq(schema.shopSettings.id, 'default'));
+      if (rows.length > 0) {
+        const row = rows[0];
+        inMemoryShopProfile = {
+          id: row.id,
+          name: row.name,
+          unitName: row.unitName,
+          slogan: row.slogan,
+          address: row.address,
+          phone: row.phone,
+          whatsapp: row.whatsapp,
+          openTime: row.openTime,
+          closeTime: row.closeTime,
+          operatingDays: row.operatingDays,
+          operatingSchedule: row.operatingSchedule,
+          mapsUrl: row.mapsUrl,
+          instagram: row.instagram,
+          logoUrl: row.logoUrl || '',
+          description: row.description
+        };
+      }
+    }
+  } catch (err) {
+    console.warn('[API] Erro ao buscar perfil da barbearia no DB, utilizando cache:', err);
+  }
+  res.json(inMemoryShopProfile);
+});
+
+app.post("/api/shop-profile", requireAuth, requireAdmin, async (req: any, res: any) => {
+  try {
+    const data = req.body;
+    inMemoryShopProfile = {
+      ...inMemoryShopProfile,
+      ...data,
+      id: 'default'
+    };
+
+    if (db && isDbConnected) {
+      const payload = {
+        id: 'default',
+        name: inMemoryShopProfile.name || 'Navo Barber & Club',
+        unitName: inMemoryShopProfile.unitName || 'Unidade Jardins',
+        slogan: inMemoryShopProfile.slogan || '',
+        address: inMemoryShopProfile.address || '',
+        phone: inMemoryShopProfile.phone || '',
+        whatsapp: inMemoryShopProfile.whatsapp || '',
+        openTime: inMemoryShopProfile.openTime || '09:00',
+        closeTime: inMemoryShopProfile.closeTime || '20:00',
+        operatingDays: inMemoryShopProfile.operatingDays || [1, 2, 3, 4, 5, 6],
+        operatingSchedule: inMemoryShopProfile.operatingSchedule || {},
+        mapsUrl: inMemoryShopProfile.mapsUrl || '',
+        instagram: inMemoryShopProfile.instagram || '',
+        logoUrl: inMemoryShopProfile.logoUrl || '',
+        description: inMemoryShopProfile.description || '',
+        updatedAt: new Date()
+      };
+
+      const existing = await db.select().from(schema.shopSettings).where(eq(schema.shopSettings.id, 'default'));
+      if (existing.length > 0) {
+        await db.update(schema.shopSettings).set(payload).where(eq(schema.shopSettings.id, 'default'));
+      } else {
+        await db.insert(schema.shopSettings).values(payload);
+      }
+    }
+
+    res.json({ success: true, profile: inMemoryShopProfile, message: 'Perfil da barbearia atualizado com sucesso!' });
+  } catch (e: any) {
+    return handleError(res, e, req.path);
+  }
+});
+
 
 function calculateTier(points: number): 'Bronze' | 'Prata' | 'Ouro' | 'Diamante' {
   if (points >= 6000) return 'Diamante';

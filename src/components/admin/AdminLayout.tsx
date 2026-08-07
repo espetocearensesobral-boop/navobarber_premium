@@ -8,6 +8,7 @@ import { ClientsManagement } from './ClientsManagement';
 import { WaitingQueue } from './WaitingQueue';
 import { SettingsManagement } from './SettingsManagement';
 import { NavoRewardsAdmin } from './NavoRewardsAdmin';
+import { BarbershopProfileManagement } from './BarbershopProfileManagement';
 import { 
   Calendar,
   Clock,
@@ -22,6 +23,7 @@ import {
   LogOut,
   Receipt,
   Award,
+  Store,
   MoreHorizontal
 } from 'lucide-react';
 
@@ -34,6 +36,7 @@ export type AdminTab =
   | 'servicos' 
   | 'profissionais' 
   | 'clientes' 
+  | 'barbearia'
   | 'settings';
 
 export const AdminLayout: React.FC = () => {
@@ -127,6 +130,12 @@ export const AdminLayout: React.FC = () => {
       description: 'Base de clientes'
     },
     { 
+      id: 'barbearia' as AdminTab, 
+      label: 'Perfil & Unidade', 
+      icon: Store,
+      description: 'Endereço, horários e dados'
+    },
+    { 
       id: 'settings' as AdminTab, 
       label: 'Configurações', 
       icon: Settings,
@@ -160,6 +169,8 @@ export const AdminLayout: React.FC = () => {
         return <ProfessionalsManagement />;
       case 'clientes':
         return <ClientsManagement />;
+      case 'barbearia':
+        return <BarbershopProfileManagement />;
       case 'settings':
         return <SettingsManagement />;
       default:

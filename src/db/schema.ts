@@ -242,3 +242,31 @@ export const waitingQueueRelations = relations(waitingQueue, ({ one }) => ({
     references: [profiles.id],
   }),
 }));
+
+export const shopSettings = pgTable('shop_settings', {
+  id: text('id').primaryKey().default('default'),
+  name: text('name').notNull().default('Navo Barber & Club'),
+  unitName: text('unit_name').notNull().default('Unidade Jardins'),
+  slogan: text('slogan').notNull().default('Estilo, Tradição e Excelência na Medida Certa'),
+  address: text('address').notNull().default('Rua Augusta, 1420 - Jardins, São Paulo - SP'),
+  phone: text('phone').notNull().default('(11) 99999-8888'),
+  whatsapp: text('whatsapp').notNull().default('5511999998888'),
+  openTime: text('open_time').notNull().default('09:00'),
+  closeTime: text('close_time').notNull().default('20:00'),
+  operatingDays: jsonb('operating_days').notNull().default([1, 2, 3, 4, 5, 6]),
+  operatingSchedule: jsonb('operating_schedule').notNull().default({
+    monday: { active: true, open: '09:00', close: '20:00' },
+    tuesday: { active: true, open: '09:00', close: '20:00' },
+    wednesday: { active: true, open: '09:00', close: '20:00' },
+    thursday: { active: true, open: '09:00', close: '20:00' },
+    friday: { active: true, open: '09:00', close: '21:00' },
+    saturday: { active: true, open: '09:00', close: '20:00' },
+    sunday: { active: false, open: '10:00', close: '16:00' },
+  }),
+  mapsUrl: text('maps_url').default('https://maps.google.com/?q=Rua+Augusta+1420+Jardins+Sao+Paulo'),
+  instagram: text('instagram').default('@barbearianavo'),
+  logoUrl: text('logo_url'),
+  description: text('description').default('Barbearia premium com foco em experiência do cliente, cortes modernos e tradicionais.'),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+

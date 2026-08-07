@@ -2,6 +2,13 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Professional, ServiceItem } from '../../types';
 import { Calendar as CalendarIcon, Clock, ArrowLeft, ArrowRight, Loader2, ChevronLeft, ChevronRight} from 'lucide-react';
 import { authFetch } from '../../lib/api';
+import { 
+  ShopProfile, 
+  defaultShopProfile, 
+  fetchShopProfile, 
+  generateTimeSlotsFromProfile, 
+  isDateOpenInProfile 
+} from '../../services/shopProfileService';
 
 interface BookingStep3Props {
   selectedServices: ServiceItem[];
@@ -28,6 +35,13 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [showBackConfirm, setShowBackConfirm] = useState(false);
   const [isAdvancing, setIsAdvancing] = useState(false);
+  const [shopProfile, setShopProfile] = useState<ShopProfile>(defaultShopProfile);
+
+  useEffect(() => {
+    fetchShopProfile().then(p => {
+      if (p) setShopProfile(p);
+    });
+  }, []);
 
   const timeSectionRef = useRef<HTMLDivElement>(null);
 
@@ -91,16 +105,10 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
     return isoDate;
   };
 
-  // Base Time Slots list
-  const baseSlots = [
-    '08:00', '08:30', '09:00',
-    '09:30', '10:00', '10:30',
-    '11:00', '11:30', '13:00',
-    '13:30', '14:00', '14:30',
-    '15:00', '15:30', '16:00',
-    '16:30', '17:00', '17:30',
-    '18:00', '18:30'
-  ];
+  // Base Time Slots list dynamically generated from shopProfile
+  const baseSlots = useMemo(() => {
+    return generateTimeSlotsFromProfile(shopProfile, selectedDate);
+  }, [shopProfile, selectedDate]);
 
   const monthYearHeader = useMemo(() => {
     const monthNames = [
@@ -201,13 +209,14 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
               const isoDate = `${calendarDaysGrid.year}-${monthStr}-${dayStr}`;
 
               const isPast = isoDate < todayStr;
+              const isClosed = !isDateOpenInProfile(shopProfile, isoDate);
               const isSelected = isoDate === selectedDate;
 
               return (
                 <button
                   key={isoDate}
                   type="button"
-                  disabled={isPast}
+                  disabled={isPast || isClosed}
                   onClick={() => {
                     if ('vibrate' in navigator) navigator.vibrate(40);
                     onSelectDate(isoDate);
@@ -216,11 +225,12 @@ export const BookingStep3DateTime: React.FC<BookingStep3Props> = ({
                       timeSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }, 100);
                   }}
+                  title={isClosed ? 'Barbearia fechada neste dia' : undefined}
                   className={`h-9 rounded-btn text-xs font-bold transition-all flex items-center justify-center ${
                     isSelected
                       ? 'bg-gold-base text-surface-base shadow-md scale-105'
-                      : isPast
-                      ? 'text-content-muted cursor-not-allowed opacity-30'
+                      : (isPast || isClosed)
+                      ? 'text-content-muted cursor-not-allowed opacity-30 line-through'
                       : 'text-content-base hover:bg-surface-card hover:text-content-base'
                   }`}
                 >

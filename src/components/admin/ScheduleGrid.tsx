@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Appointment, Professional } from '../../types';
 import {
   fetchAppointmentsFromSupabase,
@@ -9,6 +9,12 @@ import {
   createAppointmentInSupabase,
   ScheduleBlock
 } from '../../services/supabaseDataService';
+import { 
+  ShopProfile, 
+  defaultShopProfile, 
+  fetchShopProfile, 
+  generateTimeSlotsFromProfile 
+} from '../../services/shopProfileService';
 import { Calendar, Clock, Plus, Lock, Unlock, UserCheck, ShieldAlert, CheckCircle2, X, Save, RefreshCw, Scissors } from 'lucide-react';
 
 export const ScheduleGrid: React.FC = () => {
@@ -18,6 +24,13 @@ export const ScheduleGrid: React.FC = () => {
   const [barbers, setBarbers] = useState<Professional[]>([]);
   const [blocks, setBlocks] = useState<ScheduleBlock[]>([]);
   const [loading, setLoading] = useState(true);
+  const [shopProfile, setShopProfile] = useState<ShopProfile>(defaultShopProfile);
+
+  useEffect(() => {
+    fetchShopProfile().then(p => {
+      if (p) setShopProfile(p);
+    });
+  }, []);
 
   // Modals
   const [isBlockModalOpen, setIsBlockModalOpen] = useState(false);
@@ -41,12 +54,16 @@ export const ScheduleGrid: React.FC = () => {
     time_slot: '10:00'
   });
 
-  const timeSlots = [
-    '08:00', '08:30', '09:00', '09:30', '10:00', '10:30',
-    '11:00', '11:30', '12:00', '12:30', '13:00', '13:30',
-    '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
-    '17:00', '17:30', '18:00', '18:30', '19:00'
-  ];
+  const timeSlots = useMemo(() => {
+    const slots = generateTimeSlotsFromProfile(shopProfile, selectedDate);
+    if (slots.length > 0) return slots;
+    return [
+      '08:00', '08:30', '09:00', '09:30', '10:00', '10:30',
+      '11:00', '11:30', '12:00', '12:30', '13:00', '13:30',
+      '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
+      '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00'
+    ];
+  }, [shopProfile, selectedDate]);
 
   useEffect(() => {
     loadData();

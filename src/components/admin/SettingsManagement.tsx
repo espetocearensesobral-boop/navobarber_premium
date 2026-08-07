@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Store, Phone, Link as LinkIcon, Save, Camera, CheckCircle2, Globe, Clock, MapPin } from 'lucide-react';
 
-type SettingsTab = 'profile' | 'contacts' | 'links';
+type SettingsTab = 'contacts' | 'links';
 
 export const SettingsManagement: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
+  const [activeTab, setActiveTab] = useState<SettingsTab>('contacts');
   const [isSaving, setIsSaving] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
@@ -23,8 +23,6 @@ export const SettingsManagement: React.FC = () => {
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'profile':
-        return <ProfileSettings onSave={handleSave} isSaving={isSaving} />;
       case 'contacts':
         return <ContactSettings onSave={handleSave} isSaving={isSaving} />;
       case 'links':
@@ -48,11 +46,11 @@ export const SettingsManagement: React.FC = () => {
             </span>
           </div>
           <p className="text-content-muted text-xs mt-0.5 truncate hidden sm:block">
-            Gerencie a identidade da barbearia, canais de contato e links sociais.
+            Gerencie canais de atendimento, integrações e links da plataforma.
           </p>
         </div>
 
-        {/* Action Zone: Header Right Button (Fixed touch target >= 40px, icon-only on mobile) */}
+        {/* Action Zone: Header Right Button */}
         <div className="shrink-0 flex items-center justify-end">
           <button
             onClick={handleSave}
@@ -74,9 +72,8 @@ export const SettingsManagement: React.FC = () => {
         </div>
       )}
 
-      {/* TAB BAR (Rectangular 4-6px buttons, touch height 10 on mobile) */}
+      {/* TAB BAR */}
       <div className="bg-surface-card border border-border-subtle rounded-md p-1 flex items-center gap-1 overflow-x-auto custom-scrollbar">
-        <TabButton active={activeTab === 'profile'} onClick={() => setActiveTab('profile')} icon={Store} label="Perfil & Unidade" />
         <TabButton active={activeTab === 'contacts'} onClick={() => setActiveTab('contacts')} icon={Phone} label="Canais de Contato" />
         <TabButton active={activeTab === 'links'} onClick={() => setActiveTab('links')} icon={LinkIcon} label="Links & Redes" />
       </div>
