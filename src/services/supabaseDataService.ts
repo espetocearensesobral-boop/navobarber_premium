@@ -743,6 +743,18 @@ export async function fetchNavoRewardsAdminDashboard() {
   return await res.json();
 }
 
+export async function fetchClientsFromSupabase() {
+  try {
+    const res = await authFetch(`${API_BASE}/profiles`);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch (err) {
+    console.error('Erro ao buscar clientes:', err);
+    return [];
+  }
+}
+
 export async function triggerInactiveClientsCampaign() {
   const res = await authFetch(`${API_BASE}/loyalty/admin/campaign-inactives`, {
     method: 'POST',
@@ -750,6 +762,43 @@ export async function triggerInactiveClientsCampaign() {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || 'Falha ao disparar campanha');
+  return data;
+}
+
+export async function createAdminReward(rewardData: {
+  title: string;
+  pointsRequired: number;
+  rewardType: string;
+  valueDescription: string;
+  icon?: string;
+}) {
+  const res = await authFetch(`${API_BASE}/rewards/admin/create`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(rewardData)
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Falha ao criar recompensa');
+  return data;
+}
+
+export async function deleteAdminReward(id: string) {
+  const res = await authFetch(`${API_BASE}/rewards/admin/${id}`, {
+    method: 'DELETE'
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Falha ao remover recompensa');
+  return data;
+}
+
+export async function manuallyAdjustPoints(clientId: string, points: number, description: string) {
+  const res = await authFetch(`${API_BASE}/loyalty/admin/manual-points`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ clientId, points, description })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Falha ao ajustar pontos');
   return data;
 }
 

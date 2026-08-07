@@ -3363,4 +3363,63 @@ app.post("/api/loyalty/admin/campaign-inactives", requireAuth, requireAdmin, asy
   }
 });
 
+app.post("/api/rewards/admin/create", requireAuth, requireAdmin, async (req: any, res: any) => {
+  try {
+    const { title, pointsRequired, rewardType, valueDescription, icon } = req.body;
+    if (!title || !pointsRequired) {
+      return res.status(400).json({ error: 'Título e pontos necessários são obrigatórios.' });
+    }
+
+    const rewardId = `rw_${Date.now()}`;
+    const newReward = {
+      id: rewardId,
+      title,
+      pointsRequired: Number(pointsRequired),
+      rewardType: rewardType || 'upgrade',
+      valueDescription: valueDescription || '',
+      icon: icon || 'Gift',
+      isActive: true
+    };
+
+    await db.insert(schema.rewards).values(newReward);
+    res.json({ success: true, reward: newReward });
+  } catch (e: any) {
+    return handleError(res, e, req.path);
+  }
+});
+
+app.delete("/api/rewards/admin/:id", requireAuth, requireAdmin, async (req: any, res: any) => {
+  try {
+    const { id } = req.params;
+    await db.delete(schema.rewards).where(eq(schema.rewards.id, id));
+    res.json({ success: true, message: 'Recompensa removida.' });
+  } catch (e: any) {
+    return handleError(res, e, req.path);
+  }
+});
+
+app.post("/api/loyalty/admin/manual-points", requireAuth, requireAdmin, async (req: any, res: any) => {
+  try {
+    const { clientId, points, description } = req.body;
+    if (!clientId || !points) {
+      return res.status(400).json({ error: 'Cliente e pontuação são obrigatórios.' });
+    }
+
+    const result = await awardPoints(
+      clientId,
+      Number(points),
+      'manual_adjustment',
+      description || `Ajuste manual administrativo (${points > 0 ? '+' : ''}${points} pts)`
+    );
+
+    res.json({
+      success: true,
+      result,
+      message: `Pontuação de ${points > 0 ? '+' : ''}${points} pts creditada/debitada com sucesso!`
+    });
+  } catch (e: any) {
+    return handleError(res, e, req.path);
+  }
+});
+
 export default app;

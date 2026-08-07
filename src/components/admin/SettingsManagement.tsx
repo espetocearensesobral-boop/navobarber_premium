@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Store, Phone, Link as LinkIcon, Tag, Award, Save, Camera, Plus, Trash2, Edit2, Info, CheckCircle2, Globe, Clock, MapPin, Key, RefreshCw, AlertTriangle, Database, ShieldCheck, ShieldAlert } from 'lucide-react';
+import { Store, Phone, Link as LinkIcon, Tag, Award, Save, Camera, Plus, Trash2, Edit2, Info, CheckCircle2, Globe, Clock, MapPin, Key, RefreshCw, AlertTriangle, Database, ShieldCheck, ShieldAlert, Sparkles, Star, Users } from 'lucide-react';
+import { NavoRewardsAdmin } from './NavoRewardsAdmin';
 
-type SettingsTab = 'profile' | 'contacts' | 'links' | 'coupons' | 'loyalty' | 'apikeys';
+type SettingsTab = 'profile' | 'contacts' | 'links' | 'apikeys' | 'rewards_module';
 
 export const SettingsManagement: React.FC = () => {
   const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
@@ -29,12 +30,21 @@ export const SettingsManagement: React.FC = () => {
         return <ContactSettings />;
       case 'links':
         return <LinkSettings />;
-      case 'coupons':
-        return <CouponSettings showToast={showToast} />;
-      case 'loyalty':
-        return <LoyaltySettings />;
       case 'apikeys':
         return <ApiKeysSettings showToast={showToast} />;
+      case 'rewards_module':
+        return (
+          <div className="space-y-4">
+            <div className="p-4 bg-gold-base/10 border border-gold-base/30 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="space-y-0.5">
+                <span className="text-[10px] uppercase font-bold text-gold-base tracking-wider block">Módulo Centralizado</span>
+                <h3 className="text-sm font-bold text-content-base">Navo Rewards, Cupons, Fidelidade, Indicações & NPS</h3>
+                <p className="text-xs text-content-muted">Todas as regras de prêmios, cupons, cashback, programa de indicação e feedback estão reunidas abaixo.</p>
+              </div>
+            </div>
+            <NavoRewardsAdmin />
+          </div>
+        );
       default:
         return null;
     }
@@ -52,7 +62,7 @@ export const SettingsManagement: React.FC = () => {
             </span>
           </h1>
           <p className="text-content-muted text-xs mt-1 leading-relaxed">
-            Gerencie a identidade da barbearia, canais de contato, chaves secretas de API e clube de fidelidade.
+            Gerencie a identidade da barbearia, canais de contato, chaves secretas de API e motor de fidelidade/recompensas.
           </p>
         </div>
 
@@ -80,8 +90,7 @@ export const SettingsManagement: React.FC = () => {
         <TabButton active={activeTab === 'contacts'} onClick={() => setActiveTab('contacts')} icon={Phone} label="Canais de Contato" />
         <TabButton active={activeTab === 'links'} onClick={() => setActiveTab('links')} icon={LinkIcon} label="Links & Redes" />
         <TabButton active={activeTab === 'apikeys'} onClick={() => setActiveTab('apikeys')} icon={Key} label="Validação de Chaves API" />
-        <TabButton active={activeTab === 'coupons'} onClick={() => setActiveTab('coupons')} icon={Tag} label="Cupons Desconto" />
-        <TabButton active={activeTab === 'loyalty'} onClick={() => setActiveTab('loyalty')} icon={Award} label="Clube Fidelidade" />
+        <TabButton active={activeTab === 'rewards_module'} onClick={() => setActiveTab('rewards_module')} icon={Award} label="Navo Rewards & NPS (Cupons, Fidelidade, Indicações, Avaliações)" />
       </div>
 
       {/* MAIN CONTENT AREA */}
