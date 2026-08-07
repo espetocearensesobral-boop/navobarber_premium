@@ -619,24 +619,24 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             </div>
 
             {/* Live Open/Closed Status Pill */}
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-neutral-900 text-white border border-neutral-800 shadow-xs shrink-0">
-              <span className={`w-2 h-2 rounded-full ${isShopOpenNow ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'}`} />
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-neutral-100 text-neutral-800 border border-neutral-200/90 shadow-2xs shrink-0">
+              <span className={`w-2 h-2 rounded-full ${isShopOpenNow ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`} />
               <span className="text-[clamp(0.6rem,1.1vh,0.75rem)] font-bold uppercase tracking-wider">
                 {isShopOpenNow ? 'Aberto Agora' : 'Atendimento Fechado'}
               </span>
             </div>
           </div>
 
-          {/* Main Card Container */}
-          <div className="bg-neutral-950 border border-neutral-800 rounded-[clamp(0.75rem,1.6vh,1.25rem)] p-[clamp(0.625rem,1.5vh,1.25rem)] shadow-xl flex-1 min-h-0 my-auto flex flex-col md:grid md:grid-cols-12 gap-[clamp(0.625rem,1.5vh,1.25rem)] items-stretch justify-between text-white overflow-hidden">
+          {/* Main Card Container (Light System Palette) */}
+          <div className="bg-white border border-neutral-200/90 rounded-[clamp(0.75rem,1.6vh,1.25rem)] p-[clamp(0.625rem,1.5vh,1.25rem)] shadow-lg flex-1 min-h-0 my-auto flex flex-col md:grid md:grid-cols-12 gap-[clamp(0.625rem,1.5vh,1.25rem)] items-stretch justify-between text-neutral-900 overflow-hidden">
             
             {/* Real Interactive Google Maps Embedded iframe */}
-            <div className="relative w-full md:col-span-7 flex-1 min-h-[clamp(8.5rem,18vh,15rem)] rounded-[clamp(0.625rem,1.2vh,1rem)] overflow-hidden bg-neutral-900 border border-neutral-800 shrink-0 md:shrink group">
+            <div className="relative w-full md:col-span-7 flex-1 min-h-[clamp(8.5rem,18vh,15rem)] rounded-[clamp(0.625rem,1.2vh,1rem)] overflow-hidden bg-neutral-100 border border-neutral-200 shrink-0 md:shrink group shadow-2xs">
               <iframe
                 title="Mapa de Localização da Barbearia"
                 width="100%"
                 height="100%"
-                style={{ border: 0, filter: 'contrast(102%) brightness(96%)' }}
+                style={{ border: 0, filter: 'contrast(102%) brightness(98%)' }}
                 loading="lazy"
                 allowFullScreen
                 src={`https://maps.google.com/maps?q=${encodeURIComponent(shopProfile.address || 'Rua Augusta, 1420 - Jardins, São Paulo - SP')}&t=&z=16&ie=UTF8&iwloc=&output=embed`}
@@ -645,19 +645,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
               
               {/* Map Floating Top Badge & Expand Link */}
               <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between pointer-events-none">
-                <div className="bg-neutral-900/90 backdrop-blur-md border border-white/10 px-2.5 py-1 rounded-lg shadow-md flex items-center gap-2 pointer-events-auto">
+                <div className="bg-white/95 backdrop-blur-md border border-neutral-200 px-2.5 py-1 rounded-lg shadow-xs flex items-center gap-2 pointer-events-auto">
                   <div className="w-2 h-2 rounded-full bg-[#C8A96A]" />
-                  <span className="text-[10px] sm:text-[11px] font-bold text-white uppercase tracking-wide truncate max-w-[150px] sm:max-w-xs">
+                  <span className="text-[10px] sm:text-[11px] font-bold text-neutral-900 uppercase tracking-wide truncate max-w-[150px] sm:max-w-xs">
                     {shopProfile.unitName || 'Unidade Jardins'}
                   </span>
                 </div>
 
                 <button
                   onClick={handleOpenGoogleMaps}
-                  className="bg-neutral-900/95 hover:bg-neutral-900 text-[#C8A96A] border border-[#C8A96A]/40 px-2 py-1 rounded-lg shadow-md transition-all pointer-events-auto flex items-center gap-1 text-[10px] sm:text-[11px] font-bold"
+                  className="bg-white/95 hover:bg-neutral-50 text-neutral-800 border border-neutral-200 px-2.5 py-1 rounded-lg shadow-xs transition-all pointer-events-auto flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold"
                   title="Abrir no Google Maps"
                 >
-                  <ExternalLink className="w-3 h-3" />
+                  <ExternalLink className="w-3 h-3 text-[#C8A96A]" />
                   <span className="hidden sm:inline">Ver no Mapa</span>
                 </button>
               </div>
@@ -672,20 +672,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                   <span className="text-[clamp(0.6rem,1vh,0.725rem)] font-bold uppercase tracking-widest text-[#C8A96A] block mb-0.5">
                     {shopProfile.unitName || 'Unidade Jardins'}
                   </span>
-                  <h3 className="text-[clamp(1.1rem,2.2vh,1.5rem)] font-extrabold text-white tracking-tight leading-tight font-serif">
+                  <h3 className="text-[clamp(1.1rem,2.2vh,1.5rem)] font-extrabold text-neutral-900 tracking-tight leading-tight font-serif">
                     {shopProfile.name}
                   </h3>
                 </div>
 
                 {/* Big Display Address Highlight Callout */}
-                <div className="bg-neutral-900/90 border border-neutral-800 p-[clamp(0.5rem,1.2vh,0.75rem)] rounded-xl space-y-1.5">
-                  <div className="flex items-start gap-2">
-                    <div className="w-6 h-6 rounded-lg bg-[#C8A96A]/15 border border-[#C8A96A]/30 text-[#C8A96A] flex items-center justify-center shrink-0 mt-0.5">
-                      <MapPin className="w-3.5 h-3.5" />
+                <div className="bg-neutral-50 border border-neutral-200/80 p-[clamp(0.5rem,1.2vh,0.75rem)] rounded-xl space-y-1.5 shadow-2xs">
+                  <div className="flex items-start gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-[#C8A96A]/15 border border-[#C8A96A]/30 text-[#C8A96A] flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                      <MapPin className="w-4 h-4" />
                     </div>
                     <div>
-                      <span className="text-[9px] text-neutral-400 font-bold uppercase tracking-wider block">Endereço de Atendimento</span>
-                      <p className="text-[clamp(0.725rem,1.4vh,0.9rem)] font-bold text-white leading-snug">
+                      <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-wider block">Endereço de Atendimento</span>
+                      <p className="text-[clamp(0.725rem,1.4vh,0.9rem)] font-extrabold text-neutral-900 leading-snug">
                         {shopProfile.address}
                       </p>
                     </div>
@@ -694,21 +694,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
 
                 {/* Quick Info Grid (Hours & Phone) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                  <div className="bg-neutral-900/60 border border-neutral-800 p-2 rounded-lg flex items-center gap-2">
+                  <div className="bg-neutral-50 border border-neutral-200/80 p-2 rounded-lg flex items-center gap-2 shadow-2xs">
                     <Clock className="w-3.5 h-3.5 text-[#C8A96A] shrink-0" />
                     <div>
-                      <span className="text-[8.5px] text-neutral-400 uppercase tracking-wider block font-bold">Horário Hoje</span>
-                      <span className="text-[10.5px] font-bold text-neutral-200">
+                      <span className="text-[8.5px] text-neutral-500 uppercase tracking-wider block font-bold">Horário Hoje</span>
+                      <span className="text-[10.5px] font-bold text-neutral-800">
                         {shopProfile.openTime || '09:00'} às {shopProfile.closeTime || '20:00'}
                       </span>
                     </div>
                   </div>
 
-                  <div className="bg-neutral-900/60 border border-neutral-800 p-2 rounded-lg flex items-center gap-2">
+                  <div className="bg-neutral-50 border border-neutral-200/80 p-2 rounded-lg flex items-center gap-2 shadow-2xs">
                     <Phone className="w-3.5 h-3.5 text-[#C8A96A] shrink-0" />
                     <div>
-                      <span className="text-[8.5px] text-neutral-400 uppercase tracking-wider block font-bold">Contato Direto</span>
-                      <span className="text-[10.5px] font-bold text-neutral-200">
+                      <span className="text-[8.5px] text-neutral-500 uppercase tracking-wider block font-bold">Contato Direto</span>
+                      <span className="text-[10.5px] font-bold text-neutral-800">
                         {shopProfile.phone || '(11) 99999-8888'}
                       </span>
                     </div>
@@ -717,27 +717,27 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
               </div>
 
               {/* Action Buttons Zone */}
-              <div className="space-y-1.5 pt-1 border-t border-neutral-800/80 shrink-0">
+              <div className="space-y-2 pt-2 border-t border-neutral-200/80 shrink-0">
                 <button 
                   onClick={handleOpenGoogleMaps}
-                  className="w-full bg-gradient-to-r from-[#d4a853] via-[#e5be6b] to-[#c49a4a] hover:brightness-110 text-neutral-950 font-extrabold text-[clamp(0.68rem,1.3vh,0.85rem)] py-[clamp(0.45rem,1.1vh,0.65rem)] px-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-[0_4px_15px_rgba(212,168,83,0.25)] active:scale-98 cursor-pointer tracking-wide"
+                  className="w-full bg-neutral-900 hover:bg-black text-white font-extrabold text-[clamp(0.68rem,1.3vh,0.85rem)] py-[clamp(0.45rem,1.1vh,0.65rem)] px-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md active:scale-98 cursor-pointer tracking-wide border border-neutral-900"
                 >
-                  <Navigation className="w-3.5 h-3.5 fill-neutral-950" />
+                  <Navigation className="w-3.5 h-3.5 fill-[#C8A96A] text-[#C8A96A]" />
                   <span>COMO CHEGAR (GOOGLE MAPS)</span>
                 </button>
 
                 <div className="grid grid-cols-2 gap-2">
                   <button 
                     onClick={handleOpenWaze}
-                    className="w-full bg-neutral-900 hover:bg-neutral-800 text-white border border-neutral-700/80 font-bold text-[clamp(0.625rem,1.1vh,0.75rem)] py-1.5 rounded-xl flex items-center justify-center gap-1.5 transition-all active:scale-98 cursor-pointer"
+                    className="w-full bg-white hover:bg-neutral-50 text-neutral-800 border border-neutral-300 font-bold text-[clamp(0.625rem,1.1vh,0.75rem)] py-1.5 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-2xs active:scale-98 cursor-pointer"
                   >
-                    <Compass className="w-3.5 h-3.5 text-cyan-400" />
+                    <Compass className="w-3.5 h-3.5 text-cyan-600" />
                     <span>ABRIR NO WAZE</span>
                   </button>
 
                   <button 
                     onClick={handleOpenWhatsApp}
-                    className="w-full bg-[#25D366]/15 hover:bg-[#25D366]/25 border border-[#25D366]/40 text-[#25D366] font-bold text-[clamp(0.625rem,1.1vh,0.75rem)] py-1.5 rounded-xl flex items-center justify-center gap-1.5 transition-all active:scale-98 cursor-pointer"
+                    className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-[clamp(0.625rem,1.1vh,0.75rem)] py-1.5 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-2xs active:scale-98 cursor-pointer"
                   >
                     <MessageCircle className="w-3.5 h-3.5 fill-current" />
                     <span>WHATSAPP</span>
