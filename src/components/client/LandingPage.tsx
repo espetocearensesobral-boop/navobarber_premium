@@ -183,12 +183,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
   });
 
   const differentials = [
-    { icon: User, secondaryIcon: Scissors, label: 'Profissionais experientes', strokeColor: 'var(--color-gold-base)', bgColor: 'var(--color-border-subtle)' },
-    { icon: Snowflake, label: 'Ambiente climatizado', strokeColor: 'var(--color-gold-base)', bgColor: 'var(--color-border-subtle)' },
-    { icon: Coffee, label: 'Café cortesia', strokeColor: 'var(--color-gold-base)', bgColor: 'var(--color-border-subtle)' },
-    { icon: Wifi, label: 'Wi-Fi gratuito', strokeColor: 'var(--color-gold-base)', bgColor: 'var(--color-border-subtle)' },
-    { icon: Car, label: 'Estacionamento próprio', strokeColor: 'var(--color-gold-base)', bgColor: 'var(--color-border-subtle)' },
-    { icon: Clock, secondaryIcon: Check, secondaryColor: '#4ade80', label: 'Horário marcado', strokeColor: 'var(--color-gold-base)', bgColor: 'var(--color-border-subtle)' }
+    { icon: User, secondaryIcon: Scissors, label: 'Profissionais experientes', strokeColor: '#b89060', bgColor: '#f5eedc' },
+    { icon: Snowflake, label: 'Ambiente climatizado', strokeColor: '#80b6c6', bgColor: '#e3f4f8' },
+    { icon: Coffee, label: 'Café cortesia', strokeColor: '#9e795a', bgColor: '#f5efe9' },
+    { icon: Wifi, label: 'Wi-Fi gratuito', strokeColor: '#71a67a', bgColor: '#e6f5ea' },
+    { icon: Car, label: 'Estacionamento próprio', strokeColor: '#9a9bc4', bgColor: '#edeefc' },
+    { icon: Clock, secondaryIcon: Check, secondaryColor: '#4ade80', label: 'Horário marcado', strokeColor: '#c1877f', bgColor: '#faece9' }
   ];
 
   const [selectedGalleryIndex, setSelectedGalleryIndex] = useState<number | null>(null);
@@ -337,28 +337,28 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
   })();
 
   return (
-    <div ref={containerRef} className="w-full h-full min-h-0 overflow-y-scroll snap-y snap-mandatory bg-surface-base text-content-base font-sans antialiased relative selection:bg-gold-base/20 selection:text-content-base no-scrollbar">
+    <div ref={containerRef} className="w-full h-full min-h-0 overflow-y-scroll snap-y snap-mandatory bg-white text-neutral-900 font-sans antialiased relative selection:bg-[#C8A96A]/20 selection:text-neutral-900 no-scrollbar">
       {/* HOURS MODAL OVERLAY */}
-      <div className={`fixed inset-0 z-50 bg-surface-base/90 backdrop-blur-xl flex flex-col items-center justify-center transition-opacity duration-300 ${isHoursModalOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+      <div className={`fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex flex-col items-center justify-center transition-opacity duration-300 ${isHoursModalOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
         <button 
           onClick={toggleHoursModal} 
-          className="absolute top-5 right-5 w-11 h-11 rounded-full bg-surface-card border border-border-subtle text-content-base text-xl flex items-center justify-center active:scale-95 transition-transform"
+          className="absolute top-5 right-5 w-11 h-11 rounded-full bg-white/8 border border-white/10 text-white text-xl flex items-center justify-center active:scale-95 transition-transform"
           aria-label="Fechar modal"
         >
           ✕
         </button>
-        <div className="bg-surface-card border border-border-subtle rounded-2xl p-6 sm:p-8 w-full max-w-sm flex flex-col gap-4 text-content-base shadow-2xl">
-          <h3 className="text-content-base text-xl font-extrabold mb-1 tracking-wide uppercase">Horário de Funcionamento</h3>
+        <div className="bg-[#141414] border border-white/10 rounded-2xl p-6 sm:p-8 w-full max-w-sm flex flex-col gap-4">
+          <h3 className="text-white text-xl font-extrabold mb-1 tracking-wide uppercase">Horário de Funcionamento</h3>
           
           <div className="space-y-2">
             {daysOfWeekMap.map(d => {
               const sch = shopProfile.operatingSchedule?.[d.key];
               if (!sch) return null;
               return (
-                <div key={d.key} className="flex justify-between items-center text-content-base text-sm font-medium">
-                  <span className="text-content-muted">{d.label}</span>
+                <div key={d.key} className="flex justify-between items-center text-[#f5f5f5] text-sm font-medium">
+                  <span className="text-[#a0a0a0]">{d.label}</span>
                   {sch.active ? (
-                    <span className="font-mono text-gold-base font-bold">{sch.open} - {sch.close}</span>
+                    <span className="font-mono text-amber-400">{sch.open} - {sch.close}</span>
                   ) : (
                     <span className="text-red-500 font-bold">Fechado</span>
                   )}
@@ -380,69 +380,69 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
       </div>
 
       {/* MENU OVERLAY */}
-      <div className={`fixed inset-0 z-50 bg-surface-base/90 backdrop-blur-xl flex flex-col items-center justify-center gap-8 transition-opacity duration-300 ${isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+      <div className={`fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex flex-col items-center justify-center gap-8 transition-opacity duration-300 ${isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
         <button 
           onClick={toggleMenu} 
-          className="absolute top-5 right-5 w-11 h-11 rounded-full bg-surface-card border border-border-subtle text-content-base text-xl flex items-center justify-center active:scale-95 transition-transform"
+          className="absolute top-5 right-5 w-11 h-11 rounded-full bg-white/8 border border-white/10 text-white text-xl flex items-center justify-center active:scale-95 transition-transform"
           aria-label="Fechar menu"
         >
           ✕
         </button>
-        <a href="#servicos" onClick={(e) => { e.preventDefault(); toggleMenu(); onGoToBooking(); }} className="text-content-base text-2xl font-semibold opacity-80 hover:opacity-100 transition-opacity">Serviços</a>
-        <a href="#diferenciais" onClick={(e) => { e.preventDefault(); toggleMenu(); scrollToSection(1); }} className="text-content-base text-2xl font-semibold opacity-80 hover:opacity-100 transition-opacity">Diferenciais</a>
-        <a href="#galeria" onClick={(e) => { e.preventDefault(); toggleMenu(); scrollToSection(2); }} className="text-content-base text-2xl font-semibold opacity-80 hover:opacity-100 transition-opacity">Galeria</a>
-        <a href="#contato" onClick={(e) => { e.preventDefault(); toggleMenu(); scrollToSection(4); }} className="text-content-base text-2xl font-semibold opacity-80 hover:opacity-100 transition-opacity">Contato</a>
+        <a href="#servicos" onClick={(e) => { e.preventDefault(); toggleMenu(); onGoToBooking(); }} className="text-white text-2xl font-semibold opacity-80 hover:opacity-100 transition-opacity">Serviços</a>
+        <a href="#diferenciais" onClick={(e) => { e.preventDefault(); toggleMenu(); scrollToSection(1); }} className="text-white text-2xl font-semibold opacity-80 hover:opacity-100 transition-opacity">Diferenciais</a>
+        <a href="#galeria" onClick={(e) => { e.preventDefault(); toggleMenu(); scrollToSection(2); }} className="text-white text-2xl font-semibold opacity-80 hover:opacity-100 transition-opacity">Galeria</a>
+        <a href="#contato" onClick={(e) => { e.preventDefault(); toggleMenu(); scrollToSection(4); }} className="text-white text-2xl font-semibold opacity-80 hover:opacity-100 transition-opacity">Contato</a>
         <button 
           onClick={() => { 
             toggleMenu(); 
             if (onGoToAppointments) onGoToAppointments(); 
           }} 
-          className="text-gold-base text-2xl font-semibold hover:opacity-100 transition-opacity flex items-center gap-2 cursor-pointer mt-2"
+          className="text-[#d4a853] text-2xl font-semibold hover:opacity-100 transition-opacity flex items-center gap-2 cursor-pointer mt-2"
         >
           Meus Cortes
         </button>
       </div>
 
       {/* SECTION 0: HERO */}
-      <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 bg-surface-base text-content-base overflow-hidden flex flex-col justify-between box-border">
+      <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 bg-[#0a0a0a] text-[#f5f5f5] overflow-hidden flex flex-col justify-between box-border">
         {/* Background Image with Gradient Overlay */}
         <div 
           className="absolute inset-0 z-0 bg-cover bg-center"
           style={{
-            backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0.3) 0%, var(--color-surface-base) 75%), url('https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=800&q=80')`
+            backgroundImage: `linear-gradient(180deg, rgba(10,10,10,0.25) 0%, rgba(10,10,10,0.7) 45%, #0a0a0a 85%), url('https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=800&q=80')`
           }}
         />
 
         {/* HEADER */}
         <header className="relative z-20 flex items-center justify-between p-5 shrink-0">
-          <div className="font-extrabold text-lg tracking-tight text-content-base flex items-center gap-1">
-            <span>NAVO</span><span className="text-gold-base">PREMIUM</span>
+          <div className="font-extrabold text-lg tracking-tight text-white flex items-center gap-1">
+            <span>NAVO</span><span className="text-[#d4a853]">PREMIUM</span>
           </div>
           <button 
             onClick={toggleMenu} 
-            className="w-10 h-10 rounded-full bg-surface-card border border-border-subtle text-content-base flex items-center justify-center backdrop-blur-md active:scale-95 transition-transform cursor-pointer"
+            className="w-10 h-10 rounded-full bg-white/8 border border-white/10 text-white flex items-center justify-center backdrop-blur-md active:scale-95 transition-transform"
             aria-label="Menu"
           >
-            <Menu className="w-5 h-5 text-content-base" />
+            <Menu className="w-5 h-5 text-white" />
           </button>
         </header>
 
         {/* HERO CONTENT */}
         <div className="relative z-10 p-5 pb-6 flex flex-col justify-end items-start my-auto min-h-0 w-full max-w-md md:max-w-2xl mx-auto">
           {/* RATING BADGE */}
-          <div className="inline-flex items-center gap-2 bg-gold-base/15 border border-gold-base/30 px-3.5 py-1.5 rounded-full text-xs font-semibold text-gold-base mb-4 backdrop-blur-xs">
+          <div className="inline-flex items-center gap-2 bg-[#d4a853]/12 border border-[#d4a853]/25 px-3.5 py-1.5 rounded-full text-xs font-semibold text-[#d4a853] mb-4 backdrop-blur-xs">
             <span className="tracking-widest text-[0.7rem] font-bold">★★★★★</span>
             <span>4.9 · 1.2k avaliações</span>
           </div>
 
           {/* TITLE */}
-          <h1 className="text-[clamp(1.85rem,4.5vh,2.8rem)] font-extrabold leading-[1.08] tracking-tight text-content-base mb-3">
-            Seu melhor <span className="text-gold-base">visual</span><br />
+          <h1 className="text-[clamp(1.85rem,4.5vh,2.8rem)] font-extrabold leading-[1.08] tracking-tight text-white mb-3">
+            Seu melhor <span className="text-[#d4a853]">visual</span><br />
             começa aqui.
           </h1>
 
           {/* SUBTITLE */}
-          <p className="text-[clamp(0.9rem,1.6vh,1.1rem)] leading-relaxed text-content-muted mb-5 max-w-xs sm:max-w-md">
+          <p className="text-[clamp(0.9rem,1.6vh,1.1rem)] leading-relaxed text-[#a0a0a0] mb-5 max-w-xs sm:max-w-md">
             Agende online, chegue na hora certa e saia renovado. Sem filas, sem espera, sem complicação.
           </p>
 
@@ -454,15 +454,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                 trackEvent('cta_click', 'landing', 'agendar_horario_hero');
                 onGoToBooking(); 
               }}
-              className="w-full bg-gold-base hover:bg-gold-deep text-surface-base font-bold text-base py-4 px-8 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-gold-base/20 active:scale-98 transition-all shrink-0 cursor-pointer"
+              className="w-full bg-[#d4a853] hover:bg-[#c49a4a] text-[#0a0a0a] font-bold text-base py-4 px-8 rounded-2xl flex items-center justify-center gap-2 shadow-[0_4px_30px_rgba(212,168,83,0.3)] active:scale-98 transition-all shrink-0 cursor-pointer"
             >
               <span>Agendar meu horário</span>
-              <ArrowRight className="w-5 h-5 text-surface-base" />
+              <ArrowRight className="w-5 h-5 text-[#0a0a0a]" />
             </button>
 
             <button 
               onClick={() => onGoToAppointments && onGoToAppointments()}
-              className="flex items-center gap-1.5 text-[0.85rem] text-content-muted cursor-pointer hover:text-content-base transition-colors active:scale-95"
+              className="flex items-center gap-1.5 text-[0.85rem] text-[#a0a0a0] cursor-pointer hover:text-white transition-colors active:scale-95"
             >
               <span>Já possui agendamento? Clique aqui.</span>
             </button>
@@ -471,38 +471,38 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
 
         {/* HERO FOOTER / TRUST TAGS */}
         <div className="relative z-10 w-full max-w-md md:max-w-2xl mx-auto px-5 pb-6 shrink-0 mt-auto">
-          <div className="w-full h-px bg-border-subtle mb-6"></div>
+          <div className="w-full h-px bg-white/10 mb-6"></div>
 
           <div className="flex justify-between items-center w-full px-2">
             <div className="flex flex-col items-center gap-1">
-              <span className="text-content-muted text-[0.65rem] font-bold tracking-widest uppercase">PRÓXIMO</span>
-              <span className="text-content-base font-bold text-sm">{nextAvailableTimeSlot}</span>
+              <span className="text-[#a0a0a0] text-[0.65rem] font-bold tracking-widest uppercase">PRÓXIMO</span>
+              <span className="text-white font-bold text-sm">{nextAvailableTimeSlot}</span>
             </div>
 
             <button onClick={toggleHoursModal} className="flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition-transform hover:opacity-80">
-              <span className="text-content-muted text-[0.65rem] font-bold tracking-widest uppercase">STATUS</span>
+              <span className="text-[#a0a0a0] text-[0.65rem] font-bold tracking-widest uppercase">STATUS</span>
               <div className="flex items-center gap-1.5">
-                <span className="text-emerald-500 font-semibold text-sm whitespace-nowrap">Aberto</span>
+                <span className="text-green-500 font-semibold text-sm whitespace-nowrap">Aberto</span>
               </div>
             </button>
 
             <div className="flex flex-col items-center gap-1">
-              <span className="text-content-muted text-[0.65rem] font-bold tracking-widest uppercase">TEMPO MÉDIO</span>
-              <span className="text-content-base font-bold text-sm">30 min</span>
+              <span className="text-[#a0a0a0] text-[0.65rem] font-bold tracking-widest uppercase">TEMPO MÉDIO</span>
+              <span className="text-white font-bold text-sm">30 min</span>
             </div>
           </div>
         </div>
       </section>
 
       {/* SECTION 1: POR QUE A NAVO */}
-      <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-surface-base text-content-base overflow-hidden box-border">
+      <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
         <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full h-full flex flex-col justify-between items-stretch min-h-0 my-auto">
           <div className="shrink-0 mb-[clamp(0.25rem,0.8vh,0.75rem)]">
-            <span className="text-gold-base text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase block mb-0.5">
+            <span className="text-[#C8A96A] text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase block mb-0.5">
               POR QUE A NAVO
             </span>
-            <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-extrabold text-content-base tracking-tight leading-tight">
-              Feito para você <span className="text-gold-base">relaxar</span>
+            <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-extrabold text-neutral-900 tracking-tight leading-tight">
+              Feito para você <span className="text-[#b89060]">relaxar</span>
             </h2>
           </div>
 
@@ -513,7 +513,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
               return (
                 <div 
                   key={idx}
-                  className="bg-surface-card border border-border-subtle rounded-2xl p-[clamp(0.75rem,1.5vh,1.25rem)] flex flex-col items-center justify-center gap-[clamp(0.5rem,1.5vh,1rem)] text-center shadow-xs hover:border-gold-base/50 hover:shadow-md transition-all duration-300 group h-full min-h-0"
+                  className="bg-white border border-neutral-200/80 rounded-2xl p-[clamp(0.75rem,1.5vh,1.25rem)] flex flex-col items-center justify-center gap-[clamp(0.5rem,1.5vh,1rem)] text-center shadow-xs hover:shadow-md transition-all duration-300 group h-full min-h-0"
                 >
                   <div 
                     className="w-[clamp(3.5rem,8vh,4.5rem)] h-[clamp(3.5rem,8vh,4.5rem)] rounded-full flex items-center justify-center relative shrink-0 transition-transform group-hover:scale-105"
@@ -524,7 +524,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                       style={{ color: item.strokeColor }} 
                     />
                     {SecondaryIcon && (
-                      <div className="absolute bottom-1 right-1 bg-surface-card rounded-full p-[2px] shadow-sm border border-border-subtle">
+                      <div className="absolute bottom-1 right-1 bg-white rounded-full p-[2px] shadow-sm">
                         <SecondaryIcon 
                           className="w-[clamp(0.875rem,2vh,1.125rem)] h-[clamp(0.875rem,2vh,1.125rem)] stroke-[2.5]" 
                           style={{ color: item.secondaryColor || item.strokeColor }} 
@@ -532,7 +532,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                       </div>
                     )}
                   </div>
-                  <span className="text-[clamp(0.75rem,1.4vh,0.9rem)] font-bold text-content-base leading-[1.2] px-1 max-w-[80%]">
+                  <span className="text-[clamp(0.75rem,1.4vh,0.9rem)] font-bold text-neutral-800 leading-[1.2] px-1 max-w-[80%]">
                     {item.label}
                   </span>
                 </div>
@@ -543,22 +543,22 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
       </section>
 
       {/* SECTION 3: GALERIA */}
-      <section id="galeria" className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-surface-base text-content-base overflow-hidden box-border">
+      <section id="galeria" className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
         <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full h-full flex flex-col justify-between items-stretch min-h-0 my-auto">
           {/* Header */}
           <div className="flex justify-between items-end mb-[clamp(0.25rem,0.8vh,0.75rem)] shrink-0">
             <div>
-              <span className="text-gold-base text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase block mb-0.5 flex items-center gap-1">
-                <Star className="w-3 h-3 fill-gold-base" />
+              <span className="text-[#C8A96A] text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase block mb-0.5 flex items-center gap-1">
+                <Star className="w-3 h-3 fill-[#C8A96A]" />
                 <span>GALERIA • DESTAQUES</span>
               </span>
-              <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-bold text-content-base tracking-tight leading-tight">
+              <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-bold text-neutral-900 tracking-tight leading-tight">
                 Cortes reais
               </h2>
             </div>
             <button 
               onClick={() => { hapticLight(); onGoToBooking(); }}
-              className="text-[clamp(0.65rem,1.3vh,0.875rem)] font-semibold text-content-muted hover:text-content-base transition-colors flex items-center gap-1 cursor-pointer"
+              className="text-[clamp(0.65rem,1.3vh,0.875rem)] font-semibold text-neutral-500 hover:text-neutral-900 transition-colors flex items-center gap-1"
             >
               <span>Ver todos os serviços</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -585,7 +585,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                     hapticLight();
                     setSelectedGalleryIndex(index);
                   }}
-                  className={`${gridClass} rounded-[clamp(0.5rem,1vh,0.875rem)] overflow-hidden relative group bg-surface-card border border-border-subtle hover:border-gold-base/80 shadow-xs min-h-0 h-full cursor-pointer transition-all duration-300`}
+                  className={`${gridClass} rounded-[clamp(0.5rem,1vh,0.875rem)] overflow-hidden relative group bg-neutral-900 border border-neutral-200/50 hover:border-[#C8A96A]/80 shadow-xs min-h-0 h-full cursor-pointer transition-all duration-300`}
                 >
                   {/* Photo image */}
                   <img
@@ -610,7 +610,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                       )}
 
                       <div className="flex items-center justify-between gap-1 pt-0.5">
-                        <span className="text-gold-base font-black text-[clamp(0.6rem,1.2vh,0.85rem)]">
+                        <span className="text-[#C8A96A] font-black text-[clamp(0.6rem,1.2vh,0.85rem)]">
                           R$ {item.price.toFixed(2)}
                         </span>
                       </div>
@@ -624,13 +624,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
       </section>
 
       {/* SECTION 4: DEPOIMENTOS - VERTICAL LAYOUT */}
-      <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-surface-base text-content-base overflow-hidden box-border">
+      <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
         <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full h-full flex flex-col justify-between items-stretch min-h-0 my-auto">
           <div className="shrink-0 mb-[clamp(0.25rem,0.8vh,0.75rem)]">
-            <span className="text-gold-base text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase block mb-0.5">
+            <span className="text-[#C8A96A] text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase block mb-0.5">
               DEPOIMENTOS
             </span>
-            <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-bold text-content-base tracking-tight leading-tight">
+            <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-bold text-neutral-900 tracking-tight leading-tight">
               Quem já passou por aqui
             </h2>
           </div>
@@ -639,7 +639,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             {testimonials.map((item, idx) => (
               <div 
                 key={idx}
-                className="w-full bg-surface-card border border-border-subtle rounded-[clamp(0.625rem,1.4vh,1.125rem)] p-[clamp(0.5rem,1.2vh,1rem)] flex flex-col justify-between gap-[clamp(0.25rem,0.8vh,0.625rem)] shadow-xs hover:border-gold-base/50 hover:shadow-md transition-all flex-1 min-h-0"
+                className="w-full bg-white border border-neutral-200/80 rounded-[clamp(0.625rem,1.4vh,1.125rem)] p-[clamp(0.5rem,1.2vh,1rem)] flex flex-col justify-between gap-[clamp(0.25rem,0.8vh,0.625rem)] shadow-xs hover:border-[#C8A96A]/50 hover:shadow-md transition-all flex-1 min-h-0"
               >
                 <div>
                   <div className="flex items-center justify-between gap-[clamp(0.375rem,1vw,0.75rem)] mb-[clamp(0.25rem,0.8vh,0.625rem)]">
@@ -650,22 +650,22 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                         className="w-[clamp(1.75rem,3.5vh,2.5rem)] h-[clamp(1.75rem,3.5vh,2.5rem)] rounded-full object-cover shrink-0"
                       />
                       <div>
-                        <h4 className="text-[clamp(0.7rem,1.4vh,1rem)] font-bold text-content-base">
+                        <h4 className="text-[clamp(0.7rem,1.4vh,1rem)] font-bold text-neutral-900">
                           {item.name}
                         </h4>
-                        <div className="flex text-gold-base gap-0.5 mt-0.5">
+                        <div className="flex text-amber-400 gap-0.5 mt-0.5">
                           {[...Array(item.rating)].map((_, i) => (
                             <Star key={i} className="w-[clamp(0.6rem,1.1vh,0.8rem)] h-[clamp(0.6rem,1.1vh,0.8rem)] fill-current" />
                           ))}
                         </div>
                       </div>
                     </div>
-                    <span className="text-[clamp(0.55rem,1vh,0.75rem)] text-content-muted self-start mt-1">
+                    <span className="text-[clamp(0.55rem,1vh,0.75rem)] text-neutral-400 self-start mt-1">
                       {item.date}
                     </span>
                   </div>
 
-                  <p className="text-[clamp(0.625rem,1.25vh,0.875rem)] text-content-muted leading-relaxed font-normal italic line-clamp-3">
+                  <p className="text-[clamp(0.625rem,1.25vh,0.875rem)] text-neutral-600 leading-relaxed font-normal italic line-clamp-3">
                     "{item.text}"
                   </p>
                 </div>
@@ -676,22 +676,22 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
       </section>
 
       {/* SECTION 5: LOCALIZAÇÃO */}
-      <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-surface-base text-content-base overflow-hidden box-border">
+      <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
         <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full h-full flex flex-col justify-between items-stretch min-h-0 my-auto">
           {/* Section Header */}
           <div className="shrink-0 mb-[clamp(0.25rem,0.8vh,0.75rem)] flex items-end justify-between gap-3">
             <div>
-              <span className="text-gold-base text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase flex items-center gap-1.5 mb-0.5">
-                <MapPin className="w-3.5 h-3.5 text-gold-base" />
+              <span className="text-[#C8A96A] text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase flex items-center gap-1.5 mb-0.5">
+                <MapPin className="w-3.5 h-3.5 text-[#C8A96A]" />
                 LOCALIZAÇÃO & ATENDIMENTO
               </span>
-              <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-bold text-content-base tracking-tight leading-tight font-serif">
+              <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-bold text-neutral-900 tracking-tight leading-tight font-serif">
                 Onde estamos
               </h2>
             </div>
 
             {/* Live Open/Closed Status Pill */}
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-card text-content-base border border-border-subtle shadow-2xs shrink-0">
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-neutral-100 text-neutral-800 border border-neutral-200/90 shadow-2xs shrink-0">
               <span className={`w-2 h-2 rounded-full ${isShopOpenNow ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`} />
               <span className="text-[clamp(0.6rem,1.1vh,0.75rem)] font-bold uppercase tracking-wider">
                 {isShopOpenNow ? 'Aberto Agora' : 'Atendimento Fechado'}
@@ -699,11 +699,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             </div>
           </div>
 
-          {/* Main Card Container */}
-          <div className="bg-surface-card border border-border-subtle rounded-[clamp(0.75rem,1.6vh,1.25rem)] p-[clamp(0.625rem,1.5vh,1.25rem)] shadow-lg flex-1 min-h-0 my-auto flex flex-col md:grid md:grid-cols-12 gap-[clamp(0.625rem,1.5vh,1.25rem)] items-stretch justify-between text-content-base overflow-hidden">
+          {/* Main Card Container (Light System Palette) */}
+          <div className="bg-white border border-neutral-200/90 rounded-[clamp(0.75rem,1.6vh,1.25rem)] p-[clamp(0.625rem,1.5vh,1.25rem)] shadow-lg flex-1 min-h-0 my-auto flex flex-col md:grid md:grid-cols-12 gap-[clamp(0.625rem,1.5vh,1.25rem)] items-stretch justify-between text-neutral-900 overflow-hidden">
             
             {/* Real Interactive Google Maps Embedded iframe */}
-            <div className="relative w-full md:col-span-7 flex-1 min-h-[clamp(8.5rem,18vh,15rem)] rounded-[clamp(0.625rem,1.2vh,1rem)] overflow-hidden bg-surface-base border border-border-subtle shrink-0 md:shrink group shadow-2xs">
+            <div className="relative w-full md:col-span-7 flex-1 min-h-[clamp(8.5rem,18vh,15rem)] rounded-[clamp(0.625rem,1.2vh,1rem)] overflow-hidden bg-neutral-100 border border-neutral-200 shrink-0 md:shrink group shadow-2xs">
               <iframe
                 title="Mapa de Localização da Barbearia"
                 width="100%"
@@ -715,21 +715,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                 className="w-full h-full min-h-full rounded-[clamp(0.5rem,1vh,0.875rem)]"
               />
               
-              {/* Map Floating Top Badge & Expand Link */}
-              <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between pointer-events-none">
-                <div className="bg-surface-card/95 backdrop-blur-md border border-border-subtle px-2.5 py-1 rounded-lg shadow-xs flex items-center gap-2 pointer-events-auto">
-                  <div className="w-2 h-2 rounded-full bg-gold-base" />
-                  <span className="text-[10px] sm:text-[11px] font-bold text-content-base uppercase tracking-wide truncate max-w-[150px] sm:max-w-xs">
-                    {shopProfile.unitName || 'Unidade Jardins'}
-                  </span>
-                </div>
-
+              {/* Map Floating Expand Link */}
+              <div className="absolute top-2.5 right-2.5 flex items-center justify-end pointer-events-none">
                 <button
                   onClick={handleOpenGoogleMaps}
-                  className="bg-surface-card/95 hover:bg-surface-base text-content-base border border-border-subtle px-2.5 py-1 rounded-lg shadow-xs transition-all pointer-events-auto flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold cursor-pointer"
+                  className="bg-white/95 hover:bg-neutral-50 text-neutral-800 border border-neutral-200 px-2.5 py-1 rounded-lg shadow-xs transition-all pointer-events-auto flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold"
                   title="Abrir no Google Maps"
                 >
-                  <ExternalLink className="w-3 h-3 text-gold-base" />
+                  <ExternalLink className="w-3 h-3 text-[#C8A96A]" />
                   <span className="hidden sm:inline">Ver no Mapa</span>
                 </button>
               </div>
@@ -741,23 +734,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
               {/* Highlighted Custom Typography */}
               <div className="space-y-[clamp(0.375rem,1vh,0.75rem)]">
                 <div>
-                  <span className="text-[clamp(0.6rem,1vh,0.725rem)] font-bold uppercase tracking-widest text-gold-base block mb-0.5">
+                  <span className="text-[clamp(0.6rem,1vh,0.725rem)] font-bold uppercase tracking-widest text-[#C8A96A] block mb-0.5">
                     {shopProfile.unitName || 'Unidade Jardins'}
                   </span>
-                  <h3 className="text-[clamp(1.1rem,2.2vh,1.5rem)] font-extrabold text-content-base tracking-tight leading-tight font-serif">
+                  <h3 className="text-[clamp(1.1rem,2.2vh,1.5rem)] font-extrabold text-neutral-900 tracking-tight leading-tight font-serif">
                     {shopProfile.name}
                   </h3>
                 </div>
 
                 {/* Big Display Address Highlight Callout */}
-                <div className="bg-surface-base border border-border-subtle p-[clamp(0.5rem,1.2vh,0.75rem)] rounded-xl space-y-1.5 shadow-2xs">
+                <div className="bg-neutral-50 border border-neutral-200/80 p-[clamp(0.5rem,1.2vh,0.75rem)] rounded-xl space-y-1.5 shadow-2xs">
                   <div className="flex items-start gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-gold-base/15 border border-gold-base/30 text-gold-base flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                    <div className="w-7 h-7 rounded-lg bg-[#C8A96A]/15 border border-[#C8A96A]/30 text-[#C8A96A] flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
                       <MapPin className="w-4 h-4" />
                     </div>
                     <div>
-                      <span className="text-[9px] text-content-muted font-bold uppercase tracking-wider block">Endereço de Atendimento</span>
-                      <p className="text-[clamp(0.725rem,1.4vh,0.9rem)] font-extrabold text-content-base leading-snug">
+                      <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-wider block">Endereço de Atendimento</span>
+                      <p className="text-[clamp(0.725rem,1.4vh,0.9rem)] font-extrabold text-neutral-900 leading-snug">
                         {shopProfile.address}
                       </p>
                     </div>
@@ -766,21 +759,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
 
                 {/* Quick Info Grid (Hours & Phone) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                  <div className="bg-surface-base border border-border-subtle p-2 rounded-lg flex items-center gap-2 shadow-2xs">
-                    <Clock className="w-3.5 h-3.5 text-gold-base shrink-0" />
+                  <div className="bg-neutral-50 border border-neutral-200/80 p-2 rounded-lg flex items-center gap-2 shadow-2xs">
+                    <Clock className="w-3.5 h-3.5 text-[#C8A96A] shrink-0" />
                     <div>
-                      <span className="text-[8.5px] text-content-muted uppercase tracking-wider block font-bold">Horário Hoje</span>
-                      <span className="text-[10.5px] font-bold text-content-base">
+                      <span className="text-[8.5px] text-neutral-500 uppercase tracking-wider block font-bold">Horário Hoje</span>
+                      <span className="text-[10.5px] font-bold text-neutral-800">
                         {shopProfile.openTime || '09:00'} às {shopProfile.closeTime || '20:00'}
                       </span>
                     </div>
                   </div>
 
-                  <div className="bg-surface-base border border-border-subtle p-2 rounded-lg flex items-center gap-2 shadow-2xs">
-                    <Phone className="w-3.5 h-3.5 text-gold-base shrink-0" />
+                  <div className="bg-neutral-50 border border-neutral-200/80 p-2 rounded-lg flex items-center gap-2 shadow-2xs">
+                    <Phone className="w-3.5 h-3.5 text-[#C8A96A] shrink-0" />
                     <div>
-                      <span className="text-[8.5px] text-content-muted uppercase tracking-wider block font-bold">Contato Direto</span>
-                      <span className="text-[10.5px] font-bold text-content-base">
+                      <span className="text-[8.5px] text-neutral-500 uppercase tracking-wider block font-bold">Contato Direto</span>
+                      <span className="text-[10.5px] font-bold text-neutral-800">
                         {shopProfile.phone || '(11) 99999-8888'}
                       </span>
                     </div>
@@ -789,19 +782,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
               </div>
 
               {/* Action Buttons Zone */}
-              <div className="space-y-2 pt-2 border-t border-border-subtle shrink-0">
+              <div className="space-y-2 pt-2 border-t border-neutral-200/80 shrink-0">
                 <button 
                   onClick={handleOpenGoogleMaps}
-                  className="w-full bg-content-base hover:opacity-90 text-surface-base font-extrabold text-[clamp(0.68rem,1.3vh,0.85rem)] py-[clamp(0.45rem,1.1vh,0.65rem)] px-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md active:scale-98 cursor-pointer tracking-wide border border-border-subtle"
+                  className="w-full bg-neutral-900 hover:bg-black text-white font-extrabold text-[clamp(0.68rem,1.3vh,0.85rem)] py-[clamp(0.45rem,1.1vh,0.65rem)] px-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md active:scale-98 cursor-pointer tracking-wide border border-neutral-900"
                 >
-                  <Navigation className="w-3.5 h-3.5 fill-gold-base text-gold-base" />
+                  <Navigation className="w-3.5 h-3.5 fill-[#C8A96A] text-[#C8A96A]" />
                   <span>COMO CHEGAR (GOOGLE MAPS)</span>
                 </button>
 
                 <div className="grid grid-cols-2 gap-2">
                   <button 
                     onClick={handleOpenWaze}
-                    className="w-full bg-surface-base hover:bg-surface-card text-content-base border border-border-subtle font-bold text-[clamp(0.625rem,1.1vh,0.75rem)] py-1.5 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-2xs active:scale-98 cursor-pointer"
+                    className="w-full bg-white hover:bg-neutral-50 text-neutral-800 border border-neutral-300 font-bold text-[clamp(0.625rem,1.1vh,0.75rem)] py-1.5 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-2xs active:scale-98 cursor-pointer"
                   >
                     <Compass className="w-3.5 h-3.5 text-cyan-600" />
                     <span>ABRIR NO WAZE</span>
@@ -823,19 +816,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
         </div>
       </section>
 
-      {/* SECTION 6: PRONTO PARA O SEU NOVO VISUAL? */}
-      <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between pt-[clamp(0.75rem,2vh,2rem)] bg-surface-base text-content-base overflow-hidden box-border">
+      {/* SECTION 6: PRONTO PARA O SEU NOVO VISUAL? (DARK CARD) */}
+      <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between pt-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
         <div className="w-full flex-1 flex flex-col justify-center items-center max-h-full my-auto py-1 px-[clamp(0.75rem,2vh,2rem)] min-h-0">
-          <div className="max-w-md md:max-w-3xl lg:max-w-4xl w-full bg-surface-card text-content-base border border-border-subtle rounded-[clamp(0.875rem,2vh,1.5rem)] p-[clamp(0.875rem,2.2vh,2rem)] relative overflow-hidden shadow-xl text-center flex flex-col items-center justify-center my-auto min-h-0">
-            <div className="w-[clamp(2rem,4vh,3rem)] h-[clamp(2rem,4vh,3rem)] rounded-2xl bg-gold-base/20 border border-gold-base/30 flex items-center justify-center text-gold-base mb-[clamp(0.375rem,1vh,1rem)] shrink-0">
+          <div className="max-w-md md:max-w-3xl lg:max-w-4xl w-full bg-neutral-900 text-white rounded-[clamp(0.875rem,2vh,1.5rem)] p-[clamp(0.875rem,2.2vh,2rem)] relative overflow-hidden shadow-xl text-center flex flex-col items-center justify-center my-auto min-h-0">
+            <div className="w-[clamp(2rem,4vh,3rem)] h-[clamp(2rem,4vh,3rem)] rounded-2xl bg-[#C8A96A]/20 border border-[#C8A96A]/30 flex items-center justify-center text-[#C8A96A] mb-[clamp(0.375rem,1vh,1rem)] shrink-0">
               <Scissors className="w-[clamp(1rem,2.2vh,1.625rem)] h-[clamp(1rem,2.2vh,1.625rem)] stroke-[2.2]" />
             </div>
 
-            <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-bold text-content-base mb-[clamp(0.2rem,0.6vh,0.5rem)] tracking-tight leading-tight">
+            <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-bold text-white mb-[clamp(0.2rem,0.6vh,0.5rem)] tracking-tight leading-tight">
               Pronto para o seu<br />novo visual?
             </h2>
 
-            <p className="text-[clamp(0.65rem,1.3vh,0.875rem)] text-content-muted font-normal leading-relaxed mb-[clamp(0.5rem,1.5vh,1.25rem)] max-w-xs sm:max-w-md md:max-w-lg">
+            <p className="text-[clamp(0.65rem,1.3vh,0.875rem)] text-neutral-400 font-normal leading-relaxed mb-[clamp(0.5rem,1.5vh,1.25rem)] max-w-xs sm:max-w-md md:max-w-lg">
               Garanta seu horário em segundos e viva a experiência Navo Premium.
             </p>
 
@@ -846,7 +839,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                   trackEvent('cta_click', 'landing', 'agendar_online_footer');
                   onGoToBooking();
                 }}
-                className="w-full sm:w-auto px-6 py-[clamp(0.5rem,1.2vh,0.875rem)] bg-gold-base hover:bg-gold-deep text-surface-base font-bold text-[clamp(0.7rem,1.4vh,0.925rem)] rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-gold-base/20 hover:scale-102 active:scale-98 transition-all shrink-0 cursor-pointer"
+                className="w-full sm:w-auto px-6 py-[clamp(0.5rem,1.2vh,0.875rem)] bg-[#d4a853] hover:bg-[#c49a4a] text-[#0a0a0a] font-bold text-[clamp(0.7rem,1.4vh,0.925rem)] rounded-xl flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(212,168,83,0.3)] hover:scale-102 active:scale-98 transition-all shrink-0 cursor-pointer"
               >
                 <CalendarCheck className="w-[clamp(0.875rem,1.8vh,1.125rem)] h-[clamp(0.875rem,1.8vh,1.125rem)]" />
                 <span>Agendar Online</span>
@@ -864,7 +857,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
               </button>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 mt-[clamp(0.5rem,1.5vh,1.25rem)] text-content-muted text-[clamp(0.6rem,1.2vh,0.75rem)]">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 mt-[clamp(0.5rem,1.5vh,1.25rem)] text-neutral-400 text-[clamp(0.6rem,1.2vh,0.75rem)]">
               <span className="flex items-center gap-1"><span className="text-[#25D366]">✓</span> Sem taxa de cancelamento</span>
               <span className="flex items-center gap-1"><span className="text-[#25D366]">✓</span> Confirmação instantânea</span>
             </div>
@@ -875,20 +868,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
         <div className="flex justify-center pt-2 pb-[clamp(1rem,3vh,2rem)] shrink-0 px-[clamp(0.75rem,2vh,2rem)]">
           <button 
             onClick={scrollToTop}
-            className="group flex items-center gap-2 text-[clamp(0.6rem,1.1vh,0.7rem)] font-medium text-content-muted hover:text-content-base transition-all duration-300 px-3 py-[clamp(0.2rem,0.5vh,0.4rem)] rounded-full border border-border-subtle bg-surface-card hover:bg-surface-base active:scale-95 shadow-xs cursor-pointer"
+            className="group flex items-center gap-2 text-[clamp(0.6rem,1.1vh,0.7rem)] font-medium text-neutral-400 hover:text-neutral-900 transition-all duration-300 px-3 py-[clamp(0.2rem,0.5vh,0.4rem)] rounded-full border border-neutral-200/80 bg-neutral-50/80 hover:bg-neutral-100 active:scale-95 shadow-xs"
           >
-            <ArrowUp className="w-3 h-3 text-content-muted group-hover:text-content-base group-hover:-translate-y-0.5 transition-transform duration-300" />
+            <ArrowUp className="w-3 h-3 text-neutral-400 group-hover:text-neutral-900 group-hover:-translate-y-0.5 transition-transform duration-300" />
             <span>Voltar ao topo</span>
           </button>
         </div>
 
         {/* FOOTER */}
-        <footer className="w-full bg-surface-base border-t border-border-subtle px-5 py-4 shrink-0 flex flex-col sm:flex-row justify-between items-center gap-2 mt-auto">
-          <p className="text-[0.7rem] text-content-muted">
+        <footer className="w-full bg-[#0a0a0a] border-t border-white/10 px-5 py-4 shrink-0 flex flex-col sm:flex-row justify-between items-center gap-2 mt-auto">
+          <p className="text-[0.7rem] text-[#a0a0a0]">
             © 2026 Navo Premium. Todos os direitos reservados.
           </p>
-          <p className="text-[0.7rem] text-content-muted">
-            Desenvolvido por <span className="text-gold-base font-semibold">Navo</span>
+          <p className="text-[0.7rem] text-[#a0a0a0]">
+            Desenvolvido por <span className="text-[#d4a853] font-semibold">Navo</span>
           </p>
         </footer>
       </section>

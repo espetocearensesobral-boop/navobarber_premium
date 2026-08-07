@@ -53,12 +53,6 @@ export const ClientApp: React.FC = () => {
   const touchEndX = useRef<number | null>(null);
 
   useEffect(() => {
-    // Restore theme from localStorage if available
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-      document.documentElement.setAttribute('data-theme', savedTheme);
-    }
-
     // Check URL for referral code ?ref=NAV-XXX
     const params = new URLSearchParams(window.location.search);
     const refCode = params.get('ref');
