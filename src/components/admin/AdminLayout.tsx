@@ -9,7 +9,6 @@ import { WaitingQueue } from './WaitingQueue';
 import { SettingsManagement } from './SettingsManagement';
 import { NavoRewardsAdmin } from './NavoRewardsAdmin';
 import { 
-  LayoutDashboard,
   Calendar,
   Clock,
   Scissors,
@@ -42,22 +41,21 @@ export const AdminLayout: React.FC = () => {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [adminName, setAdminName] = useState('Admin');
 
-  // ✅ PROTEÇÃO DE AUTENTICAÇÃO
+  // PROTEÇÃO DE AUTENTICAÇÃO
   React.useEffect(() => {
     const checkAuth = () => {
-      // Verifica se o usuário logado é admin
       const token = localStorage.getItem('token');
       const userStr = localStorage.getItem('barberx_user');
       
       if (!userStr) {
-        window.location.href = '/'; // Redireciona para home
+        window.location.href = '/';
         return;
       }
       
       try {
         const user = JSON.parse(userStr);
         if (user.role !== 'admin') {
-          window.location.href = '/'; // Não é admin
+          window.location.href = '/';
         } else {
           setIsAuthorized(true);
           setAdminName(user.name || 'Admin');
@@ -107,7 +105,7 @@ export const AdminLayout: React.FC = () => {
       id: 'rewards' as AdminTab, 
       label: 'Navo Rewards & NPS', 
       icon: Award,
-      description: 'Fidelidade, indicações e pesquisas'
+      description: 'Fidelidade e indicações'
     },
     { 
       id: 'servicos' as AdminTab, 
@@ -168,24 +166,24 @@ export const AdminLayout: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-surface-base flex text-content-base font-sans antialiased overflow-hidden">
-      {/* Sidebar - Desktop */}
+      {/* Sidebar - Desktop (Fixed layout, 8px grid) */}
       <aside className="hidden lg:flex lg:w-64 lg:flex-col shrink-0 lg:bg-surface-card lg:border-r lg:border-border-subtle lg:fixed lg:inset-y-0">
-        {/* Logo */}
-        <div className="flex items-center h-16 px-6 border-b border-border-subtle relative overflow-hidden">
+        {/* Logo Header (Fixed 56px height) */}
+        <div className="flex items-center h-[56px] px-4 border-b border-border-subtle relative overflow-hidden shrink-0">
           <div className="absolute top-0 left-0 right-0 h-0.5 barber-pole-line" />
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gold-base text-surface-base rounded-xl flex items-center justify-center shadow-md shrink-0">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 bg-gold-base text-surface-base rounded-md flex items-center justify-center shadow-sm shrink-0">
               <Scissors className="w-4 h-4" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-base font-serif font-bold text-content-base tracking-tight truncate">Navo Premium</h1>
-              <p className="text-[9px] text-gold-base font-extrabold uppercase tracking-widest">Heritage Barber & Club</p>
+              <h1 className="text-sm font-serif font-bold text-content-base tracking-tight truncate">Navo Premium</h1>
+              <p className="text-[9px] text-gold-base font-bold uppercase tracking-widest truncate">Heritage Barber & Club</p>
             </div>
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-3 py-6 space-y-1.5 overflow-y-auto no-scrollbar">
+        <nav className="flex-1 px-2.5 py-4 space-y-1 overflow-y-auto no-scrollbar">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -194,66 +192,61 @@ export const AdminLayout: React.FC = () => {
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold transition-all duration-200 group ${
+                className={`w-full h-10 px-3 rounded-md text-xs font-semibold flex items-center gap-2.5 transition-colors group min-w-0 ${
                   isActive
-                    ? 'bg-gold-base/10 text-gold-hover border border-gold-base/20 shadow-sm'
-                    : 'text-content-muted hover:text-content-base hover:bg-white/5'
+                    ? 'bg-gold-base/10 text-gold-base border border-gold-base/30'
+                    : 'text-content-muted hover:text-content-base hover:bg-surface-base'
                 }`}
               >
-                <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-gold-hover' : 'text-content-muted group-hover:text-content-base'}`} />
-                <div className="flex-1 text-left min-w-0">
-                  <div className="truncate">{item.label}</div>
-                  <div className={`text-[11px] mt-0.5 truncate ${isActive ? 'text-gold-hover/70' : 'text-content-muted/70'}`}>
-                    {item.description}
-                  </div>
-                </div>
+                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-gold-base' : 'text-content-muted group-hover:text-content-base'}`} />
+                <span className="flex-1 text-left truncate min-w-0">{item.label}</span>
                 {isActive && (
-                  <ChevronRight className="w-4 h-4 text-gold-hover shrink-0" />
+                  <ChevronRight className="w-3.5 h-3.5 text-gold-base shrink-0" />
                 )}
               </button>
             );
           })}
         </nav>
 
-        {/* User Profile */}
-        <div className="p-4 border-t border-border-subtle">
-          <div className="flex items-center gap-3 px-3 py-3 rounded-xl bg-white/5 border border-border-subtle/50">
-            <div className="w-9 h-9 rounded-full bg-gold-base flex items-center justify-center text-surface-base font-black text-sm uppercase shrink-0">
+        {/* User Profile Footer */}
+        <div className="p-3 border-t border-border-subtle shrink-0">
+          <div className="flex items-center gap-2.5 px-3 h-12 rounded-md bg-surface-base border border-border-subtle/80">
+            <div className="w-7 h-7 rounded bg-gold-base flex items-center justify-center text-surface-base font-bold text-xs uppercase shrink-0">
               {adminName.substring(0, 2)}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-content-base truncate">{adminName}</p>
-              <p className="text-[10px] font-semibold text-content-muted uppercase tracking-wider">Admin</p>
+              <p className="text-xs font-bold text-content-base truncate">{adminName}</p>
+              <p className="text-[9px] font-bold text-content-muted uppercase tracking-wider">Admin</p>
             </div>
             <button 
               onClick={handleLogout}
-              className="p-2 rounded-lg hover:bg-white/10 text-content-muted hover:text-gold-hover transition-colors"
+              className="p-1.5 rounded hover:bg-surface-card text-content-muted hover:text-gold-base transition-colors shrink-0"
               title="Sair"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
       </aside>
 
-      {/* Mobile Header */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-surface-card/95 backdrop-blur-md border-b border-border-subtle z-40">
+      {/* Mobile Header (Fixed 56px height) */}
+      <header className="lg:hidden fixed top-0 left-0 right-0 h-[56px] bg-surface-card border-b border-border-subtle z-40">
         <div className="flex items-center justify-between h-full px-4">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-xl border border-border-subtle hover:bg-white/5 transition-colors text-gold-hover"
+            className="p-2 rounded-md border border-border-subtle hover:bg-surface-base text-gold-base"
           >
             <Menu className="w-5 h-5" />
           </button>
           
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-gold-base rounded-lg flex items-center justify-center text-surface-base shadow">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-7 h-7 bg-gold-base rounded-md flex items-center justify-center text-surface-base shrink-0">
               <Scissors className="w-3.5 h-3.5" />
             </div>
-            <h1 className="text-base font-black tracking-tight text-gold-hover">Navo Premium</h1>
+            <h1 className="text-sm font-serif font-bold text-content-base truncate">Navo Premium</h1>
           </div>
 
-          <div className="w-9" /> {/* Spacer */}
+          <div className="w-9" />
         </div>
       </header>
 
@@ -267,23 +260,23 @@ export const AdminLayout: React.FC = () => {
           
           <aside className="relative w-[280px] max-w-[80vw] bg-surface-card flex flex-col animate-slide-in shadow-2xl border-r border-border-subtle">
             {/* Header */}
-            <div className="flex items-center justify-between h-16 px-5 border-b border-border-subtle">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-gold-base rounded-lg flex items-center justify-center text-surface-base shadow">
-                  <Scissors className="w-4 h-4" />
+            <div className="flex items-center justify-between h-[56px] px-4 border-b border-border-subtle shrink-0">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-7 h-7 bg-gold-base rounded-md flex items-center justify-center text-surface-base shrink-0">
+                  <Scissors className="w-3.5 h-3.5" />
                 </div>
-                <h1 className="text-base font-black text-gold-hover">Navo Premium</h1>
+                <h1 className="text-sm font-serif font-bold text-content-base truncate">Navo Premium</h1>
               </div>
               <button
                 onClick={() => setSidebarOpen(false)}
-                className="p-2 rounded-xl text-content-muted hover:text-content-base hover:bg-white/5 transition-colors"
+                className="p-1.5 rounded-md text-content-muted hover:text-content-base hover:bg-surface-base"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto no-scrollbar">
+            <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto no-scrollbar">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = activeTab === item.id;
@@ -295,28 +288,26 @@ export const AdminLayout: React.FC = () => {
                       setActiveTab(item.id);
                       setSidebarOpen(false);
                     }}
-                    className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                    className={`w-full h-11 px-3 rounded-md text-xs font-semibold flex items-center gap-3 transition-colors ${
                       isActive
-                        ? 'bg-gold-base/10 text-gold-hover border border-gold-base/20'
-                        : 'text-content-muted hover:text-content-base hover:bg-white/5'
+                        ? 'bg-gold-base/10 text-gold-base border border-gold-base/30'
+                        : 'text-content-muted hover:text-content-base hover:bg-surface-base'
                     }`}
                   >
-                    <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-gold-hover' : 'text-content-muted'}`} />
-                    <div className="flex-1 text-left min-w-0">
-                      <div className="truncate">{item.label}</div>
-                    </div>
+                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-gold-base' : 'text-content-muted'}`} />
+                    <span className="truncate flex-1 text-left min-w-0">{item.label}</span>
                   </button>
                 );
               })}
             </nav>
             
             {/* Mobile Footer */}
-            <div className="p-4 border-t border-border-subtle">
+            <div className="p-3 border-t border-border-subtle shrink-0">
               <button 
                 onClick={handleLogout}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/5 text-content-muted hover:text-status-error hover:bg-status-error/10 transition-colors font-semibold"
+                className="w-full h-10 flex items-center justify-center gap-2 px-3 rounded-md bg-surface-base text-content-muted hover:text-status-error border border-border-subtle font-semibold text-xs"
               >
-                <LogOut className="w-4 h-4" />
+                <LogOut className="w-3.5 h-3.5" />
                 <span>Sair do sistema</span>
               </button>
             </div>
@@ -324,21 +315,23 @@ export const AdminLayout: React.FC = () => {
         </div>
       )}
 
-      {/* Main Content */}
-      <main className="flex-1 lg:ml-64 pt-16 lg:pt-0 h-[100dvh] overflow-y-auto no-scrollbar relative w-full">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10 pb-24 w-full">
+      {/* Main Content Area */}
+      <main className="flex-1 lg:ml-64 pt-[56px] lg:pt-0 h-[100dvh] overflow-y-auto no-scrollbar relative w-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 lg:py-8 pb-20 w-full min-w-0">
           {/* Page Header */}
-          <div className="mb-6 lg:mb-8">
-            <h2 className="text-2xl font-serif font-bold text-content-base mb-1 tracking-tight">
-              {navItems.find(item => item.id === activeTab)?.label}
-            </h2>
-            <p className="text-xs font-medium text-content-muted">
-              {navItems.find(item => item.id === activeTab)?.description}
-            </p>
+          <div className="mb-5 lg:mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2 min-w-0">
+            <div className="min-w-0">
+              <h2 className="text-xl sm:text-2xl font-serif font-bold text-content-base tracking-tight truncate">
+                {navItems.find(item => item.id === activeTab)?.label}
+              </h2>
+              <p className="text-xs font-medium text-content-muted truncate">
+                {navItems.find(item => item.id === activeTab)?.description}
+              </p>
+            </div>
           </div>
 
-          {/* Content */}
-          <div className="animate-fade-in w-full">
+          {/* Tab Content */}
+          <div className="animate-fade-in w-full min-w-0">
             {renderContent()}
           </div>
         </div>

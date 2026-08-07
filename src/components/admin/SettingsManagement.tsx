@@ -24,11 +24,11 @@ export const SettingsManagement: React.FC = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'profile':
-        return <ProfileSettings />;
+        return <ProfileSettings onSave={handleSave} isSaving={isSaving} />;
       case 'contacts':
-        return <ContactSettings />;
+        return <ContactSettings onSave={handleSave} isSaving={isSaving} />;
       case 'links':
-        return <LinkSettings />;
+        return <LinkSettings onSave={handleSave} isSaving={isSaving} />;
       default:
         return null;
     }
@@ -36,47 +36,52 @@ export const SettingsManagement: React.FC = () => {
 
   return (
     <div className="space-y-4 animate-in fade-in duration-300 min-w-0">
-      {/* HEADER & SAVE BUTTON */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-surface-card p-3.5 sm:p-5 rounded-2xl border border-border-subtle">
+      {/* PAGE HEADER (Zona de ação fixada na direita do cabeçalho) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-card p-4 rounded-md border border-border-subtle">
         <div className="min-w-0 flex-1">
-          <h1 className="text-lg sm:text-xl font-serif text-content-base font-semibold tracking-tight flex items-center gap-2 flex-wrap">
-            <span>Configurações do Sistema</span>
-            <span className="text-[10px] bg-gold-base/15 text-gold-hover border border-[#FFFFFF]/30 px-2 py-0.5 rounded-full uppercase font-bold">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-lg sm:text-xl font-serif text-content-base font-bold tracking-tight truncate">
+              Configurações do Sistema
+            </h1>
+            <span className="text-[10px] bg-gold-base/10 text-gold-base border border-gold-base/30 px-2 py-0.5 rounded uppercase font-bold tracking-wider whitespace-nowrap shrink-0">
               Geral
             </span>
-          </h1>
-          <p className="text-content-muted text-xs mt-1 leading-relaxed">
+          </div>
+          <p className="text-content-muted text-xs mt-0.5 truncate">
             Gerencie a identidade da barbearia, canais de contato e links sociais.
           </p>
         </div>
 
-        <button
-          onClick={handleSave}
-          disabled={isSaving}
-          className="w-full sm:w-auto bg-gold-base text-surface-base px-4 py-2.5 sm:py-2 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 hover:bg-gold-base/80 transition-all shadow-md active:scale-95 disabled:opacity-50 shrink-0"
-        >
-          <Save className="w-4 h-4" />
-          <span>{isSaving ? 'Salvando...' : 'Salvar Alterações'}</span>
-        </button>
+        {/* Action Zone: Header Right Button (Fixed 36px height) */}
+        <div className="shrink-0 flex items-center justify-end">
+          <button
+            onClick={handleSave}
+            disabled={isSaving}
+            className="h-9 px-4 bg-gold-base text-surface-base hover:bg-gold-base/90 rounded-md text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm active:scale-95 disabled:opacity-50 whitespace-nowrap"
+          >
+            <Save className="w-3.5 h-3.5" />
+            <span>{isSaving ? 'Salvando...' : 'Salvar Alterações'}</span>
+          </button>
+        </div>
       </div>
 
       {/* TOAST MESSAGE */}
       {toastMsg && (
-        <div className="bg-status-success/10 border border-status-success/30 text-status-success p-3 rounded-xl flex items-center gap-2 text-xs font-bold animate-fade-in">
+        <div className="bg-status-success/10 border border-status-success/30 text-status-success p-3 rounded-md flex items-center gap-2 text-xs font-bold animate-fade-in">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
-          <span>{toastMsg}</span>
+          <span className="truncate">{toastMsg}</span>
         </div>
       )}
 
-      {/* MOBILE TABS (SCROLLABLE BAR) */}
-      <div className="bg-surface-card border border-border-subtle rounded-2xl p-1.5 flex items-center gap-1.5 overflow-x-auto custom-scrollbar">
+      {/* TAB BAR (Rectangular 4-6px buttons) */}
+      <div className="bg-surface-card border border-border-subtle rounded-md p-1 flex items-center gap-1 overflow-x-auto custom-scrollbar">
         <TabButton active={activeTab === 'profile'} onClick={() => setActiveTab('profile')} icon={Store} label="Perfil & Unidade" />
         <TabButton active={activeTab === 'contacts'} onClick={() => setActiveTab('contacts')} icon={Phone} label="Canais de Contato" />
         <TabButton active={activeTab === 'links'} onClick={() => setActiveTab('links')} icon={LinkIcon} label="Links & Redes" />
       </div>
 
       {/* MAIN CONTENT AREA */}
-      <div className="bg-surface-card border border-border-subtle rounded-2xl p-3.5 sm:p-6 shadow-lg min-w-0">
+      <div className="bg-surface-card border border-border-subtle rounded-md p-4 sm:p-6 min-w-0">
         {renderContent()}
       </div>
     </div>
@@ -87,8 +92,8 @@ const TabButton = ({ active, onClick, icon: Icon, label }: any) => (
   <button
     onClick={onClick}
     className={`
-      px-3.5 py-2 flex items-center justify-center gap-2 text-xs font-bold rounded-xl transition-all whitespace-nowrap shrink-0
-      ${active ? 'bg-gold-base text-surface-base shadow' : 'text-content-muted hover:text-content-base bg-surface-card/60 hover:bg-surface-card'}
+      h-9 px-3.5 flex items-center justify-center gap-2 text-xs font-bold rounded transition-all whitespace-nowrap shrink-0
+      ${active ? 'bg-gold-base text-surface-base' : 'text-content-muted hover:text-content-base bg-surface-card/60 hover:bg-surface-base'}
     `}
   >
     <Icon className="w-3.5 h-3.5" />
@@ -98,29 +103,29 @@ const TabButton = ({ active, onClick, icon: Icon, label }: any) => (
 
 // --- Subcomponents for each tab ---
 
-const ProfileSettings = () => (
-  <div className="space-y-5 max-w-2xl text-xs min-w-0">
+const ProfileSettings = ({ onSave, isSaving }: { onSave: () => void; isSaving: boolean }) => (
+  <div className="space-y-6 max-w-2xl text-xs min-w-0">
     <div>
-      <h2 className="text-sm font-bold text-content-base mb-0.5">Identidade Visual da Barbearia</h2>
-      <p className="text-[11px] text-content-muted mb-4">Atualize a logomarca e o nome exibidos no app do cliente.</p>
+      <h2 className="text-sm font-serif font-bold text-content-base mb-0.5 truncate">Identidade Visual da Barbearia</h2>
+      <p className="text-[11px] text-content-muted mb-4 truncate">Atualize a logomarca e o nome exibidos no app do cliente.</p>
 
-      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 bg-surface-card p-3.5 rounded-2xl border border-border-subtle">
-        <div className="w-20 h-20 bg-surface-card rounded-2xl border border-border-subtle flex items-center justify-center relative group shrink-0 shadow-inner">
-          <Store className="w-8 h-8 text-gold-hover" />
-          <button className="absolute inset-0 bg-surface-base/70 rounded-2xl opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity text-content-base text-[10px] font-bold gap-1">
+      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 bg-surface-base p-3.5 rounded-md border border-border-subtle">
+        <div className="w-20 h-20 bg-surface-card rounded-md border border-border-subtle flex items-center justify-center relative group shrink-0 shadow-inner">
+          <Store className="w-8 h-8 text-gold-base" />
+          <button className="absolute inset-0 bg-surface-base/80 rounded-md opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity text-content-base text-[10px] font-bold gap-1">
             <Camera className="w-4 h-4" />
             <span>Alterar</span>
           </button>
         </div>
         <div className="flex-1 space-y-2 w-full min-w-0">
           <div>
-            <label className="text-[10px] font-bold text-content-muted uppercase block mb-1">
+            <label className="text-[10px] font-bold text-content-muted uppercase tracking-wider block mb-1">
               Nome Fantasia / Unidade
             </label>
             <input
               type="text"
               defaultValue="Navo Barber & Club - Unidade Principal"
-              className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF] min-w-0"
+              className="w-full bg-surface-card border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0"
             />
           </div>
         </div>
@@ -130,139 +135,175 @@ const ProfileSettings = () => (
     <hr className="border-border-subtle" />
 
     <div className="space-y-3">
-      <h2 className="text-sm font-bold text-content-base mb-0.5">Informações Gerais & Funcionamento</h2>
+      <h2 className="text-sm font-serif font-bold text-content-base mb-0.5 truncate">Informações Gerais & Funcionamento</h2>
 
       <div>
-        <label className="text-[10px] font-bold text-content-muted uppercase block mb-1">Slogan / Subtítulo</label>
+        <label className="text-[10px] font-bold text-content-muted uppercase tracking-wider block mb-1">Slogan / Subtítulo</label>
         <input
           type="text"
           defaultValue="Estilo, Tradição e Excelência na Medida Certa"
-          className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF] min-w-0"
+          className="w-full bg-surface-card border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0"
         />
       </div>
 
       <div>
-        <label className="text-[10px] font-bold text-content-muted uppercase block mb-1">
-          <MapPin className="w-3 h-3 inline mr-1 text-gold-hover" /> Endereço Completo
+        <label className="text-[10px] font-bold text-content-muted uppercase tracking-wider block mb-1">
+          <MapPin className="w-3 h-3 inline mr-1 text-gold-base" /> Endereço Completo
         </label>
         <input
           type="text"
           defaultValue="Av. Paulista, 1000 - Bela Vista, São Paulo - SP"
-          className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF] min-w-0"
+          className="w-full bg-surface-card border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0"
         />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label className="text-[10px] font-bold text-content-muted uppercase block mb-1">
-            <Clock className="w-3 h-3 inline mr-1 text-gold-hover" /> Abertura
+          <label className="text-[10px] font-bold text-content-muted uppercase tracking-wider block mb-1">
+            <Clock className="w-3 h-3 inline mr-1 text-gold-base" /> Abertura
           </label>
           <input
             type="time"
             defaultValue="09:00"
-            className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF] min-w-0"
+            className="w-full bg-surface-card border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0 num-tabular whitespace-nowrap"
           />
         </div>
         <div>
-          <label className="text-[10px] font-bold text-content-muted uppercase block mb-1">
-            <Clock className="w-3 h-3 inline mr-1 text-gold-hover" /> Fechamento
+          <label className="text-[10px] font-bold text-content-muted uppercase tracking-wider block mb-1">
+            <Clock className="w-3 h-3 inline mr-1 text-gold-base" /> Fechamento
           </label>
           <input
             type="time"
             defaultValue="20:00"
-            className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF] min-w-0"
+            className="w-full bg-surface-card border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0 num-tabular whitespace-nowrap"
           />
         </div>
       </div>
     </div>
+
+    {/* Action Zone: Form Footer */}
+    <div className="pt-4 border-t border-border-subtle flex justify-end">
+      <button
+        onClick={onSave}
+        disabled={isSaving}
+        className="h-10 px-5 bg-gold-base text-surface-base hover:bg-gold-base/90 rounded-md text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap"
+      >
+        <Save className="w-4 h-4" />
+        <span>{isSaving ? 'Salvando...' : 'Salvar Alterações do Perfil'}</span>
+      </button>
+    </div>
   </div>
 );
 
-const ContactSettings = () => (
-  <div className="space-y-4 max-w-2xl text-xs min-w-0">
+const ContactSettings = ({ onSave, isSaving }: { onSave: () => void; isSaving: boolean }) => (
+  <div className="space-y-6 max-w-2xl text-xs min-w-0">
     <div>
-      <h2 className="text-sm font-bold text-content-base mb-0.5">Canais de Atendimento</h2>
-      <p className="text-[11px] text-content-muted mb-4">
+      <h2 className="text-sm font-serif font-bold text-content-base mb-0.5 truncate">Canais de Atendimento</h2>
+      <p className="text-[11px] text-content-muted mb-4 truncate">
         Defina os contatos oficiais disponíveis no app para suporte aos clientes.
       </p>
 
       <div className="space-y-3">
         <div>
-          <label className="text-[10px] font-bold text-content-muted uppercase block mb-1">
+          <label className="text-[10px] font-bold text-content-muted uppercase tracking-wider block mb-1">
             WhatsApp Oficial de Agendamentos
           </label>
           <input
             type="text"
             defaultValue="(11) 99999-8888"
-            className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF] min-w-0"
+            className="w-full bg-surface-card border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0 num-tabular whitespace-nowrap"
           />
         </div>
 
         <div>
-          <label className="text-[10px] font-bold text-content-muted uppercase block mb-1">Telefone Fixo da Recepção</label>
+          <label className="text-[10px] font-bold text-content-muted uppercase tracking-wider block mb-1">Telefone Fixo da Recepção</label>
           <input
             type="text"
             defaultValue="(11) 3211-0000"
-            className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF] min-w-0"
+            className="w-full bg-surface-card border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0 num-tabular whitespace-nowrap"
           />
         </div>
 
         <div>
-          <label className="text-[10px] font-bold text-content-muted uppercase block mb-1">E-mail de Suporte</label>
+          <label className="text-[10px] font-bold text-content-muted uppercase tracking-wider block mb-1">E-mail de Suporte</label>
           <input
             type="email"
             defaultValue="contato@barberclub.com.br"
-            className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF] min-w-0"
+            className="w-full bg-surface-card border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0"
           />
         </div>
       </div>
     </div>
+
+    {/* Action Zone: Form Footer */}
+    <div className="pt-4 border-t border-border-subtle flex justify-end">
+      <button
+        onClick={onSave}
+        disabled={isSaving}
+        className="h-10 px-5 bg-gold-base text-surface-base hover:bg-gold-base/90 rounded-md text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap"
+      >
+        <Save className="w-4 h-4" />
+        <span>{isSaving ? 'Salvando...' : 'Salvar Contatos'}</span>
+      </button>
+    </div>
   </div>
 );
 
-const LinkSettings = () => (
-  <div className="space-y-4 max-w-2xl text-xs min-w-0">
+const LinkSettings = ({ onSave, isSaving }: { onSave: () => void; isSaving: boolean }) => (
+  <div className="space-y-6 max-w-2xl text-xs min-w-0">
     <div>
-      <h2 className="text-sm font-bold text-content-base mb-0.5">Redes Sociais & Links Externos</h2>
-      <p className="text-[11px] text-content-muted mb-4">
+      <h2 className="text-sm font-serif font-bold text-content-base mb-0.5 truncate">Redes Sociais & Links Externos</h2>
+      <p className="text-[11px] text-content-muted mb-4 truncate">
         Conecte suas redes sociais e página de localização do Google Maps.
       </p>
 
       <div className="space-y-3">
         <div>
-          <label className="text-[10px] font-bold text-content-muted uppercase block mb-1">Instagram (@usuario)</label>
+          <label className="text-[10px] font-bold text-content-muted uppercase tracking-wider block mb-1">Instagram (@usuario)</label>
           <div className="flex min-w-0">
-            <span className="bg-surface-card border border-r-0 border-border-subtle rounded-l-xl px-3 py-2.5 text-content-muted font-bold shrink-0">
+            <span className="bg-surface-base border border-r-0 border-border-subtle rounded-l-md px-3 py-2.5 text-content-muted font-bold shrink-0">
               @
             </span>
             <input
               type="text"
               defaultValue="navobarber_oficial"
-              className="flex-1 min-w-0 bg-surface-card border border-border-subtle rounded-r-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+              className="flex-1 min-w-0 bg-surface-card border border-border-subtle rounded-r-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base"
             />
           </div>
         </div>
 
         <div>
-          <label className="text-[10px] font-bold text-content-muted uppercase block mb-1">Página do Facebook</label>
+          <label className="text-[10px] font-bold text-content-muted uppercase tracking-wider block mb-1">Página do Facebook</label>
           <input
             type="url"
             defaultValue="https://facebook.com/navobarber"
-            className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF] min-w-0"
+            className="w-full bg-surface-card border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0"
           />
         </div>
 
         <div>
-          <label className="text-[10px] font-bold text-content-muted uppercase block mb-1">
-            <Globe className="w-3 h-3 inline mr-1 text-gold-hover" /> Link do Google Maps / Avaliações
+          <label className="text-[10px] font-bold text-content-muted uppercase tracking-wider block mb-1">
+            <Globe className="w-3 h-3 inline mr-1 text-gold-base" /> Link do Google Maps / Avaliações
           </label>
           <input
             type="url"
             defaultValue="https://maps.google.com/..."
-            className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF] min-w-0"
+            className="w-full bg-surface-card border border-border-subtle rounded-md p-2.5 text-xs text-content-base focus:outline-none focus:border-gold-base min-w-0"
           />
         </div>
       </div>
+    </div>
+
+    {/* Action Zone: Form Footer */}
+    <div className="pt-4 border-t border-border-subtle flex justify-end">
+      <button
+        onClick={onSave}
+        disabled={isSaving}
+        className="h-10 px-5 bg-gold-base text-surface-base hover:bg-gold-base/90 rounded-md text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap"
+      >
+        <Save className="w-4 h-4" />
+        <span>{isSaving ? 'Salvando...' : 'Salvar Links'}</span>
+      </button>
     </div>
   </div>
 );

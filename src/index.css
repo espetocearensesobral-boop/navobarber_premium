@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,500&family=Inter:wght@400;500;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -17,9 +17,9 @@
   --color-status-info: var(--color-status-info);
 
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-serif: 'Space Grotesk', 'Inter', sans-serif;
   
-  --font-display: 'Playfair Display', Georgia, serif;
+  --font-display: 'Space Grotesk', 'Inter', sans-serif;
   --font-body: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
@@ -42,16 +42,16 @@
   --color-status-info: #3B82F6;
 
   /* Typography */
-  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-serif: 'Space Grotesk', sans-serif;
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-display: 'Playfair Display', Georgia, serif;
+  --font-display: 'Space Grotesk', sans-serif;
   --font-body: 'Inter', system-ui, -apple-system, sans-serif;
 
-  /* Radii */
+  /* Radii (Strictly 4px-6px, rectangles not bubbles) */
   --radius-sm: 4px;
   --radius-md: 6px;
-  --radius-lg: 10px;
-  --radius-xl: 12px;
+  --radius-lg: 6px;
+  --radius-xl: 6px;
 }
 
 
