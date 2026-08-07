@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Appointment } from '../../types';
 import { fetchAppointmentsFromSupabase } from '../../services/supabaseDataService';
-import { authFetch, API_BASE } from '../../lib/api';
 import { motion, AnimatePresence } from 'motion/react';
 import { hapticLight, hapticSuccess, hapticMedium } from '../../lib/haptics';
 import {
@@ -148,7 +147,7 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
         setSearchedPhone('');
         setVerifiedVoucher('');
         setAppointments([]);
-        setHasError(true);
+        setHasError(false);
         try {
           localStorage.removeItem('barberx_guest_phone');
         } catch (e) {}
@@ -272,11 +271,17 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
 
     try {
       const [res] = await Promise.all([
-        fetch(`${API_BASE}/appointments/lookup/step1?phone=${encodeURIComponent(numbers)}`),
+        fetch(`/api/appointments/lookup/step1?phone=${encodeURIComponent(numbers)}`),
         new Promise(res => setTimeout(res, 400))
       ]);
 
-      const data = await res.json();
+      let data: any = {};
+      try {
+        const text = await res.text();
+        data = text ? JSON.parse(text) : {};
+      } catch (e) {
+        throw new Error('Erro de conexão com o servidor. Tente novamente.');
+      }
       
       if (!res.ok) {
         throw new Error(data.error || 'Nenhum agendamento encontrado.');
@@ -307,14 +312,20 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
     const cleanInput = voucherInput.trim().toUpperCase().replace(/^#/, '');
 
     try {
-      const res = await fetch(`${API_BASE}/appointments/lookup/verify`, {
+      const res = await fetch(`/api/appointments/lookup/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone: searchedPhone, code: cleanInput }),
         credentials: 'include' // needed to set cookie
       });
 
-      const data = await res.json();
+      const dataText = await res.text();
+      let data: any = {};
+      try {
+        data = dataText ? JSON.parse(dataText) : {};
+      } catch (e) {
+        throw new Error('Erro de conexão com o servidor. Tente novamente.');
+      }
       if (!res.ok) {
         throw new Error(data.error || 'Código do Voucher incorreto para o telefone informado.');
       }
@@ -339,7 +350,7 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
 
   const handleClearSearch = async () => {
     try {
-      await fetch(`${API_BASE}/appointments/lookup/logout`, { method: 'POST', credentials: 'include' });
+      await fetch(`/api/appointments/lookup/logout`, { method: 'POST', credentials: 'include' });
     } catch (e) {}
 
     setAppointments([]);
