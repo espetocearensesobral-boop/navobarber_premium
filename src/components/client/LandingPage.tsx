@@ -56,7 +56,7 @@ const trackEvent = (action: string, category: string, label: string) => {
 };
 
 interface LandingPageProps {
-  onGoToBooking: () => void;
+  onGoToBooking: (service?: any) => void;
   onGoToAppointments?: () => void;
 }
 

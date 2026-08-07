@@ -289,8 +289,11 @@ export const ClientApp: React.FC = () => {
     hapticLight();
     if (service) {
       setSelectedServices([service]);
+      setBookingStep(2);
+    } else {
+      setSelectedServices([]);
+      setBookingStep(1);
     }
-    setBookingStep(1);
     setActiveTab('booking');
   };
 
