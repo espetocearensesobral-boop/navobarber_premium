@@ -151,7 +151,7 @@ export const ScheduleGrid: React.FC = () => {
     <div className="space-y-4">
       {/* SUCCESS NOTIFICATION */}
       {successMsg && (
-        <div className="p-3 bg-status-success/15 border border-status-success/30 text-status-success rounded-xl text-xs font-bold flex items-center justify-between animate-fade-in">
+        <div className="p-3 bg-status-success/15 border border-status-success/30 text-status-success rounded-none text-xs font-bold flex items-center justify-between animate-fade-in">
           <div className="flex items-center space-x-2">
             <CheckCircle2 className="w-4 h-4" />
             <span>{successMsg}</span>
@@ -167,17 +167,17 @@ export const ScheduleGrid: React.FC = () => {
       {/* ========================================================= */}
       <div className="md:hidden space-y-3">
         {/* Compact Top Action Bar */}
-        <div className="bg-surface-card p-3 rounded-2xl border border-border-subtle flex items-center justify-between gap-2">
+        <div className="bg-surface-card p-3 rounded-none border border-border-subtle flex items-center justify-between gap-2">
           {/* Quick Date Selector */}
           <div className="flex items-center gap-2 min-w-0">
-            <div className="w-8 h-8 rounded-xl bg-surface-card text-gold-hover flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-none bg-surface-card text-gold-hover flex items-center justify-center shrink-0">
               <Calendar className="w-4 h-4" />
             </div>
             <input
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="bg-surface-base border border-border-subtle text-xs font-bold text-content-base rounded-xl px-2.5 py-1.5 outline-none focus:border-[#FFFFFF] max-w-[130px]"
+              className="bg-surface-base border border-border-subtle text-xs font-bold text-content-base rounded-none px-2.5 py-1.5 outline-none focus:border-[#FFFFFF] max-w-[130px]"
             />
           </div>
 
@@ -185,14 +185,14 @@ export const ScheduleGrid: React.FC = () => {
           <div className="flex items-center gap-1.5 shrink-0">
             <button
               onClick={() => setIsManualBookingOpen(true)}
-              className="px-3 py-1.5 rounded-xl bg-gold-base text-surface-base font-bold text-xs flex items-center gap-1 shadow-sm active:scale-95 transition-transform"
+              className="px-3 py-1.5 rounded-none bg-gold-base text-surface-base font-bold text-xs flex items-center gap-1 shadow-sm active:scale-95 transition-transform"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Encaixe</span>
             </button>
             <button
               onClick={() => setIsBlockModalOpen(true)}
-              className="p-1.5 rounded-xl bg-surface-card text-red-400 border border-red-500/20 active:scale-95 transition-transform"
+              className="p-1.5 rounded-none bg-surface-card text-red-400 border border-red-500/20 active:scale-95 transition-transform"
               title="Bloquear Horário"
             >
               <Lock className="w-4 h-4" />
@@ -228,7 +228,7 @@ export const ScheduleGrid: React.FC = () => {
         </div>
 
         {/* Compact Timeline Feed */}
-        <div className="bg-surface-card rounded-2xl border border-border-subtle p-3 space-y-2">
+        <div className="bg-surface-card rounded-none border border-border-subtle p-3 space-y-2">
           {timeSlots.map(slot => {
             // Find appointments or blocks in this time slot for active barbers
             const slotAppointments = activeBarbers.map(barber => {
@@ -262,7 +262,7 @@ export const ScheduleGrid: React.FC = () => {
                           setManualBookingForm(prev => ({ ...prev, time_slot: slot }));
                           setIsManualBookingOpen(true);
                         }}
-                        className="py-1 px-2.5 rounded-xl bg-surface-base/50 border border-dashed border-border-subtle hover:border-border-subtle flex items-center justify-between text-[11px] text-[#555555] cursor-pointer group"
+                        className="py-1 px-2.5 rounded-none bg-surface-base/50 border border-dashed border-border-subtle hover:border-border-subtle flex items-center justify-between text-[11px] text-[#555555] cursor-pointer group"
                       >
                         <span>Livre</span>
                         <Plus className="w-3 h-3 text-[#444444] group-hover:text-gold-hover" />
@@ -271,7 +271,7 @@ export const ScheduleGrid: React.FC = () => {
                       slotAppointments.map(({ barber, apt, block }) => {
                         if (apt) {
                           return (
-                            <div key={apt.id} className="p-2.5 rounded-xl bg-surface-base border-l-2 border-l-[#FFFFFF] border border-border-subtle">
+                            <div key={apt.id} className="p-2.5 rounded-none bg-surface-base border-l-2 border-l-[#FFFFFF] border border-border-subtle">
                               <div className="flex justify-between items-center text-xs mb-1">
                                 <span className="font-bold text-content-base truncate">{apt.client_name}</span>
                                 <span className="font-bold text-gold-hover text-[11px] shrink-0">R$ {apt.final_amount ? apt.final_amount.toFixed(2) : '60.00'}</span>
@@ -288,7 +288,7 @@ export const ScheduleGrid: React.FC = () => {
 
                         if (block) {
                           return (
-                            <div key={block.id} className="p-2 rounded-xl bg-red-950/20 border border-red-500/20 flex items-center justify-between text-xs text-red-300">
+                            <div key={block.id} className="p-2 rounded-none bg-red-950/20 border border-red-500/20 flex items-center justify-between text-xs text-red-300">
                               <div className="flex items-center gap-1.5 truncate">
                                 <Lock className="w-3 h-3 text-red-400 shrink-0" />
                                 <span className="text-[10px] font-semibold truncate">{barber.name}: {block.reason}</span>
@@ -319,7 +319,7 @@ export const ScheduleGrid: React.FC = () => {
       {/* ========================================================= */}
       <div className="hidden md:block space-y-6">
         {/* Header Bar */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-surface-card p-5 rounded-2xl border border-border-subtle">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-surface-card p-5 rounded-none border border-border-subtle">
           <div>
             <div className="flex items-center space-x-2 text-gold-hover text-xs font-bold uppercase tracking-widest mb-1">
               <Calendar className="w-4 h-4" />
@@ -334,13 +334,13 @@ export const ScheduleGrid: React.FC = () => {
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="bg-surface-base border border-border-subtle text-xs text-content-base rounded-xl px-3 py-2 outline-none focus:border-[#FFFFFF]"
+              className="bg-surface-base border border-border-subtle text-xs text-content-base rounded-none px-3 py-2 outline-none focus:border-[#FFFFFF]"
             />
 
             <select
               value={selectedBarberId}
               onChange={(e) => setSelectedBarberId(e.target.value)}
-              className="bg-surface-base border border-border-subtle text-xs text-content-base rounded-xl px-3 py-2 outline-none focus:border-[#FFFFFF]"
+              className="bg-surface-base border border-border-subtle text-xs text-content-base rounded-none px-3 py-2 outline-none focus:border-[#FFFFFF]"
             >
               <option value="all">💈 Todos os Barbeiros</option>
               {barbers.map(b => (
@@ -350,7 +350,7 @@ export const ScheduleGrid: React.FC = () => {
 
             <button
               onClick={() => setIsManualBookingOpen(true)}
-              className="px-3.5 py-2 rounded-xl bg-gold-base text-surface-base font-extrabold text-xs shadow-md flex items-center space-x-1.5 hover:opacity-90"
+              className="px-3.5 py-2 rounded-none bg-gold-base text-surface-base font-extrabold text-xs shadow-md flex items-center space-x-1.5 hover:opacity-90"
             >
               <Plus className="w-4 h-4" />
               <span>Encaixe Manual</span>
@@ -358,7 +358,7 @@ export const ScheduleGrid: React.FC = () => {
 
             <button
               onClick={() => setIsBlockModalOpen(true)}
-              className="px-3.5 py-2 rounded-xl bg-surface-card hover:bg-surface-card text-red-400 font-extrabold text-xs border border-red-500/20 flex items-center space-x-1.5"
+              className="px-3.5 py-2 rounded-none bg-surface-card hover:bg-surface-card text-red-400 font-extrabold text-xs border border-red-500/20 flex items-center space-x-1.5"
             >
               <Lock className="w-3.5 h-3.5" />
               <span>Bloquear Horário</span>
@@ -367,7 +367,7 @@ export const ScheduleGrid: React.FC = () => {
         </div>
 
         {/* Schedule Grid Table */}
-        <div className="w-full overflow-x-auto rounded-2xl border border-border-subtle bg-surface-card shadow-xl">
+        <div className="w-full overflow-x-auto rounded-none border border-border-subtle bg-surface-card shadow-xl">
           <div className="w-full min-w-[750px]">
             {/* Table Header: Barbers Columns */}
             <div className="grid grid-cols-12 bg-surface-base border-b border-border-subtle text-xs font-extrabold text-gold-hover">
@@ -428,7 +428,7 @@ export const ScheduleGrid: React.FC = () => {
                                 </div>
                               </div>
                             ) : block ? (
-                              <div className="w-full bg-red-950/30 border border-red-500/30 p-2 rounded-xl flex items-center justify-between text-xs text-red-300">
+                              <div className="w-full bg-red-950/30 border border-red-500/30 p-2 rounded-none flex items-center justify-between text-xs text-red-300">
                                 <div className="flex items-center space-x-1.5">
                                   <Lock className="w-3.5 h-3.5 text-red-400" />
                                   <span className="font-semibold text-[11px]">{block.reason}</span>
@@ -459,7 +459,7 @@ export const ScheduleGrid: React.FC = () => {
       {/* Modal: Bloquear Horário */}
       {isBlockModalOpen && (
         <div className="fixed inset-0 z-50 bg-surface-base/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-surface-card border border-red-500/40 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-fade-in">
+          <div className="bg-surface-card border border-red-500/40 rounded-none w-full max-w-md overflow-hidden shadow-2xl animate-fade-in">
             <div className="p-4 bg-surface-card border-b border-border-subtle flex justify-between items-center">
               <h2 className="text-sm font-serif text-content-base font-semibold flex items-center space-x-2">
                 <Lock className="w-4 h-4 text-red-400" />
@@ -476,7 +476,7 @@ export const ScheduleGrid: React.FC = () => {
                 <select
                   value={blockForm.professional_id}
                   onChange={(e) => setBlockForm({ ...blockForm, professional_id: e.target.value })}
-                  className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base outline-none focus:border-red-400"
+                  className="w-full bg-surface-card border border-border-subtle rounded-none p-2.5 text-xs text-content-base outline-none focus:border-red-400"
                 >
                   {barbers.map(b => (
                     <option key={b.id} value={b.id}>{b.name}</option>
@@ -489,7 +489,7 @@ export const ScheduleGrid: React.FC = () => {
                 <select
                   value={blockForm.time_slot}
                   onChange={(e) => setBlockForm({ ...blockForm, time_slot: e.target.value })}
-                  className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base outline-none focus:border-red-400"
+                  className="w-full bg-surface-card border border-border-subtle rounded-none p-2.5 text-xs text-content-base outline-none focus:border-red-400"
                 >
                   {timeSlots.map(ts => (
                     <option key={ts} value={ts}>{ts}</option>
@@ -504,7 +504,7 @@ export const ScheduleGrid: React.FC = () => {
                   value={blockForm.reason}
                   onChange={(e) => setBlockForm({ ...blockForm, reason: e.target.value })}
                   placeholder="Ex: Almoço, Intervalo, Consulta Médica"
-                  className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base outline-none focus:border-red-400"
+                  className="w-full bg-surface-card border border-border-subtle rounded-none p-2.5 text-xs text-content-base outline-none focus:border-red-400"
                   required
                 />
               </div>
@@ -513,13 +513,13 @@ export const ScheduleGrid: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsBlockModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-surface-card text-content-base text-xs font-bold"
+                  className="px-4 py-2 rounded-none bg-surface-card text-content-base text-xs font-bold"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-red-600 text-content-base text-xs font-extrabold shadow-md hover:bg-red-700"
+                  className="px-5 py-2 rounded-none bg-red-600 text-content-base text-xs font-extrabold shadow-md hover:bg-red-700"
                 >
                   Confirmar Bloqueio
                 </button>
@@ -532,7 +532,7 @@ export const ScheduleGrid: React.FC = () => {
       {/* Modal: Encaixe Manual Presencial */}
       {isManualBookingOpen && (
         <div className="fixed inset-0 z-50 bg-surface-base/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-surface-card border border-gold-base/40 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-fade-in">
+          <div className="bg-surface-card border border-gold-base/40 rounded-none w-full max-w-md overflow-hidden shadow-2xl animate-fade-in">
             <div className="p-4 bg-surface-card border-b border-border-subtle flex justify-between items-center">
               <h2 className="text-sm font-serif text-content-base font-semibold flex items-center space-x-2">
                 <Scissors className="w-4 h-4 text-gold-base" />
@@ -551,7 +551,7 @@ export const ScheduleGrid: React.FC = () => {
                   value={manualBookingForm.client_name}
                   onChange={(e) => setManualBookingForm({ ...manualBookingForm, client_name: e.target.value })}
                   placeholder="Ex: Gabriel Santos"
-                  className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base outline-none focus:border-gold-base"
+                  className="w-full bg-surface-card border border-border-subtle rounded-none p-2.5 text-xs text-content-base outline-none focus:border-gold-base"
                   required
                 />
               </div>
@@ -564,7 +564,7 @@ export const ScheduleGrid: React.FC = () => {
                     value={manualBookingForm.client_phone}
                     onChange={(e) => setManualBookingForm({ ...manualBookingForm, client_phone: e.target.value })}
                     placeholder="(11) 98765-4321"
-                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base outline-none focus:border-gold-base"
+                    className="w-full bg-surface-card border border-border-subtle rounded-none p-2.5 text-xs text-content-base outline-none focus:border-gold-base"
                   />
                 </div>
 
@@ -573,7 +573,7 @@ export const ScheduleGrid: React.FC = () => {
                   <select
                     value={manualBookingForm.professional_id}
                     onChange={(e) => setManualBookingForm({ ...manualBookingForm, professional_id: e.target.value })}
-                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base outline-none focus:border-gold-base"
+                    className="w-full bg-surface-card border border-border-subtle rounded-none p-2.5 text-xs text-content-base outline-none focus:border-gold-base"
                   >
                     {barbers.map(b => (
                       <option key={b.id} value={b.id}>{b.name}</option>
@@ -589,7 +589,7 @@ export const ScheduleGrid: React.FC = () => {
                     type="text"
                     value={manualBookingForm.service_title}
                     onChange={(e) => setManualBookingForm({ ...manualBookingForm, service_title: e.target.value })}
-                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base outline-none focus:border-gold-base"
+                    className="w-full bg-surface-card border border-border-subtle rounded-none p-2.5 text-xs text-content-base outline-none focus:border-gold-base"
                   />
                 </div>
 
@@ -598,7 +598,7 @@ export const ScheduleGrid: React.FC = () => {
                   <select
                     value={manualBookingForm.time_slot}
                     onChange={(e) => setManualBookingForm({ ...manualBookingForm, time_slot: e.target.value })}
-                    className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base outline-none focus:border-gold-base"
+                    className="w-full bg-surface-card border border-border-subtle rounded-none p-2.5 text-xs text-content-base outline-none focus:border-gold-base"
                   >
                     {timeSlots.map(ts => (
                       <option key={ts} value={ts}>{ts}</option>
@@ -614,7 +614,7 @@ export const ScheduleGrid: React.FC = () => {
                   step="0.01"
                   value={manualBookingForm.amount}
                   onChange={(e) => setManualBookingForm({ ...manualBookingForm, amount: Number(e.target.value) })}
-                  className="w-full bg-surface-card border border-border-subtle rounded-xl p-2.5 text-xs text-content-base outline-none focus:border-gold-base"
+                  className="w-full bg-surface-card border border-border-subtle rounded-none p-2.5 text-xs text-content-base outline-none focus:border-gold-base"
                   required
                 />
               </div>
@@ -623,13 +623,13 @@ export const ScheduleGrid: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsManualBookingOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-surface-card text-content-base text-xs font-bold"
+                  className="px-4 py-2 rounded-none bg-surface-card text-content-base text-xs font-bold"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-gold-base text-surface-base text-xs font-extrabold shadow-md"
+                  className="px-5 py-2 rounded-none bg-gold-base text-surface-base text-xs font-extrabold shadow-md"
                 >
                   Confirmar Agendamento
                 </button>

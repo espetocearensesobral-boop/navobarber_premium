@@ -313,14 +313,14 @@ export const FinancialManagement: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
-          <div className="text-xs text-gold-hover bg-surface-card px-3 py-1.5 rounded-xl border border-border-subtle font-semibold flex items-center gap-1.5 shrink-0">
+          <div className="text-xs text-gold-hover bg-surface-card px-3 py-1.5 rounded-none border border-border-subtle font-semibold flex items-center gap-1.5 shrink-0">
             <Calendar className="w-3.5 h-3.5 text-gold-hover" />
             <span>Hoje, {new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}</span>
           </div>
 
           <button
             onClick={() => setIsModalOpen(true)}
-            className="bg-gold-base text-surface-base px-3.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 hover:bg-gold-base/80 transition-all shadow-md active:scale-95 shrink-0"
+            className="bg-gold-base text-surface-base px-3.5 py-1.5 rounded-none text-xs font-extrabold flex items-center gap-1.5 hover:bg-gold-base/80 transition-all shadow-md active:scale-95 shrink-0"
           >
             <Plus className="w-4 h-4" />
             <span>Novo Lançamento</span>
@@ -330,7 +330,7 @@ export const FinancialManagement: React.FC = () => {
 
       {/* TOAST MESSAGE */}
       {toastMsg && (
-        <div className="bg-status-success/10 border border-status-success/30 text-status-success p-3 rounded-xl flex items-center gap-2 text-xs font-bold animate-fade-in">
+        <div className="bg-status-success/10 border border-status-success/30 text-status-success p-3 rounded-none flex items-center gap-2 text-xs font-bold animate-fade-in">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>{toastMsg}</span>
         </div>
@@ -339,10 +339,10 @@ export const FinancialManagement: React.FC = () => {
       {/* COMPACT KPI SUMMARY CARDS */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
         {/* Total Incomes */}
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-none flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
             <span className="text-[10px] font-bold uppercase tracking-wider">Entradas</span>
-            <div className="w-6 h-6 rounded-lg bg-status-success/10 text-status-success flex items-center justify-center">
+            <div className="w-6 h-6 rounded-sm bg-status-success/10 text-status-success flex items-center justify-center">
               <ArrowUpRight className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -355,10 +355,10 @@ export const FinancialManagement: React.FC = () => {
         </div>
 
         {/* Total Expenses */}
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-none flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
             <span className="text-[10px] font-bold uppercase tracking-wider">Saídas</span>
-            <div className="w-6 h-6 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center">
+            <div className="w-6 h-6 rounded-sm bg-red-500/10 text-red-400 flex items-center justify-center">
               <ArrowDownRight className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -371,10 +371,10 @@ export const FinancialManagement: React.FC = () => {
         </div>
 
         {/* Net Cash Balance */}
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-none flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
             <span className="text-[10px] font-bold uppercase tracking-wider">Saldo em Caixa</span>
-            <div className="w-6 h-6 rounded-lg bg-gold-base/10 text-gold-hover flex items-center justify-center">
+            <div className="w-6 h-6 rounded-sm bg-gold-base/10 text-gold-hover flex items-center justify-center">
               <Wallet className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -387,10 +387,10 @@ export const FinancialManagement: React.FC = () => {
         </div>
 
         {/* Commissions Total */}
-        <div className="p-3 bg-surface-card border border-border-subtle rounded-2xl flex flex-col justify-between">
+        <div className="p-3 bg-surface-card border border-border-subtle rounded-none flex flex-col justify-between">
           <div className="flex items-center justify-between text-content-muted mb-1">
             <span className="text-[10px] font-bold uppercase tracking-wider">Repasse Equipe</span>
-            <div className="w-6 h-6 rounded-lg bg-gold-base/10 text-gold-hover flex items-center justify-center">
+            <div className="w-6 h-6 rounded-sm bg-gold-base/10 text-gold-hover flex items-center justify-center">
               <Users className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -407,7 +407,7 @@ export const FinancialManagement: React.FC = () => {
       <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar border-b border-border-subtle pb-2">
         <button
           onClick={() => setActiveTab('cashbook')}
-          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-none text-xs font-bold transition-all whitespace-nowrap ${
             activeTab === 'cashbook'
               ? 'bg-gold-base text-surface-base'
               : 'bg-surface-card text-content-muted hover:text-content-base border border-border-subtle'
@@ -419,7 +419,7 @@ export const FinancialManagement: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('overview')}
-          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-none text-xs font-bold transition-all whitespace-nowrap ${
             activeTab === 'overview'
               ? 'bg-gold-base text-surface-base'
               : 'bg-surface-card text-content-muted hover:text-content-base border border-border-subtle'
@@ -431,7 +431,7 @@ export const FinancialManagement: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('commissions')}
-          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-none text-xs font-bold transition-all whitespace-nowrap ${
             activeTab === 'commissions'
               ? 'bg-gold-base text-surface-base'
               : 'bg-surface-card text-content-muted hover:text-content-base border border-border-subtle'
@@ -443,7 +443,7 @@ export const FinancialManagement: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('categories')}
-          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-none text-xs font-bold transition-all whitespace-nowrap ${
             activeTab === 'categories'
               ? 'bg-gold-base text-surface-base'
               : 'bg-surface-card text-content-muted hover:text-content-base border border-border-subtle'
@@ -458,7 +458,7 @@ export const FinancialManagement: React.FC = () => {
       {activeTab === 'cashbook' && (
         <div className="space-y-3">
           {/* SEARCH AND FILTERS BAR */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 bg-surface-card p-2.5 rounded-xl border border-border-subtle">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 bg-surface-card p-2.5 rounded-none border border-border-subtle">
             <div className="relative flex-1">
               <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-content-muted" />
               <input
@@ -466,7 +466,7 @@ export const FinancialManagement: React.FC = () => {
                 placeholder="Buscar por descrição, categoria ou barbeiro..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full bg-surface-card border border-border-subtle rounded-xl pl-8 pr-3 py-1.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                className="w-full bg-surface-card border border-border-subtle rounded-none pl-8 pr-3 py-1.5 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
               />
             </div>
 
@@ -497,7 +497,7 @@ export const FinancialManagement: React.FC = () => {
             {filteredTransactions.map(tx => (
               <div
                 key={tx.id}
-                className="bg-surface-card border border-border-subtle rounded-xl p-3 space-y-2 hover:border-border-subtle transition-all"
+                className="bg-surface-card border border-border-subtle rounded-none p-3 space-y-2 hover:border-border-subtle transition-all"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
@@ -553,14 +553,14 @@ export const FinancialManagement: React.FC = () => {
             ))}
 
             {filteredTransactions.length === 0 && (
-              <div className="p-8 text-center text-xs text-content-muted bg-surface-card border border-border-subtle rounded-xl">
+              <div className="p-8 text-center text-xs text-content-muted bg-surface-card border border-border-subtle rounded-none">
                 Nenhum lançamento encontrado no livro de caixa.
               </div>
             )}
           </div>
 
           {/* DESKTOP TABLE (HIDDEN MD:BLOCK) */}
-          <div className="hidden md:block bg-surface-card border border-border-subtle rounded-2xl overflow-hidden shadow-xl">
+          <div className="hidden md:block bg-surface-card border border-border-subtle rounded-none overflow-hidden shadow-xl">
             <div className="overflow-x-auto custom-scrollbar">
               <table className="w-full text-left text-xs whitespace-nowrap">
                 <thead className="bg-surface-base text-content-muted border-b border-border-subtle">
@@ -652,20 +652,20 @@ export const FinancialManagement: React.FC = () => {
       {/* TAB 2: OVERVIEW & FINANCIAL HEALTH */}
       {activeTab === 'overview' && (
         <div className="space-y-3">
-          <div className="bg-surface-card p-4 rounded-2xl border border-border-subtle space-y-3">
+          <div className="bg-surface-card p-4 rounded-none border border-border-subtle space-y-3">
             <h3 className="text-sm font-bold text-content-base flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-gold-hover" />
               <span>DRE Simplificado & Destaques de Faturamento</span>
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div className="p-3 bg-surface-card border border-border-subtle rounded-xl space-y-1">
+              <div className="p-3 bg-surface-card border border-border-subtle rounded-none space-y-1">
                 <span className="text-[10px] text-content-muted font-bold uppercase">Receita Bruta Total</span>
                 <p className="text-xl font-black text-status-success">R$ {totalIncomes.toFixed(2)}</p>
                 <p className="text-[10px] text-content-muted">100% das vendas registradas</p>
               </div>
 
-              <div className="p-3 bg-surface-card border border-border-subtle rounded-xl space-y-1">
+              <div className="p-3 bg-surface-card border border-border-subtle rounded-none space-y-1">
                 <span className="text-[10px] text-content-muted font-bold uppercase">Custos & Despesas</span>
                 <p className="text-xl font-black text-red-400">R$ {totalExpenses.toFixed(2)}</p>
                 <p className="text-[10px] text-content-muted">
@@ -673,7 +673,7 @@ export const FinancialManagement: React.FC = () => {
                 </p>
               </div>
 
-              <div className="p-3 bg-surface-card border border-border-subtle rounded-xl space-y-1">
+              <div className="p-3 bg-surface-card border border-border-subtle rounded-none space-y-1">
                 <span className="text-[10px] text-content-muted font-bold uppercase">Lucro Líquido Operacional</span>
                 <p className="text-xl font-black text-gold-hover">R$ {netBalance.toFixed(2)}</p>
                 <p className="text-[10px] text-status-success">
@@ -683,10 +683,10 @@ export const FinancialManagement: React.FC = () => {
             </div>
           </div>
 
-          <div className="p-4 bg-surface-card rounded-2xl border border-border-subtle space-y-3">
+          <div className="p-4 bg-surface-card rounded-none border border-border-subtle space-y-3">
             <h4 className="text-xs font-bold text-content-base uppercase tracking-wider">Projeções & Recebíveis Pendentes</h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="p-3 bg-surface-card border border-border-subtle rounded-xl flex justify-between items-center">
+              <div className="p-3 bg-surface-card border border-border-subtle rounded-none flex justify-between items-center">
                 <div>
                   <p className="text-[10px] text-content-muted font-bold">Entradas Pendentes (A Receber)</p>
                   <p className="text-sm font-extrabold text-amber-400 mt-0.5">R$ {pendingIncomes.toFixed(2)}</p>
@@ -694,7 +694,7 @@ export const FinancialManagement: React.FC = () => {
                 <Clock className="w-5 h-5 text-amber-400" />
               </div>
 
-              <div className="p-3 bg-surface-card border border-border-subtle rounded-xl flex justify-between items-center">
+              <div className="p-3 bg-surface-card border border-border-subtle rounded-none flex justify-between items-center">
                 <div>
                   <p className="text-[10px] text-content-muted font-bold">Saídas Pendentes (A Pagar)</p>
                   <p className="text-sm font-extrabold text-red-400 mt-0.5">R$ {pendingExpenses.toFixed(2)}</p>
@@ -709,7 +709,7 @@ export const FinancialManagement: React.FC = () => {
       {/* TAB 3: COMMISSIONS & BARBER PAYOUTS */}
       {activeTab === 'commissions' && (
         <div className="space-y-3">
-          <div className="bg-surface-card p-4 rounded-2xl border border-border-subtle space-y-3">
+          <div className="bg-surface-card p-4 rounded-none border border-border-subtle space-y-3">
             <div className="flex justify-between items-center">
               <div>
                 <h3 className="text-sm font-bold text-content-base">Fechamento de Comissões da Equipe</h3>
@@ -721,7 +721,7 @@ export const FinancialManagement: React.FC = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-1">
               {barberCommissions.map(b => (
-                <div key={b.id} className="p-3.5 bg-surface-card border border-border-subtle rounded-xl space-y-2.5">
+                <div key={b.id} className="p-3.5 bg-surface-card border border-border-subtle rounded-none space-y-2.5">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-xs font-bold text-content-base">{b.name}</p>
@@ -756,7 +756,7 @@ export const FinancialManagement: React.FC = () => {
 
                     <button
                       onClick={() => handlePayCommission(b.name, b.balanceDue > 0 ? b.balanceDue : b.commission)}
-                      className="px-3 py-1.5 rounded-xl bg-gold-base text-surface-base font-extrabold text-[11px] hover:bg-gold-base/80 active:scale-95 transition-all"
+                      className="px-3 py-1.5 rounded-none bg-gold-base text-surface-base font-extrabold text-[11px] hover:bg-gold-base/80 active:scale-95 transition-all"
                     >
                       Registrar Pagamento
                     </button>
@@ -771,7 +771,7 @@ export const FinancialManagement: React.FC = () => {
       {/* TAB 4: CATEGORIES & PAYMENT METHODS BREAKDOWN */}
       {activeTab === 'categories' && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div className="bg-surface-card p-4 rounded-2xl border border-border-subtle space-y-3">
+          <div className="bg-surface-card p-4 rounded-none border border-border-subtle space-y-3">
             <h3 className="text-xs font-bold text-content-base uppercase tracking-wider">Origem das Receitas (Por Categoria)</h3>
             <div className="space-y-2">
               {['Serviços', 'Produtos', 'Assinaturas'].map(cat => {
@@ -795,7 +795,7 @@ export const FinancialManagement: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-surface-card p-4 rounded-2xl border border-border-subtle space-y-3">
+          <div className="bg-surface-card p-4 rounded-none border border-border-subtle space-y-3">
             <h3 className="text-xs font-bold text-content-base uppercase tracking-wider">Métodos de Pagamento</h3>
             <div className="space-y-2">
               {[
@@ -809,7 +809,7 @@ export const FinancialManagement: React.FC = () => {
                   .reduce((sum, t) => sum + t.amount, 0);
 
                 return (
-                  <div key={m.key} className="p-2.5 bg-surface-card rounded-xl border border-border-subtle flex justify-between items-center text-xs">
+                  <div key={m.key} className="p-2.5 bg-surface-card rounded-none border border-border-subtle flex justify-between items-center text-xs">
                     <span className="text-content-base font-bold">{m.label}</span>
                     <span className="text-gold-hover font-extrabold">R$ {methodTotal.toFixed(2)}</span>
                   </div>
@@ -823,11 +823,11 @@ export const FinancialManagement: React.FC = () => {
       {/* COMPACT CREATE TRANSACTION MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-surface-base/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-hidden">
-          <div className="bg-surface-card border border-border-subtle sm:border-[#FFFFFF]/30 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-fade-in">
+          <div className="bg-surface-card border border-border-subtle sm:border-[#FFFFFF]/30 rounded-none w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-fade-in">
             {/* Modal Header */}
             <div className="p-3.5 bg-surface-base border-b border-border-subtle flex justify-between items-center shrink-0">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-gold-base/10 border border-[#FFFFFF]/30 flex items-center justify-center text-gold-hover">
+                <div className="w-8 h-8 rounded-none bg-gold-base/10 border border-[#FFFFFF]/30 flex items-center justify-center text-gold-hover">
                   <Receipt className="w-4 h-4" />
                 </div>
                 <div>
@@ -838,7 +838,7 @@ export const FinancialManagement: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="w-7 h-7 rounded-xl bg-surface-card text-content-muted hover:text-content-base flex items-center justify-center transition-colors"
+                className="w-7 h-7 rounded-none bg-surface-card text-content-muted hover:text-content-base flex items-center justify-center transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -847,7 +847,7 @@ export const FinancialManagement: React.FC = () => {
             {/* Modal Form Body */}
             <form onSubmit={handleCreateTransaction} className="p-4 overflow-y-auto space-y-3 custom-scrollbar flex-1">
               {/* Type Switcher */}
-              <div className="grid grid-cols-2 gap-2 p-1 bg-surface-base border border-border-subtle rounded-xl">
+              <div className="grid grid-cols-2 gap-2 p-1 bg-surface-base border border-border-subtle rounded-none">
                 <button
                   type="button"
                   onClick={() => setNewTx({ ...newTx, type: 'income', category: 'Serviços' })}
@@ -885,7 +885,7 @@ export const FinancialManagement: React.FC = () => {
                   value={newTx.description}
                   onChange={e => setNewTx({ ...newTx, description: e.target.value })}
                   placeholder={newTx.type === 'income' ? 'Ex: Venda de Pomada / Serviço Avulso' : 'Ex: Conta de Luz / Aluguel / Fornecedor'}
-                  className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                  className="w-full bg-surface-base border border-border-subtle rounded-none px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                 />
               </div>
 
@@ -901,7 +901,7 @@ export const FinancialManagement: React.FC = () => {
                     value={newTx.amount}
                     onChange={e => setNewTx({ ...newTx, amount: e.target.value })}
                     placeholder="0.00"
-                    className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs font-bold text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                    className="w-full bg-surface-base border border-border-subtle rounded-none px-3 py-2 text-xs font-bold text-content-base focus:outline-none focus:border-[#FFFFFF]"
                   />
                 </div>
 
@@ -912,7 +912,7 @@ export const FinancialManagement: React.FC = () => {
                   <select
                     value={newTx.category}
                     onChange={e => setNewTx({ ...newTx, category: e.target.value })}
-                    className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                    className="w-full bg-surface-base border border-border-subtle rounded-none px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                   >
                     {newTx.type === 'income' ? (
                       <>
@@ -942,7 +942,7 @@ export const FinancialManagement: React.FC = () => {
                   <select
                     value={newTx.paymentMethod}
                     onChange={e => setNewTx({ ...newTx, paymentMethod: e.target.value as any })}
-                    className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                    className="w-full bg-surface-base border border-border-subtle rounded-none px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                   >
                     <option value="pix">PIX</option>
                     <option value="credit_card">Cartão de Crédito</option>
@@ -959,12 +959,12 @@ export const FinancialManagement: React.FC = () => {
                     type="date"
                     value={newTx.date}
                     onChange={e => setNewTx({ ...newTx, date: e.target.value })}
-                    className="w-full bg-surface-base border border-border-subtle rounded-xl px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
+                    className="w-full bg-surface-base border border-border-subtle rounded-none px-3 py-2 text-xs text-content-base focus:outline-none focus:border-[#FFFFFF]"
                   />
                 </div>
               </div>
 
-              <div className="p-3 bg-surface-base border border-border-subtle rounded-xl flex items-center justify-between">
+              <div className="p-3 bg-surface-base border border-border-subtle rounded-none flex items-center justify-between">
                 <div>
                   <span className="text-xs font-bold text-content-base block">Status do Pagamento</span>
                   <span className="text-[10px] text-content-muted">
@@ -974,7 +974,7 @@ export const FinancialManagement: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setNewTx({ ...newTx, status: newTx.status === 'completed' ? 'pending' : 'completed' })}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all ${
+                  className={`px-3 py-1.5 rounded-none text-xs font-extrabold transition-all ${
                     newTx.status === 'completed'
                       ? 'bg-status-success text-surface-base'
                       : 'bg-amber-500 text-surface-base'
@@ -989,13 +989,13 @@ export const FinancialManagement: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-3 py-1.5 rounded-xl text-xs font-bold text-content-muted hover:text-content-base bg-surface-card"
+                  className="px-3 py-1.5 rounded-none text-xs font-bold text-content-muted hover:text-content-base bg-surface-card"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 rounded-xl text-xs font-extrabold text-surface-base bg-gold-base hover:bg-gold-base/80 transition-all"
+                  className="px-4 py-1.5 rounded-none text-xs font-extrabold text-surface-base bg-gold-base hover:bg-gold-base/80 transition-all"
                 >
                   Salvar Lançamento
                 </button>
