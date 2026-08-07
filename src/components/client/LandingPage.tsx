@@ -595,28 +595,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                   />
 
                   {/* Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-black/10 flex flex-col justify-between p-[clamp(0.35rem,0.8vh,0.75rem)] select-none">
-                    {/* Top Tag & Zoom */}
-                    <div className="flex items-center justify-between gap-1">
-                      <span className="bg-gradient-to-r from-amber-400 via-[#C8A96A] to-amber-500 text-neutral-950 font-black text-[clamp(0.45rem,0.85vh,0.65rem)] px-2 py-0.5 rounded-full shadow-md uppercase tracking-wider flex items-center gap-1 w-max">
-                        <Star className="w-2.5 h-2.5 fill-neutral-950" />
-                        <span>{item.badge}</span>
-                      </span>
-
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          hapticLight();
-                          setSelectedGalleryIndex(index);
-                        }}
-                        className="p-1.5 rounded-full bg-black/60 text-white/90 hover:text-white backdrop-blur-md hover:bg-black/80 transition-all border border-white/20 active:scale-90"
-                        title="Visualizar foto em tamanho cheio"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-
-                    {/* Bottom Info & Add button */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-[clamp(0.35rem,0.8vh,0.75rem)] select-none">
+                    {/* Bottom Info */}
                     <div className="space-y-1">
                       <h3 className={`text-white font-extrabold ${isHero ? 'text-[clamp(0.75rem,1.5vh,1.1rem)]' : 'text-[clamp(0.6rem,1.15vh,0.85rem)]'} leading-tight line-clamp-1`}>
                         {item.title}
@@ -632,19 +612,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                         <span className="text-[#C8A96A] font-black text-[clamp(0.6rem,1.2vh,0.85rem)]">
                           R$ {item.price.toFixed(2)}
                         </span>
-
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            hapticMedium();
-                            onGoToBooking(item.service);
-                          }}
-                          className="px-2.5 py-1 rounded-lg bg-[#C8A96A] hover:bg-amber-500 text-neutral-950 font-black text-[clamp(0.5rem,0.95vh,0.7rem)] transition-all active:scale-95 shadow-md flex items-center gap-1 cursor-pointer shrink-0"
-                          title="Adicionar ao agendamento"
-                        >
-                          <Plus className="w-3 h-3 stroke-[3]" />
-                          <span>Adicionar</span>
-                        </button>
                       </div>
                     </div>
                   </div>
