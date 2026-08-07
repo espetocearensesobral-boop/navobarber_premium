@@ -95,7 +95,7 @@ export const ProductsManagement: React.FC = () => {
       image_url: formData.image_url || undefined
     };
 
-    const updatedList = await saveProductInSupabase(itemToSave);
+    const updatedList = await saveProductInSupabase(itemToSave, Boolean(editingProduct));
     setProducts(updatedList);
     setIsModalOpen(false);
     showNotification(editingProduct ? 'Produto atualizado!' : 'Novo produto cadastrado!');

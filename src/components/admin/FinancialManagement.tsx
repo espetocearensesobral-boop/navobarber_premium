@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { fetchAppointmentsFromSupabase, fetchProfessionalsFromSupabase } from '../../services/supabaseDataService';
+import { 
+  fetchAppointmentsFromSupabase, 
+  fetchProfessionalsFromSupabase,
+  fetchCashTransactionsFromSupabase,
+  saveCashTransactionInSupabase,
+  deleteCashTransactionInSupabase,
+  CashTransactionItem
+} from '../../services/supabaseDataService';
 import { Appointment, Professional } from '../../types';
 import { 
   TrendingUp, 
@@ -40,75 +47,10 @@ export interface CashTransaction {
   notes?: string;
 }
 
-const INITIAL_TRANSACTIONS: CashTransaction[] = [
-  {
-    id: 'tx_1',
-    type: 'income',
-    description: 'Corte Degradê + Barba Terapiada (Carlos Silva)',
-    amount: 75.00,
-    category: 'Serviços',
-    paymentMethod: 'pix',
-    date: new Date().toISOString().split('T')[0],
-    status: 'completed',
-    professionalName: 'Marcos Oliver'
-  },
-  {
-    id: 'tx_2',
-    type: 'income',
-    description: 'Venda de Pomada Efeito Matte Extra Forte (2x)',
-    amount: 90.00,
-    category: 'Produtos',
-    paymentMethod: 'credit_card',
-    date: new Date().toISOString().split('T')[0],
-    status: 'completed'
-  },
-  {
-    id: 'tx_3',
-    type: 'expense',
-    description: 'Conta de Energia (CPFL Energisa)',
-    amount: 340.00,
-    category: 'Contas Fixas',
-    paymentMethod: 'pix',
-    date: new Date().toISOString().split('T')[0],
-    status: 'completed'
-  },
-  {
-    id: 'tx_4',
-    type: 'income',
-    description: 'Assinatura Mensal - Plano Barba Club',
-    amount: 119.90,
-    category: 'Assinaturas',
-    paymentMethod: 'credit_card',
-    date: new Date().toISOString().split('T')[0],
-    status: 'completed'
-  },
-  {
-    id: 'tx_5',
-    type: 'expense',
-    description: 'Compra de Toalhas Quentes e Descartáveis',
-    amount: 180.00,
-    category: 'Insumos & Suprimentos',
-    paymentMethod: 'debit_card',
-    date: new Date().toISOString().split('T')[0],
-    status: 'completed'
-  },
-  {
-    id: 'tx_6',
-    type: 'expense',
-    description: 'Adiantamento / Vale - Barbeiro Lucas',
-    amount: 150.00,
-    category: 'Comissões',
-    paymentMethod: 'pix',
-    date: new Date().toISOString().split('T')[0],
-    status: 'pending',
-    professionalName: 'Lucas Barbeiro'
-  }
-];
-
 export const FinancialManagement: React.FC = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [professionals, setProfessionals] = useState<Professional[]>([]);
-  const [transactions, setTransactions] = useState<CashTransaction[]>(INITIAL_TRANSACTIONS);
+  const [transactions, setTransactions] = useState<CashTransaction[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Active Tab & Filters
@@ -148,16 +90,32 @@ export const FinancialManagement: React.FC = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [apts, profs] = await Promise.all([
+      const [apts, profs, dbTxs] = await Promise.all([
         fetchAppointmentsFromSupabase(),
-        fetchProfessionalsFromSupabase()
+        fetchProfessionalsFromSupabase(),
+        fetchCashTransactionsFromSupabase()
       ]);
       setAppointments(apts);
       setProfessionals(profs);
 
+      // Convert DB cash transactions
+      const mappedDbTxs: CashTransaction[] = dbTxs.map(t => ({
+        id: t.id,
+        type: t.type,
+        description: t.description,
+        amount: t.amount,
+        category: t.category,
+        paymentMethod: t.paymentMethod,
+        date: t.date,
+        status: t.status,
+        professionalName: t.professionalName,
+        notes: t.notes
+      }));
+
       // Dynamically map finished appointments into income transactions if not present
+      let aptTransactions: CashTransaction[] = [];
       if (apts && apts.length > 0) {
-        const aptTransactions: CashTransaction[] = apts
+        aptTransactions = apts
           .filter(a => a.status === 'completed' || a.status === 'confirmed')
           .map(a => ({
             id: `apt_tx_${a.id}`,
@@ -170,13 +128,12 @@ export const FinancialManagement: React.FC = () => {
             status: 'completed' as const,
             professionalName: a.professional_name
           }));
-
-        setTransactions(prev => {
-          const existingIds = new Set(prev.map(t => t.id));
-          const toAdd = aptTransactions.filter(t => !existingIds.has(t.id));
-          return [...prev, ...toAdd];
-        });
       }
+
+      const existingIds = new Set(mappedDbTxs.map(t => t.id));
+      const aptsToAdd = aptTransactions.filter(t => !existingIds.has(t.id));
+      setTransactions([...mappedDbTxs, ...aptsToAdd]);
+
     } catch (err) {
       console.error('Error loading financial data:', err);
     } finally {
@@ -241,11 +198,11 @@ export const FinancialManagement: React.FC = () => {
     return true;
   });
 
-  const handleCreateTransaction = (e: React.FormEvent) => {
+  const handleCreateTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTx.description || !newTx.amount) return;
 
-    const created: CashTransaction = {
+    const created: CashTransactionItem = {
       id: `tx_custom_${Date.now()}`,
       type: newTx.type,
       description: newTx.description,
@@ -257,43 +214,68 @@ export const FinancialManagement: React.FC = () => {
       notes: newTx.notes
     };
 
-    setTransactions(prev => [created, ...prev]);
-    setIsModalOpen(false);
-    setNewTx({
-      type: 'income',
-      description: '',
-      amount: '',
-      category: 'Serviços',
-      paymentMethod: 'pix',
-      date: new Date().toISOString().split('T')[0],
-      status: 'completed',
-      notes: ''
-    });
-
-    showToast(created.type === 'income' ? 'Entrada lançada com sucesso no Livro de Caixa!' : 'Saída registrada com sucesso!');
-  };
-
-  const handleToggleStatus = (id: string) => {
-    setTransactions(prev => prev.map(t => {
-      if (t.id === id) {
-        const nextStatus = t.status === 'completed' ? 'pending' : 'completed';
-        return { ...t, status: nextStatus };
-      }
-      return t;
-    }));
-    showToast('Status do lançamento atualizado!');
-  };
-
-  const handleDeleteTransaction = (id: string) => {
-    if (window.confirm('Tem certeza que deseja remover este lançamento do livro de caixa?')) {
-      setTransactions(prev => prev.filter(t => t.id !== id));
-      showToast('Lançamento removido do histórico.');
+    try {
+      await saveCashTransactionInSupabase(created, false);
+      await loadData();
+      setIsModalOpen(false);
+      setNewTx({
+        type: 'income',
+        description: '',
+        amount: '',
+        category: 'Serviços',
+        paymentMethod: 'pix',
+        date: new Date().toISOString().split('T')[0],
+        status: 'completed',
+        notes: ''
+      });
+      showToast(created.type === 'income' ? 'Entrada lançada com sucesso no Livro de Caixa!' : 'Saída registrada com sucesso!');
+    } catch (err) {
+      console.error('Erro ao salvar no banco:', err);
+      showToast('Erro ao salvar lançamento no banco.');
     }
   };
 
-  const handlePayCommission = (profName: string, amount: number) => {
+  const handleToggleStatus = async (id: string) => {
+    const target = transactions.find(t => t.id === id);
+    if (!target) return;
+    const nextStatus = target.status === 'completed' ? 'pending' : 'completed';
+    const updated: CashTransactionItem = {
+      ...target,
+      status: nextStatus
+    };
+
+    try {
+      if (id.startsWith('apt_tx_')) {
+        setTransactions(prev => prev.map(t => t.id === id ? { ...t, status: nextStatus } : t));
+      } else {
+        await saveCashTransactionInSupabase(updated, true);
+        await loadData();
+      }
+      showToast('Status do lançamento atualizado!');
+    } catch (err) {
+      console.error('Erro ao atualizar status:', err);
+    }
+  };
+
+  const handleDeleteTransaction = async (id: string) => {
+    if (window.confirm('Tem certeza que deseja remover este lançamento do livro de caixa?')) {
+      try {
+        if (!id.startsWith('apt_tx_')) {
+          await deleteCashTransactionInSupabase(id);
+          await loadData();
+        } else {
+          setTransactions(prev => prev.filter(t => t.id !== id));
+        }
+        showToast('Lançamento removido do histórico.');
+      } catch (err) {
+        console.error('Erro ao remover lançamento:', err);
+      }
+    }
+  };
+
+  const handlePayCommission = async (profName: string, amount: number) => {
     if (amount <= 0) return;
-    const created: CashTransaction = {
+    const created: CashTransactionItem = {
       id: `comm_pay_${Date.now()}`,
       type: 'expense',
       description: `Repasse de Comissão: ${profName}`,
@@ -305,8 +287,13 @@ export const FinancialManagement: React.FC = () => {
       professionalName: profName
     };
 
-    setTransactions(prev => [created, ...prev]);
-    showToast(`Pagamento de comissão de R$ ${amount.toFixed(2)} registrado no caixa!`);
+    try {
+      await saveCashTransactionInSupabase(created, false);
+      await loadData();
+      showToast(`Pagamento de comissão de R$ ${amount.toFixed(2)} registrado no caixa!`);
+    } catch (err) {
+      console.error('Erro ao registrar comissão:', err);
+    }
   };
 
   return (

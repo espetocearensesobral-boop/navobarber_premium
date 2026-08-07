@@ -116,8 +116,37 @@ export const reviews = pgTable('reviews', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+export const scheduleBlocks = pgTable('schedule_blocks', {
+  id: text('id').primaryKey(),
+  professionalId: text('professional_id').notNull().references(() => professionals.id, { onDelete: 'cascade' }),
+  date: text('date').notNull(),
+  startTime: text('start_time').notNull(),
+  endTime: text('end_time').notNull(),
+  reason: text('reason'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const cashTransactions = pgTable('cash_transactions', {
+  id: text('id').primaryKey(),
+  type: text('type').notNull(),
+  description: text('description').notNull(),
+  amount: numeric('amount', { precision: 10, scale: 2 }).notNull(),
+  category: text('category').notNull(),
+  paymentMethod: text('payment_method').notNull(),
+  date: text('date').notNull(),
+  status: text('status').notNull().default('completed'),
+  professionalName: text('professional_name'),
+  notes: text('notes'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
 
 // Relationships
+export const scheduleBlocksRelations = relations(scheduleBlocks, ({ one }) => ({
+  professional: one(professionals, {
+    fields: [scheduleBlocks.professionalId],
+    references: [professionals.id],
+  }),
+}));
 export const profilesRelations = relations(profiles, ({ many }) => ({
   appointments: many(appointments),
 }));

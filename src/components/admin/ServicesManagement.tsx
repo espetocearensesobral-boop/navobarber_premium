@@ -180,7 +180,7 @@ export const ServicesManagement: React.FC = () => {
       ...service,
       popular: !service.popular
     };
-    const updatedList = await saveServiceInSupabase(updatedService);
+    const updatedList = await saveServiceInSupabase(updatedService, true);
     setServices(updatedList);
     showNotification(updatedService.popular ? 'Serviço destacado no cardápio!' : 'Destaque removido.');
   };
@@ -190,7 +190,7 @@ export const ServicesManagement: React.FC = () => {
       ...service,
       is_combo: !service.is_combo
     };
-    const updatedList = await saveServiceInSupabase(updatedService);
+    const updatedList = await saveServiceInSupabase(updatedService, true);
     setServices(updatedList);
     showNotification(updatedService.is_combo ? 'Serviço marcado como Combo VIP!' : 'Marcado como serviço simples.');
   };
@@ -229,7 +229,7 @@ export const ServicesManagement: React.FC = () => {
       gallery_urls: currentGallery
     };
 
-    const updatedList = await saveServiceInSupabase(itemToSave);
+    const updatedList = await saveServiceInSupabase(itemToSave, Boolean(editingService));
     setServices(updatedList);
     setIsModalOpen(false);
     showNotification(editingService ? 'Serviço atualizado com sucesso!' : 'Novo serviço cadastrado!');

@@ -189,7 +189,7 @@ export const ProfessionalsManagement: React.FC = () => {
       is_active: updatedStatus
     };
 
-    const updatedList = await saveProfessionalInSupabase(updatedBarber);
+    const updatedList = await saveProfessionalInSupabase(updatedBarber, true);
     setBarbers(updatedList.filter((b) => b.id !== 'prof_any'));
     showToast(updatedStatus ? `${barber.name} ativado na agenda!` : `${barber.name} pausado temporariamente.`);
   };
@@ -225,7 +225,7 @@ export const ProfessionalsManagement: React.FC = () => {
       pix_key: formData.pix_key || ''
     };
 
-    const updatedList = await saveProfessionalInSupabase(itemToSave);
+    const updatedList = await saveProfessionalInSupabase(itemToSave, Boolean(editingBarber));
     setBarbers(updatedList.filter((b) => b.id !== 'prof_any'));
     setIsModalOpen(false);
     showToast(editingBarber ? 'Cadastro do profissional atualizado!' : 'Novo profissional cadastrado!');

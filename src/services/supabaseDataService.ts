@@ -351,8 +351,7 @@ export async function fetchProductsFromSupabase(): Promise<ProductItem[]> {
   }
 }
 
-export async function saveProductInSupabase(product: ProductItem): Promise<ProductItem[]> {
-  const isUpdate = product.id && !product.id.startsWith('prod_temp');
+export async function saveProductInSupabase(product: ProductItem, isUpdate?: boolean): Promise<ProductItem[]> {
   const method = isUpdate ? 'PUT' : 'POST';
   const url = isUpdate ? `${API_BASE}/products/${product.id}` : `${API_BASE}/products`;
   
@@ -386,8 +385,7 @@ export async function deleteProductInSupabase(id: string): Promise<ProductItem[]
   return fetchProductsFromSupabase();
 }
 
-export async function saveProfessionalInSupabase(barber: Professional): Promise<Professional[]> {
-  const isUpdate = barber.id && !barber.id.startsWith('prof_temp');
+export async function saveProfessionalInSupabase(barber: Professional, isUpdate?: boolean): Promise<Professional[]> {
   const method = isUpdate ? 'PUT' : 'POST';
   const url = isUpdate ? `${API_BASE}/professionals/${barber.id}` : `${API_BASE}/professionals`;
   
@@ -422,8 +420,7 @@ export async function deleteProfessionalInSupabase(id: string): Promise<Professi
   return fetchProfessionalsFromSupabase(true);
 }
 
-export async function saveServiceInSupabase(service: ServiceItem): Promise<ServiceItem[]> {
-  const isUpdate = service.id && !service.id.startsWith('srv_temp');
+export async function saveServiceInSupabase(service: ServiceItem, isUpdate?: boolean): Promise<ServiceItem[]> {
   const method = isUpdate ? 'PUT' : 'POST';
   const url = isUpdate ? `${API_BASE}/services/${service.id}` : `${API_BASE}/services`;
   
@@ -459,7 +456,108 @@ export async function deleteServiceInSupabase(id: string): Promise<ServiceItem[]
   return fetchServicesFromSupabase(true);
 }
 
-export async function fetchScheduleBlocks(): Promise<ScheduleBlock[]> { return []; }
-export async function addScheduleBlock(block: Omit<ScheduleBlock, 'id'>): Promise<ScheduleBlock[]> { return []; }
-export async function deleteScheduleBlock(id: string): Promise<ScheduleBlock[]> { return []; }
+export async function fetchScheduleBlocks(): Promise<ScheduleBlock[]> {
+  try {
+    const res = await authFetch(`${API_BASE}/schedule-blocks`);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return Array.isArray(data) ? data.map((b: any) => ({
+      id: b.id,
+      professional_id: b.professionalId || b.professional_id,
+      date: b.date,
+      start_time: b.startTime || b.start_time,
+      end_time: b.endTime || b.end_time,
+      reason: b.reason || 'Bloqueio de Agenda'
+    })) : [];
+  } catch (err) {
+    console.error('Erro ao buscar bloqueios:', err);
+    return [];
+  }
+}
+
+export async function addScheduleBlock(block: Omit<ScheduleBlock, 'id'>): Promise<ScheduleBlock[]> {
+  const newBlock = {
+    id: `blk_${Date.now()}`,
+    professionalId: block.professional_id,
+    date: block.date,
+    startTime: block.start_time,
+    endTime: block.end_time,
+    reason: block.reason
+  };
+  await authFetch(`${API_BASE}/schedule-blocks`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(newBlock)
+  });
+  return fetchScheduleBlocks();
+}
+
+export async function deleteScheduleBlock(id: string): Promise<ScheduleBlock[]> {
+  await authFetch(`${API_BASE}/schedule-blocks/${id}`, { method: 'DELETE' });
+  return fetchScheduleBlocks();
+}
+
+export interface CashTransactionItem {
+  id: string;
+  type: 'income' | 'expense';
+  description: string;
+  amount: number;
+  category: string;
+  paymentMethod: 'pix' | 'credit_card' | 'debit_card' | 'cash';
+  date: string;
+  status: 'completed' | 'pending';
+  professionalName?: string;
+  notes?: string;
+}
+
+export async function fetchCashTransactionsFromSupabase(): Promise<CashTransactionItem[]> {
+  try {
+    const res = await authFetch(`${API_BASE}/cash-transactions`);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return Array.isArray(data) ? data.map((t: any) => ({
+      id: t.id,
+      type: t.type,
+      description: t.description,
+      amount: Number(t.amount),
+      category: t.category,
+      paymentMethod: t.paymentMethod || t.payment_method,
+      date: t.date,
+      status: t.status,
+      professionalName: t.professionalName || t.professional_name,
+      notes: t.notes
+    })) : [];
+  } catch (err) {
+    console.error('Erro ao buscar lançamentos financeiros:', err);
+    return [];
+  }
+}
+
+export async function saveCashTransactionInSupabase(tx: CashTransactionItem, isUpdate?: boolean): Promise<CashTransactionItem[]> {
+  const method = isUpdate ? 'PUT' : 'POST';
+  const url = isUpdate ? `${API_BASE}/cash-transactions/${tx.id}` : `${API_BASE}/cash-transactions`;
+
+  await authFetch(url, {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      id: tx.id,
+      type: tx.type,
+      description: tx.description,
+      amount: tx.amount.toString(),
+      category: tx.category,
+      paymentMethod: tx.paymentMethod,
+      date: tx.date,
+      status: tx.status,
+      professionalName: tx.professionalName,
+      notes: tx.notes
+    })
+  });
+  return fetchCashTransactionsFromSupabase();
+}
+
+export async function deleteCashTransactionInSupabase(id: string): Promise<CashTransactionItem[]> {
+  await authFetch(`${API_BASE}/cash-transactions/${id}`, { method: 'DELETE' });
+  return fetchCashTransactionsFromSupabase();
+}
 

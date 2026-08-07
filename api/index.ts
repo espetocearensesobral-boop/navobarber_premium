@@ -388,11 +388,37 @@ async function initializeDb(): Promise<void> {
     dbInitAttempts = 0; // Reset contador de tentativas
     console.log('[API] ✅ Conectado ao Banco de Dados Supabase com sucesso.');
 
-    // Migration automática para novas colunas
+    // Migration automática para novas colunas e tabelas
     try {
       await queryClient`ALTER TABLE appointments ADD COLUMN IF NOT EXISTS booking_code text;`;
+      await queryClient`
+        CREATE TABLE IF NOT EXISTS schedule_blocks (
+          id text PRIMARY KEY,
+          professional_id text NOT NULL,
+          date text NOT NULL,
+          start_time text NOT NULL,
+          end_time text NOT NULL,
+          reason text,
+          created_at timestamp DEFAULT now() NOT NULL
+        );
+      `;
+      await queryClient`
+        CREATE TABLE IF NOT EXISTS cash_transactions (
+          id text PRIMARY KEY,
+          type text NOT NULL,
+          description text NOT NULL,
+          amount numeric(10, 2) NOT NULL,
+          category text NOT NULL,
+          payment_method text NOT NULL,
+          date text NOT NULL,
+          status text NOT NULL DEFAULT 'completed',
+          professional_name text,
+          notes text,
+          created_at timestamp DEFAULT now() NOT NULL
+        );
+      `;
     } catch (migErr: any) {
-      console.warn('[API] Aviso na migração de coluna booking_code:', migErr.message);
+      console.warn('[API] Aviso na migração de tabelas:', migErr.message);
     }
 
     // Seed automático removido - use POST /api/seed manualmente quando necessário
@@ -1188,7 +1214,10 @@ app.delete("/api/services/all", requireAuth, requireAdmin, async (req, res) => {
 app.post("/api/services", requireAuth, requireAdmin, async (req, res) => {
   try {
     const newSrv = { id: req.body.id || `srv_${Date.now()}`, ...req.body };
-    await db.insert(schema.services).values(newSrv);
+    await db.insert(schema.services).values(newSrv).onConflictDoUpdate({
+      target: schema.services.id,
+      set: { ...req.body, updatedAt: new Date() }
+    });
     res.json(newSrv);
   } catch (e: any) {
     return handleError(res, e, req.path);
@@ -1197,8 +1226,12 @@ app.post("/api/services", requireAuth, requireAdmin, async (req, res) => {
 
 app.put("/api/services/:id", requireAuth, requireAdmin, async (req, res) => {
   try {
-    await db.update(schema.services).set({ ...req.body }).where(eq(schema.services.id, req.params.id));
-    res.json({ id: req.params.id, ...req.body });
+    const srvData = { id: req.params.id, ...req.body };
+    await db.insert(schema.services).values(srvData).onConflictDoUpdate({
+      target: schema.services.id,
+      set: { ...req.body, updatedAt: new Date() }
+    });
+    res.json(srvData);
   } catch (e: any) {
     return handleError(res, e, req.path);
   }
@@ -1245,7 +1278,10 @@ app.get("/api/professionals", async (req, res) => {
 app.post("/api/professionals", requireAuth, requireAdmin, async (req, res) => {
   try {
     const newProf = { id: req.body.id || `prof_${Date.now()}`, ...req.body };
-    await db.insert(schema.professionals).values(newProf);
+    await db.insert(schema.professionals).values(newProf).onConflictDoUpdate({
+      target: schema.professionals.id,
+      set: { ...req.body, updatedAt: new Date() }
+    });
     res.json(newProf);
   } catch (e: any) {
     return handleError(res, e, req.path);
@@ -1254,8 +1290,12 @@ app.post("/api/professionals", requireAuth, requireAdmin, async (req, res) => {
 
 app.put("/api/professionals/:id", requireAuth, requireAdmin, async (req, res) => {
   try {
-    await db.update(schema.professionals).set({ ...req.body }).where(eq(schema.professionals.id, req.params.id));
-    res.json({ id: req.params.id, ...req.body });
+    const profData = { id: req.params.id, ...req.body };
+    await db.insert(schema.professionals).values(profData).onConflictDoUpdate({
+      target: schema.professionals.id,
+      set: { ...req.body, updatedAt: new Date() }
+    });
+    res.json(profData);
   } catch (e: any) {
     return handleError(res, e, req.path);
   }
@@ -1269,6 +1309,89 @@ app.delete("/api/professionals/:id", requireAuth, requireAdmin, async (req, res)
     if (e.code === '23503' || (e.message && e.message.includes('violates foreign key constraint') && e.message.includes('professionals'))) {
       return res.status(400).json({ error: 'Não é possível excluir este profissional pois ele possui agendamentos vinculados.' });
     }
+    return handleError(res, e, req.path);
+  }
+});
+
+// =====================================
+// Schedule Blocks API
+// =====================================
+app.get("/api/schedule-blocks", async (req, res) => {
+  try {
+    const blocks = await db.query.scheduleBlocks.findMany();
+    res.json(blocks);
+  } catch (e: any) {
+    return handleError(res, e, req.path);
+  }
+});
+
+app.post("/api/schedule-blocks", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const newBlock = { id: req.body.id || `blk_${Date.now()}`, ...req.body };
+    await db.insert(schema.scheduleBlocks).values(newBlock).onConflictDoUpdate({
+      target: schema.scheduleBlocks.id,
+      set: { ...req.body }
+    });
+    res.json(newBlock);
+  } catch (e: any) {
+    return handleError(res, e, req.path);
+  }
+});
+
+app.delete("/api/schedule-blocks/:id", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    await db.delete(schema.scheduleBlocks).where(eq(schema.scheduleBlocks.id, req.params.id));
+    res.json({ success: true });
+  } catch (e: any) {
+    return handleError(res, e, req.path);
+  }
+});
+
+// =====================================
+// Cash Transactions API (Livro de Caixa)
+// =====================================
+app.get("/api/cash-transactions", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const transactions = await db.query.cashTransactions.findMany({
+      orderBy: [desc(schema.cashTransactions.createdAt)]
+    });
+    res.json(transactions);
+  } catch (e: any) {
+    return handleError(res, e, req.path);
+  }
+});
+
+app.post("/api/cash-transactions", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const newTx = { id: req.body.id || `tx_${Date.now()}`, ...req.body };
+    await db.insert(schema.cashTransactions).values(newTx).onConflictDoUpdate({
+      target: schema.cashTransactions.id,
+      set: { ...req.body }
+    });
+    res.json(newTx);
+  } catch (e: any) {
+    return handleError(res, e, req.path);
+  }
+});
+
+app.put("/api/cash-transactions/:id", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const txData = { id: req.params.id, ...req.body };
+    await db.insert(schema.cashTransactions).values(txData).onConflictDoUpdate({
+      target: schema.cashTransactions.id,
+      set: { ...req.body }
+    });
+    res.json(txData);
+  } catch (e: any) {
+    return handleError(res, e, req.path);
+  }
+});
+
+app.delete("/api/cash-transactions/:id", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    await db.delete(schema.cashTransactions).where(eq(schema.cashTransactions.id, req.params.id));
+    res.json({ success: true });
+  } catch (e: any) {
     return handleError(res, e, req.path);
   }
 });
@@ -1329,7 +1452,10 @@ app.get("/api/products", async (req, res) => {
 app.post("/api/products", requireAuth, requireAdmin, async (req, res) => {
   try {
     const newProd = { id: req.body.id || `prod_${Date.now()}`, ...req.body };
-    await db.insert(schema.products).values(newProd);
+    await db.insert(schema.products).values(newProd).onConflictDoUpdate({
+      target: schema.products.id,
+      set: { ...req.body, updatedAt: new Date() }
+    });
     res.json(newProd);
   } catch (e: any) {
     return handleError(res, e, req.path);
@@ -1338,8 +1464,12 @@ app.post("/api/products", requireAuth, requireAdmin, async (req, res) => {
 
 app.put("/api/products/:id", requireAuth, requireAdmin, async (req, res) => {
   try {
-    await db.update(schema.products).set({ ...req.body }).where(eq(schema.products.id, req.params.id));
-    res.json({ id: req.params.id, ...req.body });
+    const prodData = { id: req.params.id, ...req.body };
+    await db.insert(schema.products).values(prodData).onConflictDoUpdate({
+      target: schema.products.id,
+      set: { ...req.body, updatedAt: new Date() }
+    });
+    res.json(prodData);
   } catch (e: any) {
     return handleError(res, e, req.path);
   }
