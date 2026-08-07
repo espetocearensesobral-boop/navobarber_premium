@@ -29,7 +29,13 @@ import {
   Menu,
   X,
   User,
-  Check
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  Plus,
+  ZoomIn,
+  Sparkles
 } from 'lucide-react';
 import { hapticMedium, hapticLight } from '../../lib/haptics';
 
@@ -184,14 +190,69 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
     { icon: Clock, secondaryIcon: Check, secondaryColor: '#4ade80', label: 'Horário marcado', strokeColor: '#c1877f', bgColor: '#faece9' }
   ];
 
-  const galleryImages = [
-    { src: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=600&auto=format&fit=crop', title: 'Fade Moderno' },
-    { src: 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=600&auto=format&fit=crop', title: 'Barboterapia' },
-    { src: 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=600&auto=format&fit=crop', title: 'Espaço Premium' },
-    { src: 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?q=80&w=600&auto=format&fit=crop', title: 'Acabamento' },
-    { src: 'https://images.unsplash.com/photo-1517832606299-7ae9b720a186?q=80&w=600&auto=format&fit=crop', title: 'Café & Tesoura' },
-    { src: 'https://images.unsplash.com/photo-1593728612741-2461ccce8fdb?q=80&w=600&auto=format&fit=crop', title: 'Acabamento Mestre' }
-  ];
+  const [selectedGalleryIndex, setSelectedGalleryIndex] = useState<number | null>(null);
+
+  const galleryFeaturedItems = useMemo(() => {
+    const all = dbServices.length > 0 ? dbServices : defaultServices;
+    // Serviços com selo de destaque (popular, is_popular, badge, is_featured, is_combo)
+    let list = all.filter(s => Boolean(s.popular || s.is_popular || s.badge || s.is_featured || s.isFeatured || s.is_combo));
+    if (list.length === 0) {
+      list = all;
+    }
+
+    const defaultCutPresets = [
+      { id: 'cut_1', title: 'Fade Moderno', price: 60, duration_minutes: 45, description: 'Degradê na navalha com alinhamento cirúrgico.', badge: 'Mais Vendido', image: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=1000&auto=format&fit=crop' },
+      { id: 'cut_2', title: 'Barboterapia VIP', price: 50, duration_minutes: 35, description: 'Toalha quente, massagem facial e navalha amolada.', badge: 'Destaque', image: 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=1000&auto=format&fit=crop' },
+      { id: 'cut_3', title: 'Combo Imperador', price: 100, duration_minutes: 75, description: 'Corte + Barba + Sobrancelha com hidratação.', badge: 'Experiência Completa', image: 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=1000&auto=format&fit=crop' },
+      { id: 'cut_4', title: 'Corte Tesoura & Freestyle', price: 70, duration_minutes: 50, description: 'Design exclusivo na tesoura e acabamento preciso.', badge: 'Corte Mestre', image: 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?q=80&w=1000&auto=format&fit=crop' },
+      { id: 'cut_5', title: 'Design de Barba & Pigmentação', price: 65, duration_minutes: 40, description: 'Alinhamento com pigmentação e finalização.', badge: 'Exclusivo', image: 'https://images.unsplash.com/photo-1517832606299-7ae9b720a186?q=80&w=1000&auto=format&fit=crop' },
+      { id: 'cut_6', title: 'Tratamento & Styling', price: 55, duration_minutes: 30, description: 'Lavagem especial, hidratação e pomada matte.', badge: 'Cuidado VIP', image: 'https://images.unsplash.com/photo-1593728612741-2461ccce8fdb?q=80&w=1000&auto=format&fit=crop' }
+    ];
+
+    const combined = [...list];
+    if (combined.length < 6) {
+      for (const preset of defaultCutPresets) {
+        if (combined.length >= 6) break;
+        if (!combined.some(item => (item.title || '').toLowerCase() === preset.title.toLowerCase())) {
+          combined.push(preset as any);
+        }
+      }
+    }
+
+    const featured = combined.slice(0, 6);
+    const defaultPhotos = defaultCutPresets.map(p => p.image);
+
+    return featured.map((service, idx) => {
+      const preset = defaultCutPresets[idx % defaultCutPresets.length];
+      return {
+        service,
+        id: service.id || `feat_${idx}`,
+        title: service.title || preset.title,
+        price: Number(service.price) || preset.price,
+        duration: service.duration_minutes || service.duration || preset.duration_minutes,
+        description: service.description || preset.description,
+        badge: service.badge || (service.is_combo ? 'Combo Especial' : (service.popular || service.is_popular) ? 'Mais Vendido' : preset.badge),
+        src: service.image || service.image_url || defaultPhotos[idx % defaultPhotos.length]
+      };
+    });
+  }, [dbServices, defaultServices]);
+
+  useEffect(() => {
+    if (selectedGalleryIndex === null) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        setSelectedGalleryIndex(prev => (prev !== null && prev > 0 ? prev - 1 : galleryFeaturedItems.length - 1));
+      } else if (e.key === 'ArrowRight') {
+        setSelectedGalleryIndex(prev => (prev !== null ? (prev + 1) % galleryFeaturedItems.length : 0));
+      } else if (e.key === 'Escape') {
+        setSelectedGalleryIndex(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedGalleryIndex, galleryFeaturedItems]);
 
   const testimonials = [
     {
@@ -481,13 +542,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
       </section>
 
       {/* SECTION 3: GALERIA */}
-      <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
+      <section id="galeria" className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
         <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full h-full flex flex-col justify-between items-stretch min-h-0 my-auto">
           {/* Header */}
           <div className="flex justify-between items-end mb-[clamp(0.25rem,0.8vh,0.75rem)] shrink-0">
             <div>
-              <span className="text-[#C8A96A] text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase block mb-0.5">
-                GALERIA
+              <span className="text-[#C8A96A] text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase block mb-0.5 flex items-center gap-1">
+                <Star className="w-3 h-3 fill-[#C8A96A]" />
+                <span>GALERIA • DESTAQUES</span>
               </span>
               <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-bold text-neutral-900 tracking-tight leading-tight">
                 Cortes reais
@@ -495,107 +557,100 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             </div>
             <button 
               onClick={() => { hapticLight(); onGoToBooking(); }}
-              className="text-[clamp(0.65rem,1.3vh,0.875rem)] font-semibold text-neutral-500 hover:text-neutral-900 transition-colors"
+              className="text-[clamp(0.65rem,1.3vh,0.875rem)] font-semibold text-neutral-500 hover:text-neutral-900 transition-colors flex items-center gap-1"
             >
-              Ver tudo
+              <span>Ver todos os serviços</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          {/* Bento Grid Composition - Strictly sized within available space */}
-          <div className="grid grid-cols-12 grid-rows-6 gap-[clamp(0.25rem,0.8vh,0.75rem)] flex-1 min-h-0 w-full h-full">
-            {/* 1. Foto Vertical Grande (Destaque) */}
-            <div className="col-span-5 row-span-4 rounded-[clamp(0.5rem,1vh,0.875rem)] overflow-hidden relative group bg-neutral-900 shadow-xs border border-neutral-200/50 min-h-0 h-full">
-              <img 
-                loading="lazy"
-                src={galleryImages[0].src} 
-                alt={galleryImages[0].title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent flex flex-col justify-end p-[clamp(0.375rem,0.8vh,0.75rem)]">
-                <span className="bg-[#C8A96A] text-neutral-950 text-[clamp(0.5rem,0.9vh,0.65rem)] font-bold px-1 py-0.5 rounded w-max mb-0.5 uppercase tracking-wider">
-                  Destaque
-                </span>
-                <h3 className="text-white font-bold text-[clamp(0.65rem,1.3vh,0.95rem)] leading-snug line-clamp-2">
-                  {galleryImages[0].title}
-                </h3>
-              </div>
-            </div>
+          {/* Galeria Bento Grid dos Serviços com Selo de Destaque (no máximo 6 fotos) */}
+          <div className="grid grid-cols-12 grid-rows-6 gap-[clamp(0.25rem,0.6vh,0.65rem)] flex-1 min-h-0 w-full h-full">
+            {galleryFeaturedItems.map((item, index) => {
+              const isHero = index === 0;
+              let gridClass = 'col-span-4 md:col-span-4 row-span-2 md:row-span-2';
+              if (index === 0) {
+                gridClass = 'col-span-12 md:col-span-8 row-span-2 md:row-span-4';
+              } else if (index === 1 || index === 2) {
+                gridClass = 'col-span-6 md:col-span-4 row-span-2 md:row-span-2';
+              } else if (index >= 3) {
+                gridClass = 'col-span-4 md:col-span-4 row-span-2 md:row-span-2';
+              }
 
-            {/* 2. Fotos Menores - Centro/Direita */}
-            <div className="col-span-7 row-span-2 grid grid-cols-2 gap-[clamp(0.25rem,0.8vh,0.75rem)] min-h-0 h-full">
-              <div className="rounded-[clamp(0.5rem,1vh,0.875rem)] overflow-hidden relative group bg-neutral-900 shadow-xs border border-neutral-200/50 min-h-0 h-full">
-                <img 
-                  loading="lazy"
-                  src={galleryImages[1].src} 
-                  alt={galleryImages[1].title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent flex items-end p-[clamp(0.25rem,0.6vh,0.5rem)]">
-                  <span className="text-white font-semibold text-[clamp(0.55rem,1vh,0.75rem)] line-clamp-1">{galleryImages[1].title}</span>
-                </div>
-              </div>
-              <div className="rounded-[clamp(0.5rem,1vh,0.875rem)] overflow-hidden relative group bg-neutral-900 shadow-xs border border-neutral-200/50 min-h-0 h-full">
-                <img 
-                  loading="lazy"
-                  src={galleryImages[3].src} 
-                  alt={galleryImages[3].title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent flex items-end p-[clamp(0.25rem,0.6vh,0.5rem)]">
-                  <span className="text-white font-semibold text-[clamp(0.55rem,1vh,0.75rem)] line-clamp-1">{galleryImages[3].title}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* 3. Card Informativo / Promocional */}
-            <div className="col-span-7 row-span-2 bg-gradient-to-br from-neutral-900 via-neutral-950 to-neutral-900 text-white rounded-[clamp(0.5rem,1vh,0.875rem)] p-[clamp(0.375rem,0.8vh,0.75rem)] flex flex-col justify-between border border-neutral-800 shadow-xs relative overflow-hidden group min-h-0 h-full">
-              <div className="absolute -right-4 -bottom-4 w-20 h-20 bg-[#C8A96A]/15 rounded-full blur-xl group-hover:bg-[#C8A96A]/25 transition-all duration-500 pointer-events-none" />
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1 text-[#C8A96A]">
-                  <Scissors className="w-[clamp(0.65rem,1.1vh,0.85rem)] h-[clamp(0.65rem,1.1vh,0.85rem)] stroke-[2.5]" />
-                  <span className="text-[clamp(0.5rem,0.9vh,0.65rem)] font-bold uppercase tracking-wider">Acabamento Mestre</span>
-                </div>
-                <div className="flex text-amber-400 gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-[clamp(0.45rem,0.8vh,0.65rem)] h-[clamp(0.45rem,0.8vh,0.65rem)] fill-current" />
-                  ))}
-                </div>
-              </div>
-              <div>
-                <h4 className="text-[clamp(0.65rem,1.2vh,0.875rem)] font-bold text-white leading-tight">
-                  Detalhes que fazem toda a diferença.
-                </h4>
-                <p className="text-[clamp(0.5rem,0.9vh,0.65rem)] text-neutral-400 font-normal line-clamp-1">
-                  Cortes precisos, barba bem desenhada e produtos de excelência.
-                </p>
-              </div>
-            </div>
-
-            {/* 4. Foto Horizontal Grande na Base */}
-            <div className="col-span-12 row-span-2 rounded-[clamp(0.5rem,1vh,0.875rem)] overflow-hidden relative group bg-neutral-900 shadow-xs border border-neutral-200/50 min-h-0 h-full">
-              <img 
-                loading="lazy"
-                src={galleryImages[2].src} 
-                alt={galleryImages[2].title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent flex items-end justify-between p-[clamp(0.375rem,0.8vh,0.75rem)]">
-                <div>
-                  <span className="text-white font-bold text-[clamp(0.65rem,1.3vh,0.95rem)] block leading-tight">
-                    {galleryImages[2].title}
-                  </span>
-                  <span className="text-neutral-300 text-[clamp(0.5rem,0.9vh,0.65rem)] line-clamp-1">
-                    Ambiente climatizado e estrutura de alto padrão para você relaxar.
-                  </span>
-                </div>
-                <button 
-                  onClick={() => { hapticMedium(); onGoToBooking(); }}
-                  className="bg-white/95 hover:bg-white text-neutral-900 font-bold text-[clamp(0.55rem,1vh,0.7rem)] px-[clamp(0.5rem,1vw,0.75rem)] py-[clamp(0.2rem,0.5vh,0.3rem)] rounded-lg transition-all active:scale-95 shrink-0 shadow-md ml-2"
+              return (
+                <div
+                  key={item.id + '_' + index}
+                  onClick={() => {
+                    hapticLight();
+                    setSelectedGalleryIndex(index);
+                  }}
+                  className={`${gridClass} rounded-[clamp(0.5rem,1vh,0.875rem)] overflow-hidden relative group bg-neutral-900 border border-neutral-200/50 hover:border-[#C8A96A]/80 shadow-xs min-h-0 h-full cursor-pointer transition-all duration-300`}
                 >
-                  Agendar
-                </button>
-              </div>
-            </div>
+                  {/* Photo image */}
+                  <img
+                    loading="lazy"
+                    src={item.src}
+                    alt={item.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                  />
+
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-black/10 flex flex-col justify-between p-[clamp(0.35rem,0.8vh,0.75rem)] select-none">
+                    {/* Top Tag & Zoom */}
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="bg-gradient-to-r from-amber-400 via-[#C8A96A] to-amber-500 text-neutral-950 font-black text-[clamp(0.45rem,0.85vh,0.65rem)] px-2 py-0.5 rounded-full shadow-md uppercase tracking-wider flex items-center gap-1 w-max">
+                        <Star className="w-2.5 h-2.5 fill-neutral-950" />
+                        <span>{item.badge}</span>
+                      </span>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          hapticLight();
+                          setSelectedGalleryIndex(index);
+                        }}
+                        className="p-1.5 rounded-full bg-black/60 text-white/90 hover:text-white backdrop-blur-md hover:bg-black/80 transition-all border border-white/20 active:scale-90"
+                        title="Visualizar foto em tamanho cheio"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+
+                    {/* Bottom Info & Add button */}
+                    <div className="space-y-1">
+                      <h3 className={`text-white font-extrabold ${isHero ? 'text-[clamp(0.75rem,1.5vh,1.1rem)]' : 'text-[clamp(0.6rem,1.15vh,0.85rem)]'} leading-tight line-clamp-1`}>
+                        {item.title}
+                      </h3>
+
+                      {isHero && (
+                        <p className="text-neutral-300 text-[clamp(0.5rem,0.85vh,0.7rem)] line-clamp-1">
+                          {item.description}
+                        </p>
+                      )}
+
+                      <div className="flex items-center justify-between gap-1 pt-0.5">
+                        <span className="text-[#C8A96A] font-black text-[clamp(0.6rem,1.2vh,0.85rem)]">
+                          R$ {item.price.toFixed(2)}
+                        </span>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            hapticMedium();
+                            onGoToBooking(item.service);
+                          }}
+                          className="px-2.5 py-1 rounded-lg bg-[#C8A96A] hover:bg-amber-500 text-neutral-950 font-black text-[clamp(0.5rem,0.95vh,0.7rem)] transition-all active:scale-95 shadow-md flex items-center gap-1 cursor-pointer shrink-0"
+                          title="Adicionar ao agendamento"
+                        >
+                          <Plus className="w-3 h-3 stroke-[3]" />
+                          <span>Adicionar</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -869,6 +924,112 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
           </p>
         </footer>
       </section>
+
+      {/* MODAL FULLSCREEN CARROSSEL DE FOTOS DOS CORTES REAIS */}
+      {selectedGalleryIndex !== null && galleryFeaturedItems[selectedGalleryIndex] && (
+        <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-2xl flex flex-col justify-between p-4 md:p-8 animate-in fade-in duration-200 select-none overflow-hidden">
+          {/* Top Bar: Selo de Destaque, Counter, Close */}
+          <div className="flex items-center justify-between z-10 w-full max-w-4xl mx-auto">
+            <div className="flex items-center gap-2">
+              <span className="bg-gradient-to-r from-amber-400 via-[#C8A96A] to-amber-500 text-neutral-950 font-black text-xs px-3 py-1 rounded-full shadow-lg flex items-center gap-1.5 uppercase tracking-wider">
+                <Star className="w-3.5 h-3.5 fill-neutral-950" />
+                <span>Selo de Destaque</span>
+              </span>
+              <span className="text-neutral-300 text-xs font-bold font-mono px-2.5 py-1 rounded-lg bg-white/10 border border-white/10">
+                {selectedGalleryIndex + 1} / {galleryFeaturedItems.length}
+              </span>
+            </div>
+
+            <button
+              onClick={() => {
+                hapticLight();
+                setSelectedGalleryIndex(null);
+              }}
+              className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all active:scale-95 border border-white/10 cursor-pointer"
+              title="Fechar (Esc)"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Center Carousel Display */}
+          <div className="relative flex-1 flex items-center justify-center my-3 max-h-[62vh] md:max-h-[72vh] w-full max-w-4xl mx-auto">
+            {/* Left Navigation Arrow */}
+            <button
+              onClick={() => {
+                hapticLight();
+                setSelectedGalleryIndex(prev => (prev !== null && prev > 0 ? prev - 1 : galleryFeaturedItems.length - 1));
+              }}
+              className="absolute left-2 md:left-4 z-20 w-11 h-11 md:w-13 md:h-13 rounded-full bg-black/70 hover:bg-black/90 text-white border border-white/20 flex items-center justify-center backdrop-blur-md transition-all active:scale-90 shadow-2xl cursor-pointer"
+              title="Anterior"
+            >
+              <ChevronLeft className="w-6 h-6 stroke-[2.5]" />
+            </button>
+
+            {/* Photo Container */}
+            <div className="relative w-full h-full flex items-center justify-center rounded-2xl overflow-hidden shadow-2xl border border-white/15 bg-neutral-900 group">
+              <img
+                src={galleryFeaturedItems[selectedGalleryIndex].src}
+                alt={galleryFeaturedItems[selectedGalleryIndex].title}
+                className="w-full h-full object-contain md:object-cover max-h-[58vh] md:max-h-[68vh] transition-transform duration-300"
+              />
+            </div>
+
+            {/* Right Navigation Arrow */}
+            <button
+              onClick={() => {
+                hapticLight();
+                setSelectedGalleryIndex(prev => (prev !== null ? (prev + 1) % galleryFeaturedItems.length : 0));
+              }}
+              className="absolute right-2 md:right-4 z-20 w-11 h-11 md:w-13 md:h-13 rounded-full bg-black/70 hover:bg-black/90 text-white border border-white/20 flex items-center justify-center backdrop-blur-md transition-all active:scale-90 shadow-2xl cursor-pointer"
+              title="Próxima"
+            >
+              <ChevronRight className="w-6 h-6 stroke-[2.5]" />
+            </button>
+          </div>
+
+          {/* Bottom Info Card & Add to Booking CTA */}
+          <div className="w-full max-w-2xl mx-auto bg-neutral-900/95 backdrop-blur-xl p-4 md:p-5 rounded-2xl border border-neutral-800 space-y-3 z-10 shadow-2xl">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-base md:text-lg font-extrabold text-white leading-tight">
+                    {galleryFeaturedItems[selectedGalleryIndex].title}
+                  </h3>
+                  <span className="text-[10px] font-black text-[#C8A96A] bg-[#C8A96A]/20 border border-[#C8A96A]/40 px-2 py-0.5 rounded-md">
+                    {galleryFeaturedItems[selectedGalleryIndex].badge}
+                  </span>
+                </div>
+                <p className="text-xs text-neutral-400 mt-1 line-clamp-2">
+                  {galleryFeaturedItems[selectedGalleryIndex].description}
+                </p>
+              </div>
+
+              <div className="text-right shrink-0">
+                <span className="text-lg font-black text-[#C8A96A] block">
+                  R$ {galleryFeaturedItems[selectedGalleryIndex].price.toFixed(2)}
+                </span>
+                <span className="text-[11px] text-neutral-400 font-medium">
+                  ⏱️ {galleryFeaturedItems[selectedGalleryIndex].duration} min
+                </span>
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                hapticMedium();
+                const selectedService = galleryFeaturedItems[selectedGalleryIndex].service;
+                setSelectedGalleryIndex(null);
+                onGoToBooking(selectedService);
+              }}
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-400 via-[#C8A96A] to-amber-500 hover:opacity-95 text-neutral-950 font-black text-xs md:text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-xl shadow-[#C8A96A]/20 active:scale-[0.98] transition-all cursor-pointer"
+            >
+              <Plus className="w-4 h-4 stroke-[3]" />
+              <span>Adicionar ao Agendamento (R$ {galleryFeaturedItems[selectedGalleryIndex].price.toFixed(2)})</span>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

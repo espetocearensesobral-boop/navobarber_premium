@@ -5,7 +5,7 @@ interface ClientHomeProps {
   currentUser?: any;
   isGuest?: boolean;
   upcomingCount?: number;
-  onGoToBooking: () => void;
+  onGoToBooking: (service?: any) => void;
   onGoToAppointments?: () => void;
   onOpenLogin?: () => void;
   onOpenProfile?: () => void;
@@ -13,6 +13,6 @@ interface ClientHomeProps {
   onOpenLoyalty?: () => void;
 }
 
-export const ClientHome: React.FC<ClientHomeProps> = ({ onGoToBooking }) => {
-  return <LandingPage onGoToBooking={onGoToBooking} />;
+export const ClientHome: React.FC<ClientHomeProps> = ({ onGoToBooking, onGoToAppointments }) => {
+  return <LandingPage onGoToBooking={onGoToBooking} onGoToAppointments={onGoToAppointments} />;
 };

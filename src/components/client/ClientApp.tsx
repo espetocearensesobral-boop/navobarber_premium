@@ -285,6 +285,15 @@ export const ClientApp: React.FC = () => {
     }
   };
 
+  const handleStartBookingWithService = (service?: ServiceItem) => {
+    hapticLight();
+    if (service) {
+      setSelectedServices([service]);
+    }
+    setBookingStep(1);
+    setActiveTab('booking');
+  };
+
   const handleBookingFinished = (action: () => void) => {
     if (isGuest) {
       setPendingAction(() => action);
@@ -445,7 +454,7 @@ export const ClientApp: React.FC = () => {
             <>
               {activeTab === 'home' && (
                 <LandingPage
-                  onGoToBooking={() => handleTabChange('booking')}
+                  onGoToBooking={handleStartBookingWithService}
                   onGoToAppointments={() => handleTabChange('appointments')}
                 />
               )}
