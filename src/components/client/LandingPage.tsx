@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   ShopProfile, 
   defaultShopProfile, 
@@ -67,6 +68,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
   const [isHoursModalOpen, setIsHoursModalOpen] = useState(false);
   const [shopProfile, setShopProfile] = useState<ShopProfile>(defaultShopProfile);
   const [dbServices, setDbServices] = useState<any[]>([]);
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReducedMotion(mediaQuery.matches);
+    const listener = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
+    mediaQuery.addEventListener('change', listener);
+    return () => mediaQuery.removeEventListener('change', listener);
+  }, []);
 
   useEffect(() => {
     fetchShopProfile().then(data => {
@@ -339,69 +349,135 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
   return (
     <div ref={containerRef} className="w-full h-full min-h-0 overflow-y-scroll snap-y snap-mandatory bg-white text-neutral-900 font-sans antialiased relative selection:bg-[#C8A96A]/20 selection:text-neutral-900 no-scrollbar">
       {/* HOURS MODAL OVERLAY */}
-      <div className={`fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex flex-col items-center justify-center transition-opacity duration-300 ${isHoursModalOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
-        <button 
-          onClick={toggleHoursModal} 
-          className="absolute top-5 right-5 w-11 h-11 rounded-full bg-white/8 border border-white/10 text-white text-xl flex items-center justify-center active:scale-95 transition-transform"
-          aria-label="Fechar modal"
-        >
-          ✕
-        </button>
-        <div className="bg-[#141414] border border-white/10 rounded-2xl p-6 sm:p-8 w-full max-w-sm flex flex-col gap-4">
-          <h3 className="text-white text-xl font-extrabold mb-1 tracking-wide uppercase">Horário de Funcionamento</h3>
-          
-          <div className="space-y-2">
-            {daysOfWeekMap.map(d => {
-              const sch = shopProfile.operatingSchedule?.[d.key];
-              if (!sch) return null;
-              return (
-                <div key={d.key} className="flex justify-between items-center text-[#f5f5f5] text-sm font-medium">
-                  <span className="text-[#a0a0a0]">{d.label}</span>
-                  {sch.active ? (
-                    <span className="font-mono text-amber-400">{sch.open} - {sch.close}</span>
-                  ) : (
-                    <span className="text-red-500 font-bold">Fechado</span>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          <button
-            onClick={handleOpenWhatsApp}
-            className="mt-3 w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2.5 transition-colors text-sm"
+      <AnimatePresence>
+        {isHoursModalOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex flex-col items-center justify-center p-4"
           >
-            <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
-            </svg>
-            Falar no WhatsApp
-          </button>
-        </div>
-      </div>
+            <button 
+              onClick={toggleHoursModal} 
+              className="absolute top-5 right-5 w-11 h-11 rounded-full bg-white/8 border border-white/10 text-white text-xl flex items-center justify-center active:scale-95 transition-transform cursor-pointer"
+              aria-label="Fechar modal"
+            >
+              ✕
+            </button>
+            <motion.div 
+              initial={reducedMotion ? {} : { opacity: 0, y: 30, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 30, scale: 0.96 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="bg-[#141414] border border-white/10 rounded-2xl p-6 sm:p-8 w-full max-w-sm flex flex-col gap-4"
+            >
+              <h3 className="text-white text-xl font-extrabold mb-1 tracking-wide uppercase">Horário de Funcionamento</h3>
+              
+              <div className="space-y-2">
+                {daysOfWeekMap.map(d => {
+                  const sch = shopProfile.operatingSchedule?.[d.key];
+                  if (!sch) return null;
+                  return (
+                    <div key={d.key} className="flex justify-between items-center text-[#f5f5f5] text-sm font-medium">
+                      <span className="text-[#a0a0a0]">{d.label}</span>
+                      {sch.active ? (
+                        <span className="font-mono text-amber-400">{sch.open} - {sch.close}</span>
+                      ) : (
+                        <span className="text-red-500 font-bold">Fechado</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              <motion.button
+                whileTap={{ scale: 0.97 }}
+                onClick={handleOpenWhatsApp}
+                className="mt-3 w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2.5 transition-colors text-sm cursor-pointer"
+              >
+                <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
+                </svg>
+                Falar no WhatsApp
+              </motion.button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* MENU OVERLAY */}
-      <div className={`fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex flex-col items-center justify-center gap-8 transition-opacity duration-300 ${isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
-        <button 
-          onClick={toggleMenu} 
-          className="absolute top-5 right-5 w-11 h-11 rounded-full bg-white/8 border border-white/10 text-white text-xl flex items-center justify-center active:scale-95 transition-transform"
-          aria-label="Fechar menu"
-        >
-          ✕
-        </button>
-        <a href="#servicos" onClick={(e) => { e.preventDefault(); toggleMenu(); onGoToBooking(); }} className="text-white text-2xl font-semibold opacity-80 hover:opacity-100 transition-opacity">Serviços</a>
-        <a href="#diferenciais" onClick={(e) => { e.preventDefault(); toggleMenu(); scrollToSection(1); }} className="text-white text-2xl font-semibold opacity-80 hover:opacity-100 transition-opacity">Diferenciais</a>
-        <a href="#galeria" onClick={(e) => { e.preventDefault(); toggleMenu(); scrollToSection(2); }} className="text-white text-2xl font-semibold opacity-80 hover:opacity-100 transition-opacity">Galeria</a>
-        <a href="#contato" onClick={(e) => { e.preventDefault(); toggleMenu(); scrollToSection(4); }} className="text-white text-2xl font-semibold opacity-80 hover:opacity-100 transition-opacity">Contato</a>
-        <button 
-          onClick={() => { 
-            toggleMenu(); 
-            if (onGoToAppointments) onGoToAppointments(); 
-          }} 
-          className="text-[#d4a853] text-2xl font-semibold hover:opacity-100 transition-opacity flex items-center gap-2 cursor-pointer mt-2"
-        >
-          Meus Cortes
-        </button>
-      </div>
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex flex-col items-center justify-center gap-8 p-4"
+          >
+            <button 
+              onClick={toggleMenu} 
+              className="absolute top-5 right-5 w-11 h-11 rounded-full bg-white/8 border border-white/10 text-white text-xl flex items-center justify-center active:scale-95 transition-transform cursor-pointer"
+              aria-label="Fechar menu"
+            >
+              ✕
+            </button>
+            <motion.a 
+              initial={reducedMotion ? {} : { opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 }}
+              href="#servicos" 
+              onClick={(e) => { e.preventDefault(); toggleMenu(); onGoToBooking(); }} 
+              className="text-white text-2xl font-semibold opacity-80 hover:opacity-100 transition-opacity"
+            >
+              Serviços
+            </motion.a>
+            <motion.a 
+              initial={reducedMotion ? {} : { opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              href="#diferenciais" 
+              onClick={(e) => { e.preventDefault(); toggleMenu(); scrollToSection(1); }} 
+              className="text-white text-2xl font-semibold opacity-80 hover:opacity-100 transition-opacity"
+            >
+              Diferenciais
+            </motion.a>
+            <motion.a 
+              initial={reducedMotion ? {} : { opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              href="#galeria" 
+              onClick={(e) => { e.preventDefault(); toggleMenu(); scrollToSection(2); }} 
+              className="text-white text-2xl font-semibold opacity-80 hover:opacity-100 transition-opacity"
+            >
+              Galeria
+            </motion.a>
+            <motion.a 
+              initial={reducedMotion ? {} : { opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              href="#contato" 
+              onClick={(e) => { e.preventDefault(); toggleMenu(); scrollToSection(4); }} 
+              className="text-white text-2xl font-semibold opacity-80 hover:opacity-100 transition-opacity"
+            >
+              Contato
+            </motion.a>
+            <motion.button 
+              initial={reducedMotion ? {} : { opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25 }}
+              onClick={() => { 
+                toggleMenu(); 
+                if (onGoToAppointments) onGoToAppointments(); 
+              }} 
+              className="text-[#d4a853] text-2xl font-semibold hover:opacity-100 transition-opacity flex items-center gap-2 cursor-pointer mt-2"
+            >
+              Meus Cortes
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* SECTION 0: HERO */}
       <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 bg-[#0a0a0a] text-[#f5f5f5] overflow-hidden flex flex-col justify-between box-border">
@@ -414,51 +490,79 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
         />
 
         {/* HEADER */}
-        <header className="relative z-20 flex items-center justify-between p-5 shrink-0">
+        <motion.header 
+          initial={reducedMotion ? {} : { opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
+          className="relative z-20 flex items-center justify-between p-5 shrink-0"
+        >
           <div className="font-extrabold text-lg tracking-tight text-white flex items-center gap-1">
             <span>NAVO</span><span className="text-[#d4a853]">PREMIUM</span>
           </div>
-          <button 
+          <motion.button 
+            whileTap={{ scale: 0.95 }}
             onClick={toggleMenu} 
-            className="w-10 h-10 rounded-full bg-white/8 border border-white/10 text-white flex items-center justify-center backdrop-blur-md active:scale-95 transition-transform"
+            className="w-10 h-10 rounded-full bg-white/8 border border-white/10 text-white flex items-center justify-center backdrop-blur-md cursor-pointer"
             aria-label="Menu"
           >
             <Menu className="w-5 h-5 text-white" />
-          </button>
-        </header>
+          </motion.button>
+        </motion.header>
 
         {/* HERO CONTENT */}
         <div className="relative z-10 p-5 pb-6 flex flex-col justify-end items-start my-auto min-h-0 w-full max-w-md md:max-w-2xl mx-auto">
           {/* RATING BADGE */}
-          <div className="inline-flex items-center gap-2 bg-[#d4a853]/12 border border-[#d4a853]/25 px-3.5 py-1.5 rounded-full text-xs font-semibold text-[#d4a853] mb-4 backdrop-blur-xs">
+          <motion.div 
+            initial={reducedMotion ? {} : { opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1, ease: 'easeOut' }}
+            className="inline-flex items-center gap-2 bg-[#d4a853]/12 border border-[#d4a853]/25 px-3.5 py-1.5 rounded-full text-xs font-semibold text-[#d4a853] mb-4 backdrop-blur-xs"
+          >
             <span className="tracking-widest text-[0.7rem] font-bold">★★★★★</span>
             <span>4.9 · 1.2k avaliações</span>
-          </div>
+          </motion.div>
 
           {/* TITLE */}
-          <h1 className="text-[clamp(1.85rem,4.5vh,2.8rem)] font-extrabold leading-[1.08] tracking-tight text-white mb-3">
+          <motion.h1 
+            initial={reducedMotion ? {} : { opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.15, ease: 'easeOut' }}
+            className="text-[clamp(1.85rem,4.5vh,2.8rem)] font-extrabold leading-[1.08] tracking-tight text-white mb-3"
+          >
             Seu melhor <span className="text-[#d4a853]">visual</span><br />
             começa aqui.
-          </h1>
+          </motion.h1>
 
           {/* SUBTITLE */}
-          <p className="text-[clamp(0.9rem,1.6vh,1.1rem)] leading-relaxed text-[#a0a0a0] mb-5 max-w-xs sm:max-w-md">
+          <motion.p 
+            initial={reducedMotion ? {} : { opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
+            className="text-[clamp(0.9rem,1.6vh,1.1rem)] leading-relaxed text-[#a0a0a0] mb-5 max-w-xs sm:max-w-md"
+          >
             Agende online, chegue na hora certa e saia renovado. Sem filas, sem espera, sem complicação.
-          </p>
+          </motion.p>
 
           {/* CTA GROUP */}
-          <div className="flex flex-col gap-5 w-full items-center">
-            <button 
+          <motion.div 
+            initial={reducedMotion ? {} : { opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.25, ease: 'easeOut' }}
+            className="flex flex-col gap-5 w-full items-center"
+          >
+            <motion.button 
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.97 }}
               onClick={() => { 
                 hapticMedium(); 
                 trackEvent('cta_click', 'landing', 'agendar_horario_hero');
                 onGoToBooking(); 
               }}
-              className="w-full bg-[#d4a853] hover:bg-[#c49a4a] text-[#0a0a0a] font-bold text-base py-4 px-8 rounded-2xl flex items-center justify-center gap-2 shadow-[0_4px_30px_rgba(212,168,83,0.3)] active:scale-98 transition-all shrink-0 cursor-pointer"
+              className="w-full bg-[#d4a853] hover:bg-[#c49a4a] text-[#0a0a0a] font-bold text-base py-4 px-8 rounded-2xl flex items-center justify-center gap-2 shadow-[0_4px_30px_rgba(212,168,83,0.3)] transition-all shrink-0 cursor-pointer"
             >
               <span>Agendar meu horário</span>
               <ArrowRight className="w-5 h-5 text-[#0a0a0a]" />
-            </button>
+            </motion.button>
 
             <button 
               onClick={() => onGoToAppointments && onGoToAppointments()}
@@ -468,16 +572,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             </button>
 
             {/* SCROLL DOWN INDICATOR */}
-            <button
+            <motion.button
+              animate={reducedMotion ? {} : { y: [0, 5, 0] }}
+              transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
               onClick={() => scrollToSection(1)}
               className="mt-8 flex flex-col items-center justify-center cursor-pointer opacity-70 hover:opacity-100 transition-all active:scale-95 group"
               aria-label="Rolar para a próxima seção"
             >
               <div className="w-6 h-10 rounded-full border-[1.5px] border-white/60 flex justify-center p-1 relative">
-                <div className="w-1 h-2 bg-white/80 rounded-full animate-bounce mt-1" style={{ animationDuration: '2s' }}></div>
+                <div className="w-1 h-2 bg-white/80 rounded-full mt-1"></div>
               </div>
-            </button>
-          </div>
+            </motion.button>
+          </motion.div>
         </div>
 
         {/* HERO FOOTER / TRUST TAGS */}
@@ -507,7 +613,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
 
       {/* SECTION 1: POR QUE A NAVO */}
       <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
-        <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full h-full flex flex-col justify-between items-stretch min-h-0 my-auto">
+        <motion.div 
+          initial={reducedMotion ? {} : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full h-full flex flex-col justify-between items-stretch min-h-0 my-auto"
+        >
           <div className="shrink-0 mb-[clamp(0.25rem,0.8vh,0.75rem)]">
             <span className="text-[#C8A96A] text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase block mb-0.5">
               POR QUE A NAVO
@@ -522,9 +634,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
               const Icon = item.icon;
               const SecondaryIcon = item.secondaryIcon;
               return (
-                <div 
+                <motion.div 
                   key={idx}
-                  className="bg-white border border-neutral-200/80 rounded-2xl p-[clamp(0.75rem,1.5vh,1.25rem)] flex flex-col items-center justify-center gap-[clamp(0.5rem,1.5vh,1rem)] text-center shadow-xs hover:shadow-md transition-all duration-300 group h-full min-h-0"
+                  whileHover={reducedMotion ? {} : { y: -3, scale: 1.01 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ duration: 0.2 }}
+                  className="bg-white border border-neutral-200/80 rounded-2xl p-[clamp(0.75rem,1.5vh,1.25rem)] flex flex-col items-center justify-center gap-[clamp(0.5rem,1.5vh,1rem)] text-center shadow-xs hover:shadow-md transition-shadow duration-300 group h-full min-h-0 cursor-pointer"
                 >
                   <div 
                     className="w-[clamp(3.5rem,8vh,4.5rem)] h-[clamp(3.5rem,8vh,4.5rem)] rounded-full flex items-center justify-center relative shrink-0 transition-transform group-hover:scale-105"
@@ -546,16 +661,22 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                   <span className="text-[clamp(0.75rem,1.4vh,0.9rem)] font-bold text-neutral-800 leading-[1.2] px-1 max-w-[80%]">
                     {item.label}
                   </span>
-                </div>
+                </motion.div>
               );
             })}
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* SECTION 3: GALERIA */}
       <section id="galeria" className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
-        <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full h-full flex flex-col justify-between items-stretch min-h-0 my-auto">
+        <motion.div 
+          initial={reducedMotion ? {} : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full h-full flex flex-col justify-between items-stretch min-h-0 my-auto"
+        >
           {/* Header */}
           <div className="flex justify-between items-end mb-[clamp(0.25rem,0.8vh,0.75rem)] shrink-0">
             <div>
@@ -569,7 +690,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             </div>
             <button 
               onClick={() => { hapticLight(); onGoToBooking(); }}
-              className="text-[clamp(0.65rem,1.3vh,0.875rem)] font-semibold text-neutral-500 hover:text-neutral-900 transition-colors flex items-center gap-1"
+              className="text-[clamp(0.65rem,1.3vh,0.875rem)] font-semibold text-neutral-500 hover:text-neutral-900 transition-colors flex items-center gap-1 cursor-pointer"
             >
               <span>Ver todos os serviços</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -590,13 +711,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
               }
 
               return (
-                <div
+                <motion.div
                   key={item.id + '_' + index}
+                  whileHover={reducedMotion ? {} : { scale: 1.015 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ duration: 0.3 }}
                   onClick={() => {
                     hapticLight();
                     setSelectedGalleryIndex(index);
                   }}
-                  className={`${gridClass} rounded-[clamp(0.5rem,1vh,0.875rem)] overflow-hidden relative group bg-neutral-900 border border-neutral-200/50 hover:border-[#C8A96A]/80 shadow-xs min-h-0 h-full cursor-pointer transition-all duration-300`}
+                  className={`${gridClass} rounded-[clamp(0.5rem,1vh,0.875rem)] overflow-hidden relative group bg-neutral-900 border border-neutral-200/50 hover:border-[#C8A96A]/80 shadow-xs min-h-0 h-full cursor-pointer`}
                 >
                   {/* Photo image */}
                   <img
@@ -627,16 +751,22 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                       </div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* SECTION 4: DEPOIMENTOS - VERTICAL LAYOUT */}
       <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
-        <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full h-full flex flex-col justify-between items-stretch min-h-0 my-auto">
+        <motion.div 
+          initial={reducedMotion ? {} : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full h-full flex flex-col justify-between items-stretch min-h-0 my-auto"
+        >
           <div className="shrink-0 mb-[clamp(0.25rem,0.8vh,0.75rem)]">
             <span className="text-[#C8A96A] text-[clamp(0.6rem,1.1vh,0.8rem)] font-bold tracking-widest uppercase block mb-0.5">
               DEPOIMENTOS
@@ -648,9 +778,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
 
           <div className="flex flex-col gap-[clamp(0.375rem,1vh,1rem)] flex-1 min-h-0 justify-center items-stretch my-auto py-[clamp(0.25rem,0.5vh,0.5rem)] w-full">
             {testimonials.map((item, idx) => (
-              <div 
+              <motion.div 
                 key={idx}
-                className="w-full bg-white border border-neutral-200/80 rounded-[clamp(0.625rem,1.4vh,1.125rem)] p-[clamp(0.5rem,1.2vh,1rem)] flex flex-col justify-between gap-[clamp(0.25rem,0.8vh,0.625rem)] shadow-xs hover:border-[#C8A96A]/50 hover:shadow-md transition-all flex-1 min-h-0"
+                whileHover={reducedMotion ? {} : { y: -2 }}
+                transition={{ duration: 0.2 }}
+                className="w-full bg-white border border-neutral-200/80 rounded-[clamp(0.625rem,1.4vh,1.125rem)] p-[clamp(0.5rem,1.2vh,1rem)] flex flex-col justify-between gap-[clamp(0.25rem,0.8vh,0.625rem)] shadow-xs hover:border-[#C8A96A]/50 hover:shadow-md transition-shadow flex-1 min-h-0"
               >
                 <div>
                   <div className="flex items-center justify-between gap-[clamp(0.375rem,1vw,0.75rem)] mb-[clamp(0.25rem,0.8vh,0.625rem)]">
@@ -680,15 +812,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                     "{item.text}"
                   </p>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* SECTION 5: LOCALIZAÇÃO */}
       <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between p-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
-        <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full h-full flex flex-col justify-between items-stretch min-h-0 my-auto">
+        <motion.div 
+          initial={reducedMotion ? {} : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto w-full h-full flex flex-col justify-between items-stretch min-h-0 my-auto"
+        >
           {/* Section Header */}
           <div className="shrink-0 mb-[clamp(0.25rem,0.8vh,0.75rem)] flex items-end justify-between gap-3">
             <div>
@@ -728,14 +866,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
               
               {/* Map Floating Expand Link */}
               <div className="absolute top-2.5 right-2.5 flex items-center justify-end pointer-events-none">
-                <button
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
                   onClick={handleOpenGoogleMaps}
-                  className="bg-white/95 hover:bg-neutral-50 text-neutral-800 border border-neutral-200 px-2.5 py-1 rounded-lg shadow-xs transition-all pointer-events-auto flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold"
+                  className="bg-white/95 hover:bg-neutral-50 text-neutral-800 border border-neutral-200 px-2.5 py-1 rounded-lg shadow-xs transition-all pointer-events-auto flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold cursor-pointer"
                   title="Abrir no Google Maps"
                 >
                   <ExternalLink className="w-3 h-3 text-[#C8A96A]" />
                   <span className="hidden sm:inline">Ver no Mapa</span>
-                </button>
+                </motion.button>
               </div>
             </div>
 
@@ -794,24 +933,32 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
 
               {/* Action Buttons Zone */}
               <div className="pt-2 sm:pt-3 border-t border-neutral-200/80 shrink-0">
-                <button 
+                <motion.button 
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.97 }}
                   onClick={handleOpenGoogleMaps}
-                  className="w-full bg-neutral-900 hover:bg-black text-white font-extrabold text-[clamp(0.75rem,1.5vh,0.875rem)] py-[clamp(0.75rem,1.8vh,1rem)] px-4 rounded-xl flex items-center justify-center gap-2.5 transition-all shadow-md active:scale-98 cursor-pointer tracking-wide border border-neutral-900"
+                  className="w-full bg-neutral-900 hover:bg-black text-white font-extrabold text-[clamp(0.75rem,1.5vh,0.875rem)] py-[clamp(0.75rem,1.8vh,1rem)] px-4 rounded-xl flex items-center justify-center gap-2.5 transition-all shadow-md cursor-pointer tracking-wide border border-neutral-900"
                 >
                   <Navigation className="w-4 h-4 fill-[#C8A96A] text-[#C8A96A]" />
                   <span>COMO CHEGAR</span>
-                </button>
+                </motion.button>
               </div>
 
             </div>
 
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* SECTION 6: PRONTO PARA O SEU NOVO VISUAL? (DARK CARD) */}
       <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between pt-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
-        <div className="w-full flex-1 flex flex-col justify-center items-center max-h-full my-auto py-1 px-[clamp(0.75rem,2vh,2rem)] min-h-0">
+        <motion.div 
+          initial={reducedMotion ? {} : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="w-full flex-1 flex flex-col justify-center items-center max-h-full my-auto py-1 px-[clamp(0.75rem,2vh,2rem)] min-h-0"
+        >
           <div className="max-w-md md:max-w-3xl lg:max-w-4xl w-full bg-neutral-900 text-white rounded-[clamp(0.875rem,2vh,1.5rem)] p-[clamp(0.875rem,2.2vh,2rem)] relative overflow-hidden shadow-xl text-center flex flex-col items-center justify-center my-auto min-h-0">
             <div className="w-[clamp(2rem,4vh,3rem)] h-[clamp(2rem,4vh,3rem)] rounded-2xl bg-[#C8A96A]/20 border border-[#C8A96A]/30 flex items-center justify-center text-[#C8A96A] mb-[clamp(0.375rem,1vh,1rem)] shrink-0">
               <Scissors className="w-[clamp(1rem,2.2vh,1.625rem)] h-[clamp(1rem,2.2vh,1.625rem)] stroke-[2.2]" />
@@ -826,28 +973,32 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
-              <button 
+              <motion.button 
+                whileHover={{ scale: 1.015 }}
+                whileTap={{ scale: 0.97 }}
                 onClick={() => {
                   hapticMedium();
                   trackEvent('cta_click', 'landing', 'agendar_online_footer');
                   onGoToBooking();
                 }}
-                className="w-full sm:w-auto px-6 py-[clamp(0.5rem,1.2vh,0.875rem)] bg-[#d4a853] hover:bg-[#c49a4a] text-[#0a0a0a] font-bold text-[clamp(0.7rem,1.4vh,0.925rem)] rounded-xl flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(212,168,83,0.3)] hover:scale-102 active:scale-98 transition-all shrink-0 cursor-pointer"
+                className="w-full sm:w-auto px-6 py-[clamp(0.5rem,1.2vh,0.875rem)] bg-[#d4a853] hover:bg-[#c49a4a] text-[#0a0a0a] font-bold text-[clamp(0.7rem,1.4vh,0.925rem)] rounded-xl flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(212,168,83,0.3)] transition-all shrink-0 cursor-pointer"
               >
                 <CalendarCheck className="w-[clamp(0.875rem,1.8vh,1.125rem)] h-[clamp(0.875rem,1.8vh,1.125rem)]" />
                 <span>Agendar Online</span>
-              </button>
+              </motion.button>
 
-              <button 
+              <motion.button 
+                whileHover={{ scale: 1.015 }}
+                whileTap={{ scale: 0.97 }}
                 onClick={() => {
                   trackEvent('cta_click', 'landing', 'agendar_whatsapp_footer');
                   handleOpenWhatsApp();
                 }}
-                className="w-full sm:w-auto px-6 py-[clamp(0.5rem,1.2vh,0.875rem)] bg-[#25D366]/15 hover:bg-[#25D366]/25 border border-[#25D366]/40 text-[#25D366] font-bold text-[clamp(0.7rem,1.4vh,0.925rem)] rounded-xl flex items-center justify-center gap-2 hover:scale-102 active:scale-98 transition-all shrink-0 cursor-pointer"
+                className="w-full sm:w-auto px-6 py-[clamp(0.5rem,1.2vh,0.875rem)] bg-[#25D366]/15 hover:bg-[#25D366]/25 border border-[#25D366]/40 text-[#25D366] font-bold text-[clamp(0.7rem,1.4vh,0.925rem)] rounded-xl flex items-center justify-center gap-2 transition-all shrink-0 cursor-pointer"
               >
                 <MessageCircle className="w-[clamp(0.875rem,1.8vh,1.125rem)] h-[clamp(0.875rem,1.8vh,1.125rem)] fill-current" />
                 <span>Atendimento WhatsApp</span>
-              </button>
+              </motion.button>
             </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 mt-[clamp(0.5rem,1.5vh,1.25rem)] text-neutral-400 text-[clamp(0.6rem,1.2vh,0.75rem)]">
@@ -855,19 +1006,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
               <span className="flex items-center gap-1"><span className="text-[#25D366]">✓</span> Confirmação instantânea</span>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* MINIMALIST BACK TO TOP BUTTON IN THE BOTTOM WHITESPACE */}
         <div className="flex justify-center pt-2 pb-[clamp(1rem,3vh,2rem)] shrink-0 px-[clamp(0.75rem,2vh,2rem)]">
-          <button 
+          <motion.button 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={scrollToTop}
-            className="group flex flex-col items-center justify-center cursor-pointer opacity-70 hover:opacity-100 transition-all active:scale-95"
+            className="group flex flex-col items-center justify-center cursor-pointer opacity-70 hover:opacity-100 transition-opacity"
             aria-label="Voltar ao topo"
           >
             <div className="w-10 h-10 rounded-full border-[1.5px] border-neutral-300 flex justify-center items-center text-neutral-400 group-hover:border-neutral-500 group-hover:text-neutral-600 transition-colors bg-white">
               <ArrowUp className="w-4 h-4 group-hover:-translate-y-1 transition-transform duration-300" />
             </div>
-          </button>
+          </motion.button>
         </div>
 
         {/* FOOTER */}
@@ -882,97 +1035,123 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
       </section>
 
       {/* MODAL FULLSCREEN CARROSSEL DE FOTOS DOS CORTES REAIS */}
-      {selectedGalleryIndex !== null && galleryFeaturedItems[selectedGalleryIndex] && (
-        <div className="fixed inset-0 z-50 bg-surface-base/95 backdrop-blur-md flex flex-col justify-between p-3 sm:p-4 md:p-6 pb-4 animate-in fade-in duration-200 select-none overflow-hidden">
-          {/* Photo Carousel Area - Fills space to the top */}
-          <div className="relative flex-1 flex items-center justify-center mb-3 w-full max-w-4xl mx-auto min-h-0">
-            {/* Left Navigation Arrow */}
-            <button
-              onClick={() => {
-                hapticLight();
-                setSelectedGalleryIndex(prev => (prev !== null && prev > 0 ? prev - 1 : galleryFeaturedItems.length - 1));
-              }}
-              className="absolute left-2 md:left-4 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-surface-card/80 hover:bg-surface-card text-content-base border border-border-subtle flex items-center justify-center backdrop-blur-md transition-all active:scale-90 shadow-2xl cursor-pointer"
-              title="Anterior"
-            >
-              <ChevronLeft className="w-6 h-6 stroke-[2.5]" />
-            </button>
-
-            {/* Photo Container - Fills area cleanly */}
-            <div className="relative w-full h-full flex items-center justify-center rounded-2xl overflow-hidden shadow-2xl border border-border-subtle bg-surface-card group">
-              <img
-                src={galleryFeaturedItems[selectedGalleryIndex].src}
-                alt={galleryFeaturedItems[selectedGalleryIndex].title}
-                className="w-full h-full object-cover transition-transform duration-300"
-              />
-            </div>
-
-            {/* Right Navigation Arrow */}
-            <button
-              onClick={() => {
-                hapticLight();
-                setSelectedGalleryIndex(prev => (prev !== null ? (prev + 1) % galleryFeaturedItems.length : 0));
-              }}
-              className="absolute right-2 md:right-4 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-surface-card/80 hover:bg-surface-card text-content-base border border-border-subtle flex items-center justify-center backdrop-blur-md transition-all active:scale-90 shadow-2xl cursor-pointer"
-              title="Próxima"
-            >
-              <ChevronRight className="w-6 h-6 stroke-[2.5]" />
-            </button>
-          </div>
-
-          {/* Bottom Info Card & Actions: Galeria > Agendar (Uses App Theme Palette) */}
-          <div className="w-full max-w-2xl mx-auto bg-surface-card/95 backdrop-blur-xl p-4 md:p-5 rounded-2xl border border-border-subtle space-y-3 z-10 shadow-2xl text-content-base">
-            <div className="flex items-center justify-between gap-3 border-b border-border-subtle pb-2.5">
-              <div className="min-w-0 flex-1">
-                <h3 className="text-base md:text-lg font-extrabold text-content-base tracking-tight leading-tight truncate">
-                  {galleryFeaturedItems[selectedGalleryIndex].title}
-                </h3>
-                <p className="text-xs md:text-sm text-content-muted font-normal leading-normal line-clamp-2 mt-0.5">
-                  {galleryFeaturedItems[selectedGalleryIndex].description}
-                </p>
-              </div>
-
-              <div className="text-right shrink-0 pl-2">
-                <span className="text-base md:text-lg font-black text-gold-base block leading-none">
-                  R$ {galleryFeaturedItems[selectedGalleryIndex].price.toFixed(2)}
-                </span>
-                <span className="text-[10px] md:text-xs text-content-muted font-medium mt-1 block">
-                  ⏱️ {galleryFeaturedItems[selectedGalleryIndex].duration} min
-                </span>
-              </div>
-            </div>
-
-            {/* Buttons in order: Galeria > Agendar */}
-            <div className="flex items-center gap-2.5 pt-0.5">
-              <button
+      <AnimatePresence>
+        {selectedGalleryIndex !== null && galleryFeaturedItems[selectedGalleryIndex] && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-50 bg-surface-base/95 backdrop-blur-md flex flex-col justify-between p-3 sm:p-4 md:p-6 pb-4 select-none overflow-hidden"
+          >
+            {/* Photo Carousel Area - Fills space to the top */}
+            <div className="relative flex-1 flex items-center justify-center mb-3 w-full max-w-4xl mx-auto min-h-0">
+              {/* Left Navigation Arrow */}
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.9 }}
                 onClick={() => {
                   hapticLight();
-                  setSelectedGalleryIndex(null);
+                  setSelectedGalleryIndex(prev => (prev !== null && prev > 0 ? prev - 1 : galleryFeaturedItems.length - 1));
                 }}
-                className="px-4 md:px-6 py-3 rounded-xl bg-surface-base hover:bg-surface-base/80 text-content-base font-bold text-xs md:text-sm uppercase tracking-wider transition-all active:scale-95 border border-border-subtle flex items-center justify-center gap-2 cursor-pointer shrink-0"
-                title="Voltar para a Galeria"
+                className="absolute left-2 md:left-4 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-surface-card/80 hover:bg-surface-card text-content-base border border-border-subtle flex items-center justify-center backdrop-blur-md shadow-2xl cursor-pointer"
+                title="Anterior"
               >
-                <ArrowLeft className="w-4 h-4 stroke-[2.5]" />
-                <span>Galeria</span>
-              </button>
+                <ChevronLeft className="w-6 h-6 stroke-[2.5]" />
+              </motion.button>
 
-              <button
-                onClick={() => {
-                  hapticMedium();
-                  const selectedService = galleryFeaturedItems[selectedGalleryIndex].service;
-                  setSelectedGalleryIndex(null);
-                  onGoToBooking(selectedService);
-                }}
-                className="flex-1 py-3 rounded-xl bg-gold-base hover:bg-gold-deep text-surface-base font-bold text-xs md:text-sm uppercase tracking-wider transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-lg shadow-gold-base/20 cursor-pointer"
-                title="Agendar este serviço"
+              {/* Photo Container - Fills area cleanly */}
+              <motion.div 
+                initial={reducedMotion ? {} : { opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+                className="relative w-full h-full flex items-center justify-center rounded-2xl overflow-hidden shadow-2xl border border-border-subtle bg-surface-card group"
               >
-                <CalendarCheck className="w-4 h-4 stroke-[2.5]" />
-                <span>Agendar</span>
-              </button>
+                <img
+                  src={galleryFeaturedItems[selectedGalleryIndex].src}
+                  alt={galleryFeaturedItems[selectedGalleryIndex].title}
+                  className="w-full h-full object-cover transition-transform duration-300"
+                />
+              </motion.div>
+
+              {/* Right Navigation Arrow */}
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => {
+                  hapticLight();
+                  setSelectedGalleryIndex(prev => (prev !== null ? (prev + 1) % galleryFeaturedItems.length : 0));
+                }}
+                className="absolute right-2 md:right-4 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-surface-card/80 hover:bg-surface-card text-content-base border border-border-subtle flex items-center justify-center backdrop-blur-md shadow-2xl cursor-pointer"
+                title="Próxima"
+              >
+                <ChevronRight className="w-6 h-6 stroke-[2.5]" />
+              </motion.button>
             </div>
-          </div>
-        </div>
-      )}
+
+            {/* Bottom Info Card & Actions: Galeria > Agendar (Uses App Theme Palette) */}
+            <motion.div 
+              initial={reducedMotion ? {} : { opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="w-full max-w-2xl mx-auto bg-surface-card/95 backdrop-blur-xl p-4 md:p-5 rounded-2xl border border-border-subtle space-y-3 z-10 shadow-2xl text-content-base"
+            >
+              <div className="flex items-center justify-between gap-3 border-b border-border-subtle pb-2.5">
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-base md:text-lg font-extrabold text-content-base tracking-tight leading-tight truncate">
+                    {galleryFeaturedItems[selectedGalleryIndex].title}
+                  </h3>
+                  <p className="text-xs md:text-sm text-content-muted font-normal leading-normal line-clamp-2 mt-0.5">
+                    {galleryFeaturedItems[selectedGalleryIndex].description}
+                  </p>
+                </div>
+
+                <div className="text-right shrink-0 pl-2">
+                  <span className="text-base md:text-lg font-black text-gold-base block leading-none">
+                    R$ {galleryFeaturedItems[selectedGalleryIndex].price.toFixed(2)}
+                  </span>
+                  <span className="text-[10px] md:text-xs text-content-muted font-medium mt-1 block">
+                    ⏱️ {galleryFeaturedItems[selectedGalleryIndex].duration} min
+                  </span>
+                </div>
+              </div>
+
+              {/* Buttons in order: Galeria > Agendar */}
+              <div className="flex items-center gap-2.5 pt-0.5">
+                <motion.button
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => {
+                    hapticLight();
+                    setSelectedGalleryIndex(null);
+                  }}
+                  className="px-4 md:px-6 py-3 rounded-xl bg-surface-base hover:bg-surface-base/80 text-content-base font-bold text-xs md:text-sm uppercase tracking-wider border border-border-subtle flex items-center justify-center gap-2 cursor-pointer shrink-0"
+                  title="Voltar para a Galeria"
+                >
+                  <ArrowLeft className="w-4 h-4 stroke-[2.5]" />
+                  <span>Galeria</span>
+                </motion.button>
+
+                <motion.button
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => {
+                    hapticMedium();
+                    const selectedService = galleryFeaturedItems[selectedGalleryIndex].service;
+                    setSelectedGalleryIndex(null);
+                    onGoToBooking(selectedService);
+                  }}
+                  className="flex-1 py-3 rounded-xl bg-gold-base hover:bg-gold-deep text-surface-base font-bold text-xs md:text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-gold-base/20 cursor-pointer"
+                  title="Agendar este serviço"
+                >
+                  <CalendarCheck className="w-4 h-4 stroke-[2.5]" />
+                  <span>Agendar</span>
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
