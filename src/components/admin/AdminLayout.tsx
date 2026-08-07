@@ -7,6 +7,7 @@ import { ProfessionalsManagement } from './ProfessionalsManagement';
 import { ClientsManagement } from './ClientsManagement';
 import { WaitingQueue } from './WaitingQueue';
 import { SettingsManagement } from './SettingsManagement';
+import { LandingPageManagement } from './LandingPageManagement';
 import { 
   LayoutDashboard,
   Calendar,
@@ -20,7 +21,8 @@ import {
   ChevronRight,
   TrendingUp,
   LogOut,
-  Receipt
+  Receipt,
+  Globe
 } from 'lucide-react';
 
 export type AdminTab = 
@@ -31,6 +33,7 @@ export type AdminTab =
   | 'servicos' 
   | 'profissionais' 
   | 'clientes' 
+  | 'landingpage'
   | 'settings';
 
 export const AdminLayout: React.FC = () => {
@@ -119,6 +122,12 @@ export const AdminLayout: React.FC = () => {
       description: 'Base de clientes'
     },
     { 
+      id: 'landingpage' as AdminTab, 
+      label: 'Landing Page', 
+      icon: Globe,
+      description: 'Editar textos, fotos e seções'
+    },
+    { 
       id: 'settings' as AdminTab, 
       label: 'Configurações', 
       icon: Settings,
@@ -142,6 +151,8 @@ export const AdminLayout: React.FC = () => {
         return <ProfessionalsManagement />;
       case 'clientes':
         return <ClientsManagement />;
+      case 'landingpage':
+        return <LandingPageManagement />;
       case 'settings':
         return <SettingsManagement />;
       default:
