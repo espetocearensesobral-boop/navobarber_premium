@@ -289,7 +289,13 @@ export const ClientApp: React.FC = () => {
     hapticLight();
     if (service) {
       setSelectedServices([service]);
-      setBookingStep(2);
+      if (selectedBarber) {
+        setBookingStep(3);
+        showToast(`Serviço "${service.title}" selecionado! Profissional já definido.`, 'success');
+      } else {
+        setBookingStep(2);
+        showToast(`Serviço "${service.title}" selecionado! Escolha o profissional.`, 'success');
+      }
     } else {
       setSelectedServices([]);
       setBookingStep(1);
@@ -492,7 +498,13 @@ export const ClientApp: React.FC = () => {
                       selectedServices={selectedServices}
                       onToggleService={handleToggleService}
                       onClearServices={() => setSelectedServices([])}
-                      onNext={() => goToStep(2, 'Carregando barbeiros disponíveis...')}
+                      onNext={() => {
+                        if (selectedBarber) {
+                          goToStep(3, 'Buscando horários na agenda...');
+                        } else {
+                          goToStep(2, 'Carregando barbeiros disponíveis...');
+                        }
+                      }}
                     />
                   )}
                   {bookingStep === 2 && (
