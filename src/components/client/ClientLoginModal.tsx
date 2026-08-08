@@ -34,11 +34,21 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
   const [isSubmittingForgot, setIsSubmittingForgot] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Reset-password step (after the WhatsApp code was requested)
+  const [resetCode, setResetCode] = useState('');
+  const [resetNewPassword, setResetNewPassword] = useState('');
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [isSubmittingReset, setIsSubmittingReset] = useState(false);
+  const [resetDone, setResetDone] = useState(false);
+
   // Sync state if initialView changes
   React.useEffect(() => {
     setMode(initialView);
     setForgotSuccess(false);
     setErrorMsg('');
+    setResetCode('');
+    setResetNewPassword('');
+    setResetDone(false);
   }, [initialView, isOpen]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, nextFieldId?: string) => {
@@ -139,6 +149,41 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
       setErrorMsg(err.message || 'Erro ao processar solicitação.');
     } finally {
       setIsSubmittingForgot(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg('');
+    setSuccessMsg('');
+    if (resetCode.trim().length !== 6) {
+      setErrorMsg('Digite o código de 6 dígitos recebido no WhatsApp.');
+      return;
+    }
+    if (resetNewPassword.length < 6) {
+      setErrorMsg('A nova senha deve ter pelo menos 6 caracteres.');
+      return;
+    }
+    setIsSubmittingReset(true);
+    try {
+      const res = await authFetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          loginId: formData.loginId || formData.email,
+          code: resetCode.trim(),
+          newPassword: resetNewPassword
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Código inválido ou expirado.');
+      }
+      setResetDone(true);
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Erro ao redefinir senha.');
+    } finally {
+      setIsSubmittingReset(false);
     }
   };
 
@@ -256,22 +301,95 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
         {errorMsg && <div id="login-error-msg" role="alert" className="mb-4 p-3 rounded-xl bg-status-error/10 border border-status-error/20 text-status-error text-sm font-medium">{errorMsg}</div>}
         {successMsg && <div className="mb-4 p-3 rounded-xl bg-status-success/10 border border-status-success/20 text-status-success text-sm font-medium flex items-center gap-2"><CheckCircle className="w-4 h-4 shrink-0" /><span>{successMsg}</span></div>}
 
-        {mode === 'forgot' && forgotSuccess ? (
+        {mode === 'forgot' && forgotSuccess && resetDone ? (
           <div className="space-y-4 text-center py-2">
             <div className="w-12 h-12 rounded-full bg-status-success/20 border border-status-success/30 text-status-success mx-auto flex items-center justify-center">
               <CheckCircle className="w-6 h-6" />
             </div>
             <p className="text-xs text-content-muted leading-relaxed">
-              Enviamos as instruções e o código de verificação para o e-mail ou WhatsApp cadastrado. Verifique suas mensagens!
+              Senha redefinida com sucesso! Já pode entrar com a nova senha.
             </p>
             <button
               type="button"
-              onClick={() => { setMode('login'); setForgotSuccess(false); setErrorMsg(''); }}
+              onClick={() => { setMode('login'); setForgotSuccess(false); setResetDone(false); setErrorMsg(''); }}
               className="w-full bg-gold-base text-surface-base font-extrabold rounded-xl py-3 mt-2 active:scale-95 transition-all shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-base focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
             >
               Voltar ao Login
             </button>
           </div>
+        ) : mode === 'forgot' && forgotSuccess ? (
+          <form onSubmit={handleResetPassword} className="space-y-4">
+            <div className="space-y-2 text-center py-1">
+              <div className="w-12 h-12 rounded-full bg-status-success/20 border border-status-success/30 text-status-success mx-auto flex items-center justify-center">
+                <CheckCircle className="w-6 h-6" />
+              </div>
+              <p className="text-xs text-content-muted leading-relaxed">
+                Se o cadastro existir, enviamos um código de 6 dígitos por WhatsApp. Ele expira em 10 minutos.
+              </p>
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-content-muted block mb-1">Código de verificação</label>
+              <div className="relative">
+                <KeyRound className="absolute left-3 top-3 w-5 h-5 text-content-muted" />
+                <input
+                  id="reset-code"
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={6}
+                  required
+                  aria-describedby={errorMsg ? "login-error-msg" : undefined}
+                  value={resetCode}
+                  onChange={(e) => setResetCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  onKeyDown={(e) => handleKeyDown(e, 'reset-new-password')}
+                  className="w-full bg-surface-base border border-border-subtle rounded-xl py-3 pl-10 pr-4 text-content-base text-sm tracking-[0.3em] focus:border-gold-base focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-base"
+                  placeholder="000000"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-content-muted block mb-1">Nova senha</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 w-5 h-5 text-content-muted" />
+                <input
+                  id="reset-new-password"
+                  type={showResetPassword ? 'text' : 'password'}
+                  required
+                  minLength={6}
+                  value={resetNewPassword}
+                  onChange={(e) => setResetNewPassword(e.target.value)}
+                  className="w-full bg-surface-base border border-border-subtle rounded-xl py-3 pl-10 pr-10 text-content-base text-sm focus:border-gold-base focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-base"
+                  placeholder="Mínimo 6 caracteres"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowResetPassword(prev => !prev)}
+                  className="absolute right-3 top-3 text-content-muted"
+                  aria-label={showResetPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                >
+                  {showResetPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmittingReset || resetCode.length !== 6 || resetNewPassword.length < 6}
+              className="w-full bg-gold-base text-surface-base font-extrabold rounded-xl py-3 mt-2 active:scale-95 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-base focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
+            >
+              {isSubmittingReset ? 'Redefinindo...' : 'Redefinir Senha'}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => { setForgotSuccess(false); setErrorMsg(''); setResetCode(''); }}
+              className="w-full flex items-center justify-center gap-1.5 text-xs text-content-muted hover:text-content-base transition-colors"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Não recebi o código, tentar de novo</span>
+            </button>
+          </form>
         ) : mode === 'forgot' ? (
           <form onSubmit={handleSubmit} className="space-y-4">
             <p className="text-xs text-content-muted leading-relaxed mb-2">
