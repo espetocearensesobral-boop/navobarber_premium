@@ -14,8 +14,6 @@ export const profiles = pgTable('profiles', {
   referralCode: text('referral_code').unique(),
   referredBy: text('referred_by'),
   birthday: text('birthday'),
-  resetCodeHash: text('reset_code_hash'),
-  resetCodeExpiresAt: timestamp('reset_code_expires_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

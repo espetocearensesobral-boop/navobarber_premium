@@ -40,7 +40,21 @@ import {
   Sparkles
 } from 'lucide-react';
 import { hapticMedium, hapticLight } from '../../lib/haptics';
-import { trackEvent } from '../../lib/analytics';
+
+declare global {
+  interface Window {
+    gtag?: (...args: any[]) => void;
+  }
+}
+
+const trackEvent = (action: string, category: string, label: string) => {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', action, { 
+      event_category: category, 
+      event_label: label 
+    });
+  }
+};
 
 interface LandingPageProps {
   onGoToBooking: (service?: any) => void;
@@ -544,20 +558,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                 trackEvent('cta_click', 'landing', 'agendar_horario_hero');
                 onGoToBooking(); 
               }}
-              className="w-full bg-[#d4a853] hover:bg-[#c49a4a] text-[#0a0a0a] font-bold text-base py-4 px-8 rounded-2xl flex flex-col items-center justify-center gap-0.5 shadow-[0_4px_30px_rgba(212,168,83,0.3)] transition-all shrink-0 cursor-pointer"
+              className="w-full bg-[#d4a853] hover:bg-[#c49a4a] text-[#0a0a0a] font-bold text-base py-4 px-8 rounded-2xl flex items-center justify-center gap-2 shadow-[0_4px_30px_rgba(212,168,83,0.3)] transition-all shrink-0 cursor-pointer"
             >
-              <span className="flex items-center gap-2">
-                Agendar meu horário
-                <ArrowRight className="w-5 h-5 text-[#0a0a0a]" />
-              </span>
-              <span className="text-[0.7rem] font-semibold opacity-70 normal-case">
-                Próximo horário: {nextAvailableTimeSlot}
-              </span>
+              <span>Agendar meu horário</span>
+              <ArrowRight className="w-5 h-5 text-[#0a0a0a]" />
             </motion.button>
 
             <button 
               onClick={() => onGoToAppointments && onGoToAppointments()}
-              className="flex items-center gap-1.5 text-[0.75rem] text-[#a0a0a0]/70 cursor-pointer hover:text-white transition-colors active:scale-95"
+              className="flex items-center gap-1.5 text-[0.85rem] text-[#a0a0a0] cursor-pointer hover:text-white transition-colors active:scale-95"
             >
               <span>Já possui agendamento? Clique aqui.</span>
             </button>
@@ -978,16 +987,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                 <span>Agendar Online</span>
               </motion.button>
 
-              <button 
+              <motion.button 
+                whileHover={{ scale: 1.015 }}
+                whileTap={{ scale: 0.97 }}
                 onClick={() => {
                   trackEvent('cta_click', 'landing', 'agendar_whatsapp_footer');
                   handleOpenWhatsApp();
                 }}
-                className="w-full sm:w-auto px-4 py-2 text-[#25D366] font-semibold text-[clamp(0.7rem,1.4vh,0.85rem)] flex items-center justify-center gap-1.5 transition-opacity opacity-80 hover:opacity-100 shrink-0 cursor-pointer"
+                className="w-full sm:w-auto px-6 py-[clamp(0.5rem,1.2vh,0.875rem)] bg-[#25D366]/15 hover:bg-[#25D366]/25 border border-[#25D366]/40 text-[#25D366] font-bold text-[clamp(0.7rem,1.4vh,0.925rem)] rounded-xl flex items-center justify-center gap-2 transition-all shrink-0 cursor-pointer"
               >
-                <MessageCircle className="w-[clamp(0.8rem,1.6vh,1rem)] h-[clamp(0.8rem,1.6vh,1rem)] fill-current" />
-                <span>ou fale no WhatsApp</span>
-              </button>
+                <MessageCircle className="w-[clamp(0.875rem,1.8vh,1.125rem)] h-[clamp(0.875rem,1.8vh,1.125rem)] fill-current" />
+                <span>Atendimento WhatsApp</span>
+              </motion.button>
             </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 mt-[clamp(0.5rem,1.5vh,1.25rem)] text-neutral-400 text-[clamp(0.6rem,1.2vh,0.75rem)]">

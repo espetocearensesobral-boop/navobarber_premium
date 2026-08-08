@@ -2053,69 +2053,14 @@ app.post("/api/auth/forgot-password", authLimiter, async (req, res) => {
     });
 
     if (user && user.phone) {
-      const code = String(Math.floor(100000 + Math.random() * 900000));
-      const codeHash = await bcrypt.hash(code, 10);
-      const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutos
-
-      await db.update(schema.profiles)
-        .set({ resetCodeHash: codeHash, resetCodeExpiresAt: expiresAt })
-        .where(eq(schema.profiles.id, user.id));
-
-      const msg = `🔑 *BARBERX PREMIUM*\n\nOlá, *${user.name}*!\n\nRecebemos uma solicitação de redefinição de senha para sua conta.\n\nUse o código de verificação: *${code}*\n\nEle expira em 10 minutos. Se não foi você quem solicitou, desconsidere esta mensagem.`;
+      const msg = `🔑 *BARBERX PREMIUM*\n\nOlá, *${user.name}*!\n\nRecebemos uma solicitação de redefinição de senha para sua conta.\n\nUse o código de verificação: *${Math.floor(100000 + Math.random() * 900000)}*\n\nSe não foi você quem solicitou, desconsidere esta mensagem.`;
       sendWhatsAppMessage(user.phone, msg).catch(() => {});
     }
 
-    // Sempre responde sucesso (mesmo se o usuário não existir) para não vazar
-    // quais e-mails/telefones estão cadastrados.
     res.json({
       success: true,
-      message: 'Se o cadastro existir, um código de verificação foi enviado por WhatsApp.'
+      message: 'Instruções para redefinição de senha foram enviadas para o seu e-mail e WhatsApp cadastrado.'
     });
-  } catch (e: any) {
-    return handleError(res, e, req.path);
-  }
-});
-
-app.post("/api/auth/reset-password", authLimiter, async (req, res) => {
-  try {
-    const { loginId, code, newPassword } = req.body;
-    if (!loginId || !code || !newPassword) {
-      return res.status(400).json({ error: 'Código e nova senha são obrigatórios.' });
-    }
-    if (String(newPassword).length < 6) {
-      return res.status(400).json({ error: 'A nova senha deve ter pelo menos 6 caracteres.' });
-    }
-
-    const cleanLoginId = loginId.replace(/\D/g, '');
-    const user = await db.query.profiles.findFirst({
-      where: or(
-        eq(schema.profiles.email, loginId.toLowerCase()),
-        cleanLoginId ? eq(schema.profiles.phone, cleanLoginId) : undefined
-      )
-    });
-
-    // Resposta genérica em caso de usuário/código inválido, para não vazar
-    // se o e-mail/telefone existe na base.
-    const invalidResponse = () => res.status(400).json({ error: 'Código inválido ou expirado.' });
-
-    if (!user || !user.resetCodeHash || !user.resetCodeExpiresAt) {
-      return invalidResponse();
-    }
-    if (new Date(user.resetCodeExpiresAt).getTime() < Date.now()) {
-      return invalidResponse();
-    }
-
-    const codeMatches = await bcrypt.compare(String(code), user.resetCodeHash);
-    if (!codeMatches) {
-      return invalidResponse();
-    }
-
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await db.update(schema.profiles)
-      .set({ password: hashedPassword, resetCodeHash: null, resetCodeExpiresAt: null })
-      .where(eq(schema.profiles.id, user.id));
-
-    res.json({ success: true, message: 'Senha redefinida com sucesso.' });
   } catch (e: any) {
     return handleError(res, e, req.path);
   }

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ServiceItem, Professional, Appointment } from '../../types';
 import { motion, AnimatePresence } from 'motion/react';
 import { hapticLight, hapticMedium, hapticSuccess } from '../../lib/haptics';
-import { trackEvent } from '../../lib/analytics';
 
 import { createAppointmentInSupabase, fetchServicesFromSupabase, fetchProfessionalsFromSupabase } from '../../services/supabaseDataService';
 import { BookingSummaryCard } from './BookingSummaryCard';
@@ -212,8 +211,6 @@ export const ClientApp: React.FC = () => {
       }
 
       setUserCreatedAppointments(prev => [savedApt, ...prev]);
-      trackEvent('funnel_step', 'booking', 'step5_confirmed');
-      trackEvent('funnel_step', 'booking', `payment_${paymentDetails.method}`);
       showToast('Agendamento realizado com sucesso!', 'success');
       setBookingStep(5);
     } catch (error) {
@@ -243,17 +240,7 @@ export const ClientApp: React.FC = () => {
   const [isChangingTab, setIsChangingTab] = useState(false);
   const [tabLoadingMessage, setTabLoadingMessage] = useState('Carregando...');
 
-  const bookingStepLabels: Record<number, string> = {
-    1: 'step1_services',
-    2: 'step2_barber',
-    3: 'step3_datetime',
-    4: 'step4_review'
-  };
-
   const goToStep = (targetStep: number, message?: string) => {
-    if (targetStep > bookingStep && bookingStepLabels[targetStep]) {
-      trackEvent('funnel_step', 'booking', bookingStepLabels[targetStep]);
-    }
     setIsChangingStep(true);
     setStepLoadingMessage(
       message ||
