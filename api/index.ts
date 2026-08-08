@@ -255,6 +255,15 @@ app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ limit: "2mb", extended: true }));
 app.use(cookieParser());
 
+// JSON malformado no corpo da requisição: resposta JSON uniforme,
+// em vez da página HTML de erro padrão do Express.
+app.use((err: any, req: any, res: any, next: any) => {
+  if (err?.type === 'entity.parse.failed' || err instanceof SyntaxError) {
+    return res.status(400).json({ error: 'Corpo da requisição em formato inválido.' });
+  }
+  next(err);
+});
+
 const setAuthCookie = (res: any, token: string) => {
   res.cookie('token', token, {
     httpOnly: true,
@@ -1544,10 +1553,20 @@ app.get("/api/professionals", async (req, res) => {
     let professionals = await db.query.professionals.findMany();
 
     if (!isAdmin) {
-      professionals = professionals.map((p: any) => {
-        const { commissionRate, ...safeProf } = p;
-        return safeProf;
-      });
+      // Allowlist explícito de campos públicos. Evita vazar userId (id interno do
+      // perfil vinculado), commissionRate e timestamps internos para visitantes.
+      professionals = professionals.map((p: any) => ({
+        id: p.id,
+        name: p.name,
+        nickname: p.nickname,
+        roleTitle: p.roleTitle,
+        rating: p.rating,
+        reviewsCount: p.reviewsCount,
+        photoUrl: p.photoUrl,
+        specialties: p.specialties,
+        isActive: p.isActive,
+        workingHours: p.workingHours,
+      }));
     }
     res.json(professionals);
   } catch (e: any) {
@@ -1688,7 +1707,13 @@ app.get("/api/availability", async (req, res) => {
     }
 
     const dateStr = String(date);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      return res.status(400).json({ error: 'Formato de data inválido. Use AAAA-MM-DD.' });
+    }
     const profIdStr = professionalId ? String(professionalId) : '';
+    if (profIdStr && !/^[a-zA-Z0-9_-]+$/.test(profIdStr)) {
+      return res.status(400).json({ error: 'Identificador de profissional inválido.' });
+    }
 
     // Buscar agendamentos não cancelados para a data
     const allAppointments = await db.query.appointments.findMany({
