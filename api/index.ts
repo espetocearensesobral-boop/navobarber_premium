@@ -141,6 +141,10 @@ function matchPhoneNumbers(phone1: string, phone2: string): boolean {
 }
 
 const app = express();
+// Express re-adds "X-Powered-By: Express" lazily on every res.send() unless this is
+// disabled at the app level — helmet's hidePoweredBy alone isn't enough because it only
+// strips the header once, earlier in the middleware chain, before Express sets it again.
+app.disable('x-powered-by');
 app.set("trust proxy", 1);
 
 app.use((req, res, next) => {
@@ -3932,6 +3936,12 @@ app.post("/api/loyalty/admin/manual-points", requireAuth, requireAdmin, async (r
   } catch (e: any) {
     return handleError(res, e, req.path);
   }
+});
+
+// Rota /api/* não reconhecida: resposta JSON uniforme em vez do texto
+// padrão do Express ("Cannot GET /api/..."), que expõe detalhes do framework.
+app.use('/api', (req, res) => {
+  res.status(404).json({ error: 'Recurso não encontrado.' });
 });
 
 export default app;
