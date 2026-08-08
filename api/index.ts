@@ -211,7 +211,7 @@ const sensitiveOpsLimiter = rateLimit({
   message: { error: 'Muitas operações sensíveis. Aguarde alguns minutos.' }
 });
 
-app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false, crossOriginResourcePolicy: false, frameguard: false }));
+app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false, crossOriginResourcePolicy: false, frameguard: { action: 'deny' } }));
 app.use("/api/", apiLimiter);
 app.use("/api", async (req, res, next) => {
   // Rotas públicas que não precisam de banco
@@ -533,6 +533,8 @@ app.post("/api/migrate", requireAuth, async (req: any, res) => { if(req.user.rol
 
 // --- WhatsApp Notification Service (Baileys) ---
 import whatsappRouter, { sendWhatsAppMessage } from './whatsapp.js';
+app.use('/api/whatsapp/reconnect', requireAuth, requireAdmin);
+app.use('/api/whatsapp/logout', requireAuth, requireAdmin);
 app.use('/api/whatsapp', whatsappRouter);
 
 // =====================================
@@ -540,7 +542,7 @@ app.use('/api/whatsapp', whatsappRouter);
 // =====================================
 
 // GET /api/appointments/lookup/step1 — Verifica se há agendamentos ativos para o telefone
-app.get("/api/appointments/lookup/step1", async (req: any, res) => {
+app.get("/api/appointments/lookup/step1", sensitiveOpsLimiter, async (req: any, res) => {
   try {
     const { phone } = req.query;
 
@@ -641,7 +643,7 @@ app.post("/api/appointments/lookup/logout", (req: any, res) => {
 });
 
 // GET /api/appointments/lookup/step2 — Valida código e retorna detalhes do agendamento
-app.get("/api/appointments/lookup/step2", async (req: any, res) => {
+app.get("/api/appointments/lookup/step2", optionalAuth, async (req: any, res) => {
   try {
     const { phone, code } = req.query;
 
@@ -653,6 +655,34 @@ app.get("/api/appointments/lookup/step2", async (req: any, res) => {
 
     const inputPhone = phone.toString().trim();
     const cleanCode = code.toString().toUpperCase().trim();
+
+    // Secure checking: Verify authorization
+    let isAuthorized = false;
+    const isAdmin = req.user?.role === 'admin';
+    let userPhone = req.user?.phone;
+    if (!userPhone && req.user?.id && req.user.id !== 'usr_guest') {
+      const dbUser = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, req.user.id) });
+      if (dbUser) userPhone = dbUser.phone;
+    }
+
+    if (isAdmin) {
+      isAuthorized = true;
+    } else if (userPhone && matchPhoneNumbers(userPhone, inputPhone)) {
+      isAuthorized = true;
+    } else if (req.cookies?.guest_token) {
+      try {
+        const guestDecoded: any = jwt.verify(req.cookies.guest_token, JWT_SECRET);
+        if (guestDecoded.phone && matchPhoneNumbers(guestDecoded.phone, inputPhone)) {
+          isAuthorized = true;
+        }
+      } catch (e) {
+        // Token inválido ou expirado
+      }
+    }
+
+    if (!isAuthorized) {
+      return res.status(401).json({ error: 'Acesso negado: Sessão de busca inválida ou expirada.' });
+    }
 
     const allApts = await db
       .select()
@@ -704,7 +734,7 @@ app.get("/api/appointments/lookup/step2", async (req: any, res) => {
 });
 
 // PATCH /api/appointments/lookup/cancel — Cancela agendamento via telefone + código
-app.patch("/api/appointments/lookup/cancel", sensitiveOpsLimiter, async (req: any, res) => {
+app.patch("/api/appointments/lookup/cancel", sensitiveOpsLimiter, optionalAuth, async (req: any, res) => {
   try {
     const { phone, code } = req.body;
 
@@ -714,6 +744,34 @@ app.patch("/api/appointments/lookup/cancel", sensitiveOpsLimiter, async (req: an
 
     const inputPhone = phone.toString().trim();
     const cleanCode = code.toString().toUpperCase().trim();
+
+    // Secure checking: Verify authorization
+    let isAuthorized = false;
+    const isAdmin = req.user?.role === 'admin';
+    let userPhone = req.user?.phone;
+    if (!userPhone && req.user?.id && req.user.id !== 'usr_guest') {
+      const dbUser = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, req.user.id) });
+      if (dbUser) userPhone = dbUser.phone;
+    }
+
+    if (isAdmin) {
+      isAuthorized = true;
+    } else if (userPhone && matchPhoneNumbers(userPhone, inputPhone)) {
+      isAuthorized = true;
+    } else if (req.cookies?.guest_token) {
+      try {
+        const guestDecoded: any = jwt.verify(req.cookies.guest_token, JWT_SECRET);
+        if (guestDecoded.phone && matchPhoneNumbers(guestDecoded.phone, inputPhone)) {
+          isAuthorized = true;
+        }
+      } catch (e) {
+        // Token inválido ou expirado
+      }
+    }
+
+    if (!isAuthorized) {
+      return res.status(401).json({ error: 'Acesso negado: Sessão de busca inválida ou expirada.' });
+    }
 
     const allApts = await db
       .select()
@@ -922,11 +980,40 @@ app.post("/api/appointments", optionalAuth, async (req: any, res) => {
     }
     
     const originalAmount = calculatedTotal;
-    const discountAmount = Number(data.discountAmount ?? data.discount_amount ?? 0);
-    const finalAmount = Math.max(0, originalAmount - discountAmount);
-    
     const isAdmin = req.user && req.user.role === 'admin';
+
+    // Discount amount comes from the client, so it must be validated server-side.
+    // Non-admins cannot apply an arbitrary discount; only admins (e.g. manual adjustments
+    // via the admin panel) may set a discount value directly. For everyone else, the
+    // discount is clamped to the calculated total to prevent a negative or forged final price.
+    let rawDiscount = Number(data.discountAmount ?? data.discount_amount ?? 0);
+    if (!Number.isFinite(rawDiscount) || rawDiscount < 0) rawDiscount = 0;
+    const discountAmount = isAdmin
+      ? Math.min(rawDiscount, originalAmount)
+      : 0;
+    const finalAmount = Math.max(0, originalAmount - discountAmount);
+
     let clientId = data.clientId || data.client_id || (req.user?.id || 'guest');
+
+    // Ensure regular users cannot spoof booking for other users
+    if (!isAdmin && req.user && req.user.id && req.user.role !== 'guest' && req.user.id !== 'usr_guest' && !req.user.id.startsWith('guest_')) {
+      clientId = req.user.id;
+    }
+
+    // Guests (unauthenticated) must not be able to attach the booking to an existing
+    // registered profile just by guessing/knowing that profile's id.
+    if (!isAdmin && (!req.user || !req.user.id || req.user.role === 'guest' || req.user.id === 'usr_guest' || req.user.id.startsWith('guest_'))) {
+      const requestedClientId = data.clientId || data.client_id;
+      if (requestedClientId) {
+        const existingProfile = await db.query.profiles.findFirst({ where: eq(schema.profiles.id, requestedClientId) });
+        if (existingProfile) {
+          // Requested id belongs to a real, existing account — a guest cannot claim it.
+          // Fall back to a freshly generated guest id instead.
+          clientId = `guest_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+        }
+      }
+    }
+
     let clientName = data.clientName || data.client_name || 'Cliente';
     let clientPhone = sanitizePhone(data.clientPhone || data.client_phone || '');
     
@@ -1162,19 +1249,27 @@ app.patch("/api/appointments/:id/cancel", sensitiveOpsLimiter, optionalAuth, asy
         if (dbUser) userPhone = dbUser.phone;
       }
 
-      const isOwner = dbApt.clientId === req.user?.id;
-      const isPhoneMatch = userPhone && dbApt.clientPhone && 
-        matchPhoneNumbers(userPhone, dbApt.clientPhone);
+      const isOwner = req.user?.id && req.user.id !== 'usr_guest' && dbApt.clientId === req.user.id;
+      const isPhoneMatch = userPhone && dbApt.clientPhone && matchPhoneNumbers(userPhone, dbApt.clientPhone);
       
       const reqPhone = req.body.clientPhone || req.body.client_phone;
       const reqCode = req.body.bookingCode || req.body.booking_code;
       const isLookupMatch = reqPhone && dbApt.clientPhone && matchPhoneNumbers(reqPhone, dbApt.clientPhone) &&
-                            reqCode && dbApt.bookingCode && reqCode === dbApt.bookingCode;
+                            reqCode && dbApt.bookingCode && reqCode.toUpperCase().trim() === dbApt.bookingCode.toUpperCase().trim();
 
-      const isPhoneReqMatch = reqPhone && dbApt.clientPhone && matchPhoneNumbers(reqPhone, dbApt.clientPhone);
-      const isGuestApt = !dbApt.clientId || dbApt.clientId === 'usr_guest' || dbApt.clientId.startsWith('guest_');
-      if (!isOwner && !isPhoneMatch && !isPhoneReqMatch && !isGuestApt) {
-        return res.status(403).json({ error: 'Acesso negado: Você só pode cancelar o próprio agendamento' });
+      // Check for guest_token cookie validation
+      let isGuestTokenMatch = false;
+      if (req.cookies?.guest_token) {
+        try {
+          const guestDecoded: any = jwt.verify(req.cookies.guest_token, JWT_SECRET);
+          if (guestDecoded.phone && dbApt.clientPhone && matchPhoneNumbers(guestDecoded.phone, dbApt.clientPhone)) {
+            isGuestTokenMatch = true;
+          }
+        } catch (e) {}
+      }
+
+      if (!isOwner && !isPhoneMatch && !isLookupMatch && !isGuestTokenMatch) {
+        return res.status(403).json({ error: 'Acesso negado: Você não tem autorização para cancelar este agendamento' });
       }
     }
 
@@ -1225,19 +1320,27 @@ app.put("/api/appointments/:id", sensitiveOpsLimiter, optionalAuth, async (req: 
         if (dbUser) userPhone = dbUser.phone;
       }
 
-      const isOwner = dbApt.clientId === req.user?.id;
-      const isPhoneMatch = userPhone && dbApt.clientPhone && 
-        matchPhoneNumbers(userPhone, dbApt.clientPhone);
+      const isOwner = req.user?.id && req.user.id !== 'usr_guest' && dbApt.clientId === req.user.id;
+      const isPhoneMatch = userPhone && dbApt.clientPhone && matchPhoneNumbers(userPhone, dbApt.clientPhone);
       
       const reqPhone = req.body.clientPhone || req.body.client_phone;
       const reqCode = req.body.bookingCode || req.body.booking_code;
       const isLookupMatch = reqPhone && dbApt.clientPhone && matchPhoneNumbers(reqPhone, dbApt.clientPhone) &&
-                            reqCode && dbApt.bookingCode && reqCode === dbApt.bookingCode;
+                            reqCode && dbApt.bookingCode && reqCode.toUpperCase().trim() === dbApt.bookingCode.toUpperCase().trim();
 
-      const isPhoneReqMatch = reqPhone && dbApt.clientPhone && matchPhoneNumbers(reqPhone, dbApt.clientPhone);
-      const isGuestApt = !dbApt.clientId || dbApt.clientId === 'usr_guest' || dbApt.clientId.startsWith('guest_');
-      if (!isOwner && !isPhoneMatch && !isPhoneReqMatch && !isGuestApt) {
-        return res.status(403).json({ error: 'Acesso negado: Você só pode editar o próprio agendamento' });
+      // Check for guest_token cookie validation
+      let isGuestTokenMatch = false;
+      if (req.cookies?.guest_token) {
+        try {
+          const guestDecoded: any = jwt.verify(req.cookies.guest_token, JWT_SECRET);
+          if (guestDecoded.phone && dbApt.clientPhone && matchPhoneNumbers(guestDecoded.phone, dbApt.clientPhone)) {
+            isGuestTokenMatch = true;
+          }
+        } catch (e) {}
+      }
+
+      if (!isOwner && !isPhoneMatch && !isLookupMatch && !isGuestTokenMatch) {
+        return res.status(403).json({ error: 'Acesso negado: Você não tem autorização para editar este agendamento' });
       }
     }
 
@@ -1278,15 +1381,48 @@ app.put("/api/appointments/:id", sensitiveOpsLimiter, optionalAuth, async (req: 
         if (data.professional_id !== undefined) updateData.professionalId = data.professional_id;
         if (data.professionalName !== undefined) updateData.professionalName = data.professionalName;
         if (data.professional_name !== undefined) updateData.professionalName = data.professional_name;
-        if (data.services !== undefined) updateData.services = data.services;
+        // Price fields (originalAmount/discountAmount/finalAmount) are NEVER taken verbatim
+        // from the request body. They are recalculated server-side below, the same way
+        // POST /api/appointments does it, so a caller cannot forge or zero out the price
+        // by editing an existing appointment.
+        const newServices = data.services !== undefined ? data.services : dbApt.services;
+        if (data.services !== undefined) updateData.services = newServices;
         if (data.totalDurationMinutes !== undefined) updateData.totalDurationMinutes = data.totalDurationMinutes;
         if (data.total_duration_minutes !== undefined) updateData.totalDurationMinutes = data.total_duration_minutes;
-        if (data.originalAmount !== undefined) updateData.originalAmount = data.originalAmount;
-        if (data.original_amount !== undefined) updateData.originalAmount = data.original_amount;
-        if (data.finalAmount !== undefined) updateData.finalAmount = data.finalAmount;
-        if (data.final_amount !== undefined) updateData.finalAmount = data.final_amount;
-        if (data.discountAmount !== undefined) updateData.discountAmount = data.discountAmount;
-        if (data.discount_amount !== undefined) updateData.discountAmount = data.discount_amount;
+
+        if (data.services !== undefined) {
+          // Services changed (or were re-sent): recompute price/duration from the DB, never from the client.
+          const allServices = await db.query.services.findMany();
+          let recalcTotal = 0;
+          let recalcDuration = 0;
+          if (Array.isArray(newServices)) {
+            for (const reqSvc of newServices) {
+              const srvId = typeof reqSvc === 'string' ? reqSvc : reqSvc?.id;
+              const srv = allServices.find((s: any) => s.id === srvId);
+              if (srv) {
+                recalcTotal += Number(srv.price || 0);
+                recalcDuration += Number(srv.durationMinutes || srv.duration_minutes || 0);
+              }
+            }
+          }
+          updateData.originalAmount = recalcTotal.toString();
+          if (recalcDuration > 0) updateData.totalDurationMinutes = recalcDuration;
+
+          let rawDiscount = Number(data.discountAmount ?? data.discount_amount ?? 0);
+          if (!Number.isFinite(rawDiscount) || rawDiscount < 0) rawDiscount = 0;
+          const cappedDiscount = isAdmin ? Math.min(rawDiscount, recalcTotal) : 0;
+          updateData.discountAmount = cappedDiscount.toString();
+          updateData.finalAmount = Math.max(0, recalcTotal - cappedDiscount).toString();
+        } else if (isAdmin && (data.discountAmount !== undefined || data.discount_amount !== undefined)) {
+          // Admin manually adjusting the discount on an unchanged set of services.
+          const baseAmount = Number(dbApt.originalAmount || 0);
+          let rawDiscount = Number(data.discountAmount ?? data.discount_amount ?? 0);
+          if (!Number.isFinite(rawDiscount) || rawDiscount < 0) rawDiscount = 0;
+          const cappedDiscount = Math.min(rawDiscount, baseAmount);
+          updateData.discountAmount = cappedDiscount.toString();
+          updateData.finalAmount = Math.max(0, baseAmount - cappedDiscount).toString();
+        }
+
         if (data.paymentMethod !== undefined) updateData.paymentMethod = data.paymentMethod;
         if (data.payment_method !== undefined) updateData.paymentMethod = data.payment_method;
 

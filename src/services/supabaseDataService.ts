@@ -127,7 +127,9 @@ export async function fetchAppointmentsFromSupabase(phone?: string): Promise<App
     const url = phone ? `${API_BASE}/appointments?phone=${encodeURIComponent(phone)}` : `${API_BASE}/appointments`;
     const res = await authFetch(url);
     if (!res.ok) {
-      return [];
+      const err: any = new Error(`Request failed with status ${res.status}`);
+      err.status = res.status;
+      throw err;
     }
     const data = await res.json();
     if (!Array.isArray(data)) {
