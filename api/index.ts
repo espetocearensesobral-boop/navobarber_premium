@@ -970,30 +970,46 @@ app.post("/api/appointments", optionalAuth, async (req: any, res) => {
       }
     }
 
-    // Calculate total price from services on the server side
+    const isAdmin = req.user && req.user.role === 'admin';
+
+    // Calculate total price from services on the server side.
+    // The price/duration NEVER come from the client — only from the `services`
+    // table, looked up by id. Every id sent by the client must resolve to a
+    // real service; an unmatched id is a validation error, not a silent 0.
     let calculatedTotal = 0;
     let calculatedDuration = 0;
-    
+
     let allServices = await db.query.services.findMany();
 
-    if (data.services && Array.isArray(data.services)) {
-      for (const reqSvc of data.services) {
-        const srvId = typeof reqSvc === 'string' ? reqSvc : reqSvc.id;
+    const requestedServiceIds: string[] = Array.isArray(data.services)
+      ? data.services.map((reqSvc: any) => (typeof reqSvc === 'string' ? reqSvc : reqSvc?.id)).filter(Boolean)
+      : [];
+
+    if (requestedServiceIds.length > 0) {
+      const unmatchedIds: string[] = [];
+      for (const srvId of requestedServiceIds) {
         const srv = allServices.find((s: any) => s.id === srvId);
         if (srv) {
           calculatedTotal += Number(srv.price || 0);
           calculatedDuration += Number(srv.durationMinutes || srv.duration_minutes || 0);
+        } else {
+          unmatchedIds.push(srvId);
         }
       }
+      if (unmatchedIds.length > 0) {
+        return res.status(400).json({ error: 'Um ou mais serviços selecionados são inválidos.', invalidServiceIds: unmatchedIds });
+      }
+    } else if (isAdmin && data.originalAmount) {
+      // Admin-only manual override (e.g. custom/off-menu charge from the admin panel).
+      // Regular clients can never supply the price directly — it must always
+      // come from real `services` rows above.
+      calculatedTotal = Number(data.originalAmount ?? data.original_amount ?? 0);
+      if (!Number.isFinite(calculatedTotal) || calculatedTotal < 0) calculatedTotal = 0;
+    } else {
+      return res.status(400).json({ error: 'Selecione ao menos um serviço válido.' });
     }
 
-    // Default values if no services matched
-    if (calculatedTotal === 0 && data.originalAmount) {
-      calculatedTotal = Number(data.originalAmount ?? data.original_amount ?? 0);
-    }
-    
     const originalAmount = calculatedTotal;
-    const isAdmin = req.user && req.user.role === 'admin';
 
     // Discount amount comes from the client, so it must be validated server-side.
     // Non-admins cannot apply an arbitrary discount; only admins (e.g. manual adjustments
@@ -1405,18 +1421,32 @@ app.put("/api/appointments/:id", sensitiveOpsLimiter, optionalAuth, async (req: 
 
         if (data.services !== undefined) {
           // Services changed (or were re-sent): recompute price/duration from the DB, never from the client.
+          // Every id must resolve to a real service — an unmatched id is a validation
+          // error, not a silent 0 (which would let a non-admin zero out the price by
+          // sending an empty/invalid services array on an edit).
           const allServices = await db.query.services.findMany();
           let recalcTotal = 0;
           let recalcDuration = 0;
-          if (Array.isArray(newServices)) {
-            for (const reqSvc of newServices) {
-              const srvId = typeof reqSvc === 'string' ? reqSvc : reqSvc?.id;
-              const srv = allServices.find((s: any) => s.id === srvId);
-              if (srv) {
-                recalcTotal += Number(srv.price || 0);
-                recalcDuration += Number(srv.durationMinutes || srv.duration_minutes || 0);
-              }
+          const editRequestedIds: string[] = Array.isArray(newServices)
+            ? newServices.map((reqSvc: any) => (typeof reqSvc === 'string' ? reqSvc : reqSvc?.id)).filter(Boolean)
+            : [];
+
+          if (editRequestedIds.length === 0 && !isAdmin) {
+            return res.status(400).json({ error: 'Selecione ao menos um serviço válido.' });
+          }
+
+          const editUnmatchedIds: string[] = [];
+          for (const srvId of editRequestedIds) {
+            const srv = allServices.find((s: any) => s.id === srvId);
+            if (srv) {
+              recalcTotal += Number(srv.price || 0);
+              recalcDuration += Number(srv.durationMinutes || srv.duration_minutes || 0);
+            } else {
+              editUnmatchedIds.push(srvId);
             }
+          }
+          if (editUnmatchedIds.length > 0 && !isAdmin) {
+            return res.status(400).json({ error: 'Um ou mais serviços selecionados são inválidos.', invalidServiceIds: editUnmatchedIds });
           }
           updateData.originalAmount = recalcTotal.toString();
           if (recalcDuration > 0) updateData.totalDurationMinutes = recalcDuration;
