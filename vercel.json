@@ -9,7 +9,7 @@
   },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/index.ts" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/((?!\\.env|\\.env\\.local|\\.env\\.production|config\\.json|\\.git|wp-config\\.php).*)", "destination": "/index.html" }
   ],
   "headers": [
     {
