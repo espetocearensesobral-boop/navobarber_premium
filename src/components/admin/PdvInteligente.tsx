@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '../../lib/api';
 import { 
   fetchAppointmentsFromSupabase, 
   fetchServicesFromSupabase, 
@@ -122,12 +123,24 @@ export const PdvInteligente: React.FC = () => {
 
   useEffect(() => {
     loadData();
-    const savedSales = localStorage.getItem('navo_pdv_sales_today');
-    if (savedSales) {
-      try {
-        setTodaysSales(JSON.parse(savedSales));
-      } catch (e) {}
-    }
+    authFetch('/api/cash-transactions')
+      .then((res) => res.ok ? res.json() : [])
+      .then((rows) => setTodaysSales((rows || []).map((row: any) => {
+        let parsedItems: CartItem[] = [];
+        try { parsedItems = row.notes ? JSON.parse(row.notes) : []; } catch { parsedItems = []; }
+        return {
+          id: row.id,
+          clientName: row.description || 'Cliente',
+          clientPhone: '',
+          professionalName: row.professionalName || 'Profissional',
+          items: parsedItems,
+          subtotal: Number(row.amount || 0), discount: 0, tip: 0,
+          total: Number(row.amount || 0),
+          paymentMethod: row.paymentMethod || 'pix',
+          timestamp: row.createdAt ? new Date(row.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
+        } as PdvTransaction;
+      })))
+      .catch((error) => console.error('Erro ao carregar vendas do banco:', error));
   }, []);
 
   // Filter Today's Pending Appointments
@@ -270,7 +283,7 @@ export const PdvInteligente: React.FC = () => {
   };
 
   // Checkout Completion
-  const handleFinalizeSale = () => {
+  const handleFinalizeSale = async () => {
     if (cart.length === 0) return;
 
     const tx: PdvTransaction = {
@@ -289,9 +302,29 @@ export const PdvInteligente: React.FC = () => {
       appointmentId: linkedAppointmentId || undefined
     };
 
-    const updatedSales = [tx, ...todaysSales];
-    setTodaysSales(updatedSales);
-    localStorage.setItem('navo_pdv_sales_today', JSON.stringify(updatedSales));
+    try {
+      const response = await authFetch('/api/cash-transactions', {
+        method: 'POST',
+        body: JSON.stringify({
+          id: tx.id,
+          type: 'income',
+          description: tx.clientName,
+          amount: tx.total.toFixed(2),
+          category: 'pdv',
+          paymentMethod: tx.paymentMethod,
+          date: new Date().toISOString().split('T')[0],
+          status: 'completed',
+          professionalName: tx.professionalName,
+          notes: JSON.stringify(tx.items)
+        })
+      });
+      if (!response.ok) throw new Error('Não foi possível gravar a venda no banco.');
+      const updatedSales = [tx, ...todaysSales];
+      setTodaysSales(updatedSales);
+    } catch (error) {
+      console.error('Erro ao gravar venda no banco:', error);
+      return;
+    }
 
     if (linkedAppointmentId) {
       setAppointments(prev => prev.map(a => a.id === linkedAppointmentId ? { ...a, status: 'completed' } : a));

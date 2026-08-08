@@ -376,10 +376,7 @@ async function initializeDb(): Promise<void> {
     const connectionString = process.env.DATABASE_URL;
     
     if (!connectionString) {
-      console.error('[API] DATABASE_URL não definida nas variáveis de ambiente.');
-      db = null;
-      isDbConnected = false;
-      return;
+      throw new Error('DATABASE_URL é obrigatória. A aplicação não pode operar sem banco de dados.');
     }
 
     if (!connectionString.startsWith('postgres://') && !connectionString.startsWith('postgresql://')) {
@@ -3236,101 +3233,43 @@ app.post("/api/loyalty/config", requireAuth, requireAdmin, async (req: any, res:
 // =====================================================================
 // SHOP PROFILE & SETTINGS ENDPOINTS
 // =====================================================================
-let inMemoryShopProfile: any = {
-  id: 'default',
-  name: 'Navo Barber & Club',
-  unitName: 'Unidade Jardins',
-  slogan: 'Estilo, Tradição e Excelência na Medida Certa',
-  address: 'Rua Augusta, 1420 - Jardins, São Paulo - SP',
-  phone: '(11) 99999-8888',
-  whatsapp: '5511999998888',
-  openTime: '09:00',
-  closeTime: '20:00',
-  operatingDays: [1, 2, 3, 4, 5, 6],
-  operatingSchedule: {
-    sunday: { active: false, open: '10:00', close: '16:00' },
-    monday: { active: true, open: '09:00', close: '20:00' },
-    tuesday: { active: true, open: '09:00', close: '20:00' },
-    wednesday: { active: true, open: '09:00', close: '20:00' },
-    thursday: { active: true, open: '09:00', close: '20:00' },
-    friday: { active: true, open: '09:00', close: '21:00' },
-    saturday: { active: true, open: '09:00', close: '20:00' }
-  },
-  mapsUrl: 'https://maps.google.com/?q=Rua+Augusta+1420+Jardins+Sao+Paulo',
-  instagram: '@barbearianavo',
-  logoUrl: '',
-  description: 'Barbearia premium com foco em experiência do cliente, cortes modernos e tradicionais.'
-};
-
 app.get("/api/shop-profile", async (req: any, res: any) => {
   try {
-    if (db && isDbConnected) {
-      const rows = await db.select().from(schema.shopSettings).where(eq(schema.shopSettings.id, 'default'));
-      if (rows.length > 0) {
-        const row = rows[0];
-        inMemoryShopProfile = {
-          id: row.id,
-          name: row.name,
-          unitName: row.unitName,
-          slogan: row.slogan,
-          address: row.address,
-          phone: row.phone,
-          whatsapp: row.whatsapp,
-          openTime: row.openTime,
-          closeTime: row.closeTime,
-          operatingDays: row.operatingDays,
-          operatingSchedule: row.operatingSchedule,
-          mapsUrl: row.mapsUrl,
-          instagram: row.instagram,
-          logoUrl: row.logoUrl || '',
-          description: row.description
-        };
-      }
-    }
-  } catch (err) {
-    console.warn('[API] Erro ao buscar perfil da barbearia no DB, utilizando cache:', err);
+    const rows = await db.select().from(schema.shopSettings).where(eq(schema.shopSettings.id, 'default'));
+    if (!rows.length) return res.status(404).json({ error: 'Perfil da barbearia não cadastrado no banco de dados.' });
+    const row = rows[0];
+    res.json({
+      id: row.id, name: row.name, unitName: row.unitName, slogan: row.slogan,
+      address: row.address, phone: row.phone, whatsapp: row.whatsapp,
+      openTime: row.openTime, closeTime: row.closeTime,
+      operatingDays: row.operatingDays, operatingSchedule: row.operatingSchedule,
+      mapsUrl: row.mapsUrl, instagram: row.instagram, logoUrl: row.logoUrl || '',
+      description: row.description
+    });
+  } catch (e: any) {
+    return handleError(res, e, req.path);
   }
-  res.json(inMemoryShopProfile);
 });
 
 app.post("/api/shop-profile", requireAuth, requireAdmin, async (req: any, res: any) => {
   try {
     const data = req.body;
-    inMemoryShopProfile = {
-      ...inMemoryShopProfile,
-      ...data,
-      id: 'default'
+    const payload = {
+      id: 'default', name: data.name, unitName: data.unitName, slogan: data.slogan,
+      address: data.address, phone: data.phone, whatsapp: data.whatsapp,
+      openTime: data.openTime, closeTime: data.closeTime,
+      operatingDays: data.operatingDays, operatingSchedule: data.operatingSchedule,
+      mapsUrl: data.mapsUrl || '', instagram: data.instagram || '',
+      logoUrl: data.logoUrl || '', description: data.description || '', updatedAt: new Date()
     };
-
-    if (db && isDbConnected) {
-      const payload = {
-        id: 'default',
-        name: inMemoryShopProfile.name || 'Navo Barber & Club',
-        unitName: inMemoryShopProfile.unitName || 'Unidade Jardins',
-        slogan: inMemoryShopProfile.slogan || '',
-        address: inMemoryShopProfile.address || '',
-        phone: inMemoryShopProfile.phone || '',
-        whatsapp: inMemoryShopProfile.whatsapp || '',
-        openTime: inMemoryShopProfile.openTime || '09:00',
-        closeTime: inMemoryShopProfile.closeTime || '20:00',
-        operatingDays: inMemoryShopProfile.operatingDays || [1, 2, 3, 4, 5, 6],
-        operatingSchedule: inMemoryShopProfile.operatingSchedule || {},
-        mapsUrl: inMemoryShopProfile.mapsUrl || '',
-        instagram: inMemoryShopProfile.instagram || '',
-        logoUrl: inMemoryShopProfile.logoUrl || '',
-        description: inMemoryShopProfile.description || '',
-        updatedAt: new Date()
-      };
-
-      const existing = await db.select().from(schema.shopSettings).where(eq(schema.shopSettings.id, 'default'));
-      if (existing.length > 0) {
-        await db.update(schema.shopSettings).set(payload).where(eq(schema.shopSettings.id, 'default'));
-      } else {
-        await db.insert(schema.shopSettings).values(payload);
-      }
+    const existing = await db.select().from(schema.shopSettings).where(eq(schema.shopSettings.id, 'default'));
+    if (existing.length > 0) {
+      await db.update(schema.shopSettings).set(payload).where(eq(schema.shopSettings.id, 'default'));
+    } else {
+      await db.insert(schema.shopSettings).values(payload);
     }
-
-    res.json({ success: true, profile: inMemoryShopProfile, message: 'Perfil da barbearia atualizado com sucesso!' });
+    const [saved] = await db.select().from(schema.shopSettings).where(eq(schema.shopSettings.id, 'default'));
+    res.json({ success: true, profile: saved, message: 'Perfil da barbearia atualizado com sucesso!' });
   } catch (e: any) {
     return handleError(res, e, req.path);
   }
@@ -3775,24 +3714,7 @@ app.get("/api/reviews/public", async (req: any, res: any) => {
 
     res.json(populated);
   } catch (e: any) {
-    res.json([
-      {
-        id: 'rev_demo_1',
-        clientName: 'Carlos Eduardo',
-        barberName: 'Marcos Oliver',
-        rating: 5,
-        comment: 'Melhor barbearia de São Paulo! Atendimento rápido, ambiente incrível e o café é top.',
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: 'rev_demo_2',
-        clientName: 'Gabriel Santos',
-        barberName: 'Lucas Barbeiro',
-        rating: 5,
-        comment: 'O programa de pontos vale muito a pena. Já troquei por uma pomada grátis e ganhei upgrade no corte!',
-        createdAt: new Date().toISOString()
-      }
-    ]);
+    return handleError(res, e, req.path);
   }
 });
 

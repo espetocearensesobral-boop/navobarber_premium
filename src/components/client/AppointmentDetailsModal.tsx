@@ -236,9 +236,9 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
   const getGoogleCalendarUrl = () => {
     const title = encodeURIComponent(`Navo Premium - ${currentApt.services?.[0]?.title || 'Agendamento'}`);
     const details = encodeURIComponent(
-      `Agendamento Navo Premium\nBarbeiro: ${currentApt.professional_name}\nServiços: ${(currentApt.services || []).map(s => s.title).join(', ')}\nLocal: Navo Premium - Rua Augusta, 1420 - Jardins`
+      `Agendamento Navo Premium\nBarbeiro: ${currentApt.professional_name}\nServiços: ${(currentApt.services || []).map(s => s.title).join(', ')}\nLocal: Navo Premium - Rua Fortaleza, 1420 - Expectativa, Sobral - CE`
     );
-    const location = encodeURIComponent('Navo Premium - Rua Augusta, 1420 - Jardins');
+    const location = encodeURIComponent('Navo Premium - Rua Fortaleza, 1420 - Expectativa, Sobral - CE');
     return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}`;
   };
 
@@ -247,12 +247,12 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
     const text = encodeURIComponent(
       `💈 *NAVO PREMIUM*\n\nOlá! Gostaria de falar sobre o meu agendamento:\n\n📋 *Voucher:* #${currentApt.id.replace('apt_', '').substring(0, 8)}\n📅 *Data:* ${currentApt.date}\n⏰ *Horário:* ${currentApt.time_slot}\n✂️ *Barbeiro:* ${currentApt.professional_name}`
     );
-    return `https://api.whatsapp.com/send?text=${text}`;
+    return `https://api.whatsapp.com/send?phone=5588998340085&text=${text}`;
   };
 
   // Google Maps Link
   const getMapsUrl = () => {
-    return 'https://maps.google.com/?q=Rua+dos+Baroes+1420+Jardins';
+    return 'https://maps.app.goo.gl/2uCakwEHwA6bbXq97';
   };
 
   // Confirm cancellation logic
@@ -463,7 +463,7 @@ export const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = (
                     </div>
                     <div>
                       <div className="text-[13px] font-semibold text-[#2d2a26] leading-tight">Navo Premium</div>
-                      <div className="text-[11px] text-[#7a7268]">Rua Augusta, 1420 — Jardins</div>
+                      <div className="text-[11px] text-[#7a7268]">Rua Fortaleza, 1420 — Expectativa, Sobral</div>
                     </div>
                   </div>
                 </div>

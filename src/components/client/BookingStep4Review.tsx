@@ -39,29 +39,10 @@ export const BookingStep4Review: React.FC<BookingStep4ReviewProps> = ({
   const [useLoyaltyPoints, setUseLoyaltyPoints] = useState<boolean>(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
-  const [clientName, setClientName] = useState<string>(() => {
-    if (userProfile?.name && userProfile.name !== 'Visitante') return userProfile.name;
-    const savedUser = localStorage.getItem('barberx_user');
-    if (savedUser) {
-      try {
-        const u = JSON.parse(savedUser);
-        if (u.name && u.name !== 'Visitante') return u.name;
-      } catch (e) {}
-    }
-    return '';
-  });
-
-  const [clientPhone, setClientPhone] = useState<string>(() => {
-    if (userProfile?.phone) return userProfile.phone;
-    const savedUser = localStorage.getItem('barberx_user');
-    if (savedUser) {
-      try {
-        const u = JSON.parse(savedUser);
-        if (u.phone) return u.phone;
-      } catch (e) {}
-    }
-    return isGuest ? '' : '(11) 98888-7777';
-  });
+  const [clientName, setClientName] = useState<string>(
+    userProfile?.name && userProfile.name !== 'Visitante' ? userProfile.name : ''
+  );
+  const [clientPhone, setClientPhone] = useState<string>(userProfile?.phone || '');
 
   const [clientNameError, setClientNameError] = useState('');
   const [clientPhoneError, setClientPhoneError] = useState('');

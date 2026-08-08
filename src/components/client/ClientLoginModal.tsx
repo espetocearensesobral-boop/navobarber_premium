@@ -204,7 +204,7 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
       }
       // Create profile
       try {
-        const pendingRef = localStorage.getItem('pending_referral_code');
+        const pendingRef = new URLSearchParams(window.location.search).get('ref')?.trim().toUpperCase() || undefined;
         const res = await authFetch('/api/profiles', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -231,7 +231,6 @@ export const ClientLoginModal: React.FC<ClientLoginModalProps> = ({ isOpen, onCl
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ referralCode: pendingRef })
             });
-            localStorage.removeItem('pending_referral_code');
           } catch (e) {}
         }
         onLoginSuccess(data);

@@ -304,13 +304,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
 
   const handleOpenWhatsApp = () => {
     hapticLight();
-    const num = shopProfile.whatsapp ? shopProfile.whatsapp.replace(/\D/g, '') : '5511999998888';
+    const num = shopProfile.whatsapp ? shopProfile.whatsapp.replace(/\D/g, '') : '5588998340085';
     window.open(`https://wa.me/${num}?text=Olá!%20Gostaria%20de%20agendar%20um%20horário%20na%20${encodeURIComponent(shopProfile.name)}.`, '_blank', 'noopener,noreferrer');
   };
 
   const handleOpenWaze = () => {
     hapticLight();
-    const address = shopProfile.address || 'Rua Augusta 1420 Jardins São Paulo';
+    const address = shopProfile.address || 'Rua Fortaleza 1420 Expectativa Sobral CE';
     const url = `https://waze.com/ul?q=${encodeURIComponent(address)}&navigate=yes`;
     window.open(url, '_blank', 'noopener,noreferrer');
   };
@@ -851,7 +851,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                 style={{ border: 0, filter: 'contrast(102%) brightness(98%)' }}
                 loading="lazy"
                 allowFullScreen
-                src={`https://maps.google.com/maps?q=${encodeURIComponent(shopProfile.address || 'Rua Augusta, 1420 - Jardins, São Paulo - SP')}&t=&z=16&ie=UTF8&iwloc=&output=embed`}
+                src={`https://maps.google.com/maps?q=${encodeURIComponent(shopProfile.address || 'Rua Fortaleza, 1420 - Expectativa, Sobral - CE')}&t=&z=16&ie=UTF8&iwloc=&output=embed`}
                 className="w-full h-full min-h-full rounded-[clamp(0.5rem,1vh,0.875rem)]"
               />
               
@@ -876,7 +876,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
               <div className="space-y-[clamp(0.375rem,1vh,0.75rem)]">
                 <div>
                   <span className="text-[clamp(0.6rem,1vh,0.725rem)] font-bold uppercase tracking-widest text-[#C8A96A] block mb-0.5">
-                    {shopProfile.unitName || 'Unidade Jardins'}
+                    {shopProfile.unitName || 'Unidade Expectativa'}
                   </span>
                   <h3 className="text-[clamp(1.1rem,2.2vh,1.5rem)] font-extrabold text-neutral-900 tracking-tight leading-tight font-serif">
                     {shopProfile.name}
@@ -915,7 +915,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
                     <div>
                       <span className="text-[8.5px] text-neutral-500 uppercase tracking-wider block font-bold">Contato Direto</span>
                       <span className="text-[10.5px] font-bold text-neutral-800">
-                        {shopProfile.phone || '(11) 99999-8888'}
+                        {shopProfile.phone || '(88) 99834-0085'}
                       </span>
                     </div>
                   </div>
@@ -941,84 +941,112 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGoToBooking, onGoToA
         </motion.div>
       </section>
 
-      {/* SECTION 6: PRONTO PARA O SEU NOVO VISUAL? (DARK CARD) */}
-      <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between pt-[clamp(0.75rem,2vh,2rem)] bg-white overflow-hidden box-border">
+      {/* SECTION 6: FINAL CTA & FOOTER (HERO-LIKE FULL BACKGROUND) */}
+      <section className="relative w-full h-full min-h-full max-h-full snap-start snap-always shrink-0 flex flex-col justify-between bg-[#0a0b0e] text-white overflow-hidden box-border">
+        
+        {/* Background Image with Dark Gradient Overlay (Similar to Hero) */}
+        <div 
+          className="absolute inset-0 z-0 bg-cover bg-center opacity-40 mix-blend-luminosity pointer-events-none"
+          style={{
+            backgroundImage: `linear-gradient(180deg, rgba(10,11,14,0.7) 0%, rgba(10,11,14,0.88) 50%, #06070a 100%), url('https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=1200&q=80')`
+          }}
+        />
+
+        {/* Ambient Gold Glow Effect */}
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-[#d4a853]/15 rounded-full blur-3xl pointer-events-none z-0" />
+
+        {/* Main CTA Content Area (Unboxed, Full Immersive Layout) */}
         <motion.div 
           initial={reducedMotion ? {} : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-50px' }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
-          className="w-full flex-1 flex flex-col justify-center items-center max-h-full my-auto py-1 px-[clamp(0.75rem,2vh,2rem)] min-h-0"
+          className="relative z-10 w-full flex-1 flex flex-col justify-center items-center my-auto py-[clamp(1rem,3vh,2.5rem)] px-[clamp(1.25rem,4vh,3rem)] text-center max-w-2xl lg:max-w-3xl mx-auto min-h-0"
         >
-          <div className="max-w-md md:max-w-3xl lg:max-w-4xl w-full bg-neutral-900 text-white rounded-[clamp(0.875rem,2vh,1.5rem)] p-[clamp(0.875rem,2.2vh,2rem)] relative overflow-hidden shadow-xl text-center flex flex-col items-center justify-center my-auto min-h-0">
-            <div className="w-[clamp(2rem,4vh,3rem)] h-[clamp(2rem,4vh,3rem)] rounded-2xl bg-[#C8A96A]/20 border border-[#C8A96A]/30 flex items-center justify-center text-[#C8A96A] mb-[clamp(0.375rem,1vh,1rem)] shrink-0">
-              <Scissors className="w-[clamp(1rem,2.2vh,1.625rem)] h-[clamp(1rem,2.2vh,1.625rem)] stroke-[2.2]" />
-            </div>
+          {/* TRUST / RATING BADGE */}
+          <div className="inline-flex items-center gap-2 bg-[#d4a853]/15 border border-[#d4a853]/30 px-3.5 py-1.5 rounded-full text-xs font-bold text-[#d4a853] mb-[clamp(0.5rem,1.5vh,1rem)] backdrop-blur-xs shadow-xs">
+            <span className="tracking-widest text-[0.7rem] font-black">★★★★★</span>
+            <span>4.9 · 1.2k avaliações</span>
+          </div>
 
-            <h2 className="text-[clamp(1.25rem,3.2vh,2.5rem)] font-bold text-white mb-[clamp(0.2rem,0.6vh,0.5rem)] tracking-tight leading-tight">
-              Pronto para o seu<br />novo visual?
-            </h2>
+          {/* MAIN HEADING */}
+          <h2 className="text-[clamp(1.75rem,4.2vh,3rem)] font-extrabold text-white mb-[clamp(0.35rem,1.2vh,0.85rem)] tracking-tight leading-[1.12]">
+            Pronto para o seu <span className="text-[#d4a853]">novo visual</span>?
+          </h2>
 
-            <p className="text-[clamp(0.65rem,1.3vh,0.875rem)] text-neutral-400 font-normal leading-relaxed mb-[clamp(0.5rem,1.5vh,1.25rem)] max-w-xs sm:max-w-md md:max-w-lg">
-              Garanta seu horário em segundos e viva a experiência Navo Premium.
-            </p>
+          {/* SUBTITLE & MICRO-URGENCY */}
+          <p className="text-[clamp(0.8rem,1.6vh,1.05rem)] text-[#b0b0b0] font-normal leading-relaxed mb-[clamp(1rem,2.2vh,1.75rem)] max-w-md sm:max-w-lg">
+            Agende em segundos, escolha seu barbeiro e garanta seu horário exclusivo com atendimento VIP.
+          </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
-              <motion.button 
-                whileHover={{ scale: 1.015 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={() => {
-                  hapticMedium();
-                  trackEvent('cta_click', 'landing', 'agendar_online_footer');
-                  onGoToBooking();
-                }}
-                className="w-full sm:w-auto px-6 py-[clamp(0.5rem,1.2vh,0.875rem)] bg-[#d4a853] hover:bg-[#c49a4a] text-[#0a0a0a] font-bold text-[clamp(0.7rem,1.4vh,0.925rem)] rounded-xl flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(212,168,83,0.3)] transition-all shrink-0 cursor-pointer"
-              >
-                <CalendarCheck className="w-[clamp(0.875rem,1.8vh,1.125rem)] h-[clamp(0.875rem,1.8vh,1.125rem)]" />
-                <span>Agendar Online</span>
-              </motion.button>
+          {/* ACTION BUTTONS GROUP */}
+          <div className="flex flex-col gap-3 w-full max-w-sm sm:max-w-md items-center">
+            
+            {/* PRIMARY CTA - GOLD BUTTON */}
+            <motion.button 
+              whileHover={{ scale: 1.015 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => {
+                hapticMedium();
+                trackEvent('cta_click', 'landing', 'agendar_online_footer');
+                onGoToBooking();
+              }}
+              className="w-full bg-[#d4a853] hover:bg-[#c49a4a] text-[#0a0a0a] font-bold text-[clamp(0.85rem,1.8vh,1.05rem)] py-[clamp(0.85rem,1.9vh,1.15rem)] px-6 rounded-2xl flex flex-col items-center justify-center gap-0.5 shadow-[0_6px_35px_rgba(212,168,83,0.38)] transition-all cursor-pointer border border-[#f3c973]/40"
+            >
+              <span className="flex items-center gap-2 font-extrabold tracking-wide">
+                <span>Agendar meu horário agora</span>
+                <ArrowRight className="w-5 h-5 text-[#0a0a0a]" />
+              </span>
+              <span className="text-[0.68rem] font-semibold opacity-80 normal-case">
+                Próxima vaga hoje às {nextAvailableTimeSlot}
+              </span>
+            </motion.button>
 
-              <button 
-                onClick={() => {
-                  trackEvent('cta_click', 'landing', 'agendar_whatsapp_footer');
-                  handleOpenWhatsApp();
-                }}
-                className="w-full sm:w-auto px-4 py-2 text-[#25D366] font-semibold text-[clamp(0.7rem,1.4vh,0.85rem)] flex items-center justify-center gap-1.5 transition-opacity opacity-80 hover:opacity-100 shrink-0 cursor-pointer"
-              >
-                <MessageCircle className="w-[clamp(0.8rem,1.6vh,1rem)] h-[clamp(0.8rem,1.6vh,1rem)] fill-current" />
-                <span>ou fale no WhatsApp</span>
-              </button>
-            </div>
+            {/* SECONDARY CTA - WHATSAPP LINK */}
+            <button 
+              onClick={() => {
+                trackEvent('cta_click', 'landing', 'agendar_whatsapp_footer');
+                handleOpenWhatsApp();
+              }}
+              className="flex items-center justify-center gap-2 text-[#25D366] hover:text-[#34e275] font-semibold text-[clamp(0.75rem,1.5vh,0.875rem)] py-1.5 transition-colors cursor-pointer group"
+            >
+              <MessageCircle className="w-4 h-4 fill-current group-hover:scale-110 transition-transform" />
+              <span>ou tirar dúvidas no WhatsApp</span>
+            </button>
+          </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 mt-[clamp(0.5rem,1.5vh,1.25rem)] text-neutral-400 text-[clamp(0.6rem,1.2vh,0.75rem)]">
-              <span className="flex items-center gap-1"><span className="text-[#25D366]">✓</span> Sem taxa de cancelamento</span>
-              <span className="flex items-center gap-1"><span className="text-[#25D366]">✓</span> Confirmação instantânea</span>
-            </div>
+          {/* TRUST GUARANTEES BADGES */}
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mt-[clamp(1rem,2.2vh,1.5rem)] pt-[clamp(0.75rem,1.8vh,1.25rem)] border-t border-white/10 text-[#a8a8a8] text-[clamp(0.68rem,1.3vh,0.78rem)] font-medium">
+            <span className="flex items-center gap-1.5"><span className="text-[#25D366] font-bold">✓</span> Confirmação instantânea</span>
+            <span className="flex items-center gap-1.5"><span className="text-[#25D366] font-bold">✓</span> Sem taxa de cancelamento</span>
+            <span className="flex items-center gap-1.5"><span className="text-[#25D366] font-bold">✓</span> Bebida cortesia no local</span>
           </div>
         </motion.div>
 
-        {/* MINIMALIST BACK TO TOP BUTTON IN THE BOTTOM WHITESPACE */}
-        <div className="flex justify-center pt-2 pb-[clamp(1rem,3vh,2rem)] shrink-0 px-[clamp(0.75rem,2vh,2rem)]">
+        {/* BACK TO TOP BUTTON (DARK GLASS STYLE) */}
+        <div className="relative z-10 flex justify-center pt-1 pb-[clamp(0.5rem,1.5vh,1rem)] shrink-0 px-4">
           <motion.button 
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={scrollToTop}
-            className="group flex flex-col items-center justify-center cursor-pointer opacity-70 hover:opacity-100 transition-opacity"
+            className="group flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/15 text-white/70 hover:text-white transition-all text-xs font-semibold cursor-pointer backdrop-blur-xs"
             aria-label="Voltar ao topo"
           >
-            <div className="w-10 h-10 rounded-full border-[1.5px] border-neutral-300 flex justify-center items-center text-neutral-400 group-hover:border-neutral-500 group-hover:text-neutral-600 transition-colors bg-white">
-              <ArrowUp className="w-4 h-4 group-hover:-translate-y-1 transition-transform duration-300" />
-            </div>
+            <ArrowUp className="w-3.5 h-3.5 group-hover:-translate-y-0.5 transition-transform duration-300 text-[#d4a853]" />
+            <span>Voltar ao topo</span>
           </motion.button>
         </div>
 
         {/* FOOTER */}
-        <footer className="w-full bg-[#0a0a0a] border-t border-white/10 px-5 py-4 shrink-0 flex flex-col sm:flex-row justify-between items-center gap-2 mt-auto">
-          <p className="text-[0.7rem] text-[#a0a0a0]">
+        <footer className="relative z-10 w-full bg-[#06070a]/90 border-t border-white/10 px-5 py-3.5 shrink-0 flex flex-col sm:flex-row justify-between items-center gap-2 mt-auto text-[0.7rem] text-[#888888]">
+          <p>
             © 2026 Navo Premium. Todos os direitos reservados.
           </p>
-          <p className="text-[0.7rem] text-[#a0a0a0]">
-            Desenvolvido por <span className="text-[#d4a853] font-semibold">Navo</span>
+          <p>
+            {shopProfile.address}
+          </p>
+          <p>
+            Desenvolvido com excelência por <span className="text-[#d4a853] font-semibold">Navo</span>
           </p>
         </footer>
       </section>

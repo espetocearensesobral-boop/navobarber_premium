@@ -34,11 +34,11 @@ export interface ShopProfile {
 
 export const defaultShopProfile: ShopProfile = {
   name: 'Navo Barber & Club',
-  unitName: 'Unidade Jardins',
+  unitName: 'Unidade Expectativa',
   slogan: 'Estilo, Tradição e Excelência na Medida Certa',
-  address: 'Rua Augusta, 1420 - Jardins, São Paulo - SP',
-  phone: '(11) 99999-8888',
-  whatsapp: '5511999998888',
+  address: 'Rua Fortaleza, 1420 - Expectativa, Sobral - CE',
+  phone: '(88) 99834-0085',
+  whatsapp: '5588998340085',
   openTime: '09:00',
   closeTime: '20:00',
   operatingDays: [1, 2, 3, 4, 5, 6],
@@ -51,7 +51,7 @@ export const defaultShopProfile: ShopProfile = {
     friday: { active: true, open: '09:00', close: '21:00' },
     saturday: { active: true, open: '09:00', close: '20:00' }
   },
-  mapsUrl: 'https://maps.google.com/?q=Rua+Augusta+1420+Jardins+Sao+Paulo',
+  mapsUrl: 'https://maps.app.goo.gl/2uCakwEHwA6bbXq97',
   instagram: '@barbearianavo',
   logoUrl: '',
   description: 'Barbearia premium com foco em experiência do cliente, cortes modernos e tradicionais.'

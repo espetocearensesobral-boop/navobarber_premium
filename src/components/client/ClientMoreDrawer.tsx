@@ -221,7 +221,6 @@ export const ClientMoreDrawer: React.FC<ClientMoreDrawerProps> = ({
                 const newTheme = theme === 'dark' ? 'light' : 'dark';
                 setTheme(newTheme);
                 document.documentElement.setAttribute('data-theme', newTheme);
-                localStorage.setItem('theme', newTheme);
               }}
               className="w-full bg-surface-base/50 hover:bg-surface-base p-3.5 rounded-btn border border-border-subtle/60 flex items-center justify-between transition-all text-left"
             >

@@ -76,21 +76,8 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
       setIsLoading(true);
     }
 
-    // Retrieve locally stored appointments ONLY for logged-in registered users
-    let localStored: Appointment[] = [];
-    if (!isGuest && currentUser?.id && currentUser.id !== 'guest' && !currentUser.id.startsWith('guest_')) {
-      try {
-        const saved = localStorage.getItem(`barberx_user_appointments_${currentUser.id}`);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed)) localStored = parsed;
-        }
-      } catch (e) {
-        console.warn('Error reading local user appointments:', e);
-      }
-    }
-
-    const allLocal = [...customAppointments, ...localStored];
+    // Registros persistentes são consultados somente pela API/banco.
+    const allLocal = [...customAppointments];
     const uniqueLocalMap = new Map<string, Appointment>();
     allLocal.forEach(apt => {
       if (apt && apt.id) uniqueLocalMap.set(apt.id, apt);
@@ -148,9 +135,7 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
         setVerifiedVoucher('');
         setAppointments([]);
         setHasError(false);
-        try {
-          localStorage.removeItem('barberx_guest_phone');
-        } catch (e) {}
+        
       } else if (localCombined.length > 0) {
         setAppointments(localCombined);
       } else {
@@ -213,27 +198,9 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
 
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
-  const [guestPhoneInput, setGuestPhoneInput] = useState(() => {
-    try {
-      return localStorage.getItem('barberx_guest_phone') || '';
-    } catch {
-      return '';
-    }
-  });
-  const [searchedPhone, setSearchedPhone] = useState(() => {
-    try {
-      return localStorage.getItem('barberx_guest_phone') || '';
-    } catch {
-      return '';
-    }
-  });
-  const [verifiedVoucher, setVerifiedVoucher] = useState(() => {
-    try {
-      return localStorage.getItem('barberx_guest_voucher') || '';
-    } catch {
-      return '';
-    }
-  });
+  const [guestPhoneInput, setGuestPhoneInput] = useState('');
+  const [searchedPhone, setSearchedPhone] = useState('');
+  const [verifiedVoucher, setVerifiedVoucher] = useState('');
 
   const [isSearchingGuest, setIsSearchingGuest] = useState(false);
   const [guestPhoneError, setGuestPhoneError] = useState('');
@@ -290,9 +257,6 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
       setSearchedPhone(phoneToUse);
       setIsVoucherVerificationMode(true); // Enter voucher verification step
       setAppointments([]); // Hide appointments until voucher is validated
-      try {
-        localStorage.setItem('barberx_guest_phone', phoneToUse);
-      } catch (e) {}
     } catch (err: any) {
       setGuestPhoneError(err.message || 'Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.');
       setAppointments([]);
@@ -335,10 +299,6 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
       setIsVoucherVerificationMode(false);
       setVoucherError('');
       
-      try {
-        localStorage.setItem('barberx_guest_phone', searchedPhone);
-        localStorage.setItem('barberx_guest_voucher', cleanInput);
-      } catch (e) {}
 
       // Reload appointments with newly acquired guest auth session
       loadAppointments(searchedPhone);
@@ -361,10 +321,6 @@ export const ClientAppointments: React.FC<ClientAppointmentsProps> = ({
     setVoucherInput('');
     setVoucherError('');
     setIsVoucherVerificationMode(false);
-    try {
-      localStorage.removeItem('barberx_guest_phone');
-      localStorage.removeItem('barberx_guest_voucher');
-    } catch (e) {}
   };
 
   const getStatusBadge = (status: string) => {

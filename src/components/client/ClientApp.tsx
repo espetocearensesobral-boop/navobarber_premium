@@ -23,7 +23,7 @@ import { ClientMoreDrawer } from './ClientMoreDrawer';
 import { PWAInstallModal } from '../pwa/PWAInstallModal';
 import { Calendar, Crown, Award, Clock, Home, Menu, Smartphone, User, Sparkles, Scissors, Loader2, Sun, Moon, CheckCircle2, Info, AlertTriangle, Sliders, Download } from 'lucide-react';
 
-import { authFetch, saveToken } from '../../lib/api';
+import { authFetch } from '../../lib/api';
 
 export const ClientApp: React.FC = () => {
   const [isAppInitializing, setIsAppInitializing] = useState(true);
@@ -58,7 +58,6 @@ export const ClientApp: React.FC = () => {
     const params = new URLSearchParams(window.location.search);
     const refCode = params.get('ref');
     if (refCode) {
-      localStorage.setItem('pending_referral_code', refCode.trim().toUpperCase());
       showToast(`Código de indicação ${refCode.toUpperCase()} ativado! Cadastre-se para ganhar 50 pontos bônus.`, 'info');
     }
 
@@ -72,17 +71,9 @@ export const ClientApp: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
   
-  const [isGuest, setIsGuest] = useState(() => {
-    return !localStorage.getItem('barberx_user');
-  });
-  const [currentUser, setCurrentUser] = useState<any>(() => {
-    const saved = localStorage.getItem('barberx_user');
-    if (saved) {
-      try { return JSON.parse(saved); } catch (e) {}
-    }
-    return { id: 'guest', name: 'Visitante', role: 'guest', loyalty_points: 0, loyalty_tier: 'Bronze' };
-  });
-  const [loyaltyEnabled, setLoyaltyEnabled] = useState(() => localStorage.getItem('app_loyalty_enabled') !== 'false');
+  const [isGuest, setIsGuest] = useState(true);
+  const [currentUser, setCurrentUser] = useState<any>({ id: 'guest', name: 'Visitante', role: 'guest', loyalty_points: 0, loyalty_tier: 'Bronze' });
+  const [loyaltyEnabled, setLoyaltyEnabled] = useState(true);
   
   useEffect(() => {
     // Sync current user profile from server if logged in
@@ -92,29 +83,11 @@ export const ClientApp: React.FC = () => {
         .then(me => {
           if (me && me.id) {
             setCurrentUser(me);
-            localStorage.setItem('barberx_user', JSON.stringify(me));
           }
         })
         .catch(() => {});
     }
 
-    const handleStorage = () => {
-      setLoyaltyEnabled(localStorage.getItem('app_loyalty_enabled') !== 'false');
-      const saved = localStorage.getItem('barberx_user');
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          if (parsed && parsed.id) {
-            setCurrentUser(parsed);
-            setIsGuest(false);
-          }
-        } catch (e) {}
-      }
-    };
-    window.addEventListener('storage', handleStorage);
-    return () => {
-      window.removeEventListener('storage', handleStorage);
-    };
   }, [isGuest]);
 
 
@@ -127,29 +100,8 @@ export const ClientApp: React.FC = () => {
   const [totalPaid, setTotalPaid] = useState<number>(0);
   const [createdBookingCode, setCreatedBookingCode] = useState<string>('');
   const [reviewDetails, setReviewDetails] = useState({ loyaltyDiscount: 0, couponDiscount: 0 });
-  const [userCreatedAppointments, setUserCreatedAppointments] = useState<Appointment[]>(() => {
-    try {
-      const savedUser = localStorage.getItem('barberx_user');
-      if (savedUser) {
-        const u = JSON.parse(savedUser);
-        if (u && u.id && u.id !== 'guest' && !u.id.startsWith('guest_')) {
-          const saved = localStorage.getItem(`barberx_user_appointments_${u.id}`);
-          return saved ? JSON.parse(saved) : [];
-        }
-      }
-    } catch {}
-    return [];
-  });
-
-  useEffect(() => {
-    try {
-      if (!isGuest && currentUser?.id && currentUser.id !== 'guest' && !currentUser.id.startsWith('guest_')) {
-        localStorage.setItem(`barberx_user_appointments_${currentUser.id}`, JSON.stringify(userCreatedAppointments));
-      }
-    } catch (e) {
-      console.warn('Failed to store appointments locally:', e);
-    }
-  }, [userCreatedAppointments, isGuest, currentUser]);
+  // O histórico é sempre carregado da API; este estado contém apenas a resposta da sessão atual.
+  const [userCreatedAppointments, setUserCreatedAppointments] = useState<Appointment[]>([]);
   const [isConfirmingBooking, setIsConfirmingBooking] = useState(false);
 
   const handleToggleService = (service: ServiceItem) => {
@@ -202,14 +154,6 @@ export const ClientApp: React.FC = () => {
       const savedApt = await createAppointmentInSupabase(newApt);
       const finalVoucherCode = savedApt.booking_code || generatedVoucher;
       setCreatedBookingCode(finalVoucherCode);
-
-      // Save phone and voucher for guests
-      if (isGuest && clientPhone) {
-        try {
-          localStorage.setItem('barberx_guest_phone', clientPhone);
-          localStorage.setItem('barberx_guest_voucher', finalVoucherCode);
-        } catch (e) {}
-      }
 
       setUserCreatedAppointments(prev => [savedApt, ...prev]);
       trackEvent('funnel_step', 'booking', 'step5_confirmed');
@@ -662,8 +606,6 @@ export const ClientApp: React.FC = () => {
           setIsLoginModalOpen(true);
         }}
         onLogout={() => {
-          localStorage.removeItem('barberx_user');
-          localStorage.removeItem('barberx_user_appointments');
           setUserCreatedAppointments([]);
           setIsGuest(true);
           setCurrentUser({ id: `guest_${Date.now()}`, name: 'Visitante', role: 'guest', loyalty_points: 0, loyalty_tier: 'Bronze' });
@@ -676,8 +618,6 @@ export const ClientApp: React.FC = () => {
         onClose={() => setIsProfileModalOpen(false)}
         userProfile={currentUser}
         onLogout={() => {
-          localStorage.removeItem('barberx_user');
-          localStorage.removeItem('barberx_user_appointments');
           setUserCreatedAppointments([]);
           setIsGuest(true);
           setCurrentUser({ id: `guest_${Date.now()}`, name: 'Visitante', role: 'guest', loyalty_points: 0, loyalty_tier: 'Bronze' });
@@ -687,9 +627,6 @@ export const ClientApp: React.FC = () => {
           try {
             const updated = { ...currentUser, ...updates };
             setCurrentUser(updated);
-            if (!isGuest) {
-              localStorage.setItem('barberx_user', JSON.stringify(updated));
-            }
           } catch (e) {
             console.warn(e);
           }
@@ -704,8 +641,6 @@ export const ClientApp: React.FC = () => {
           setIsLoginModalOpen(false);
           setIsGuest(false);
           setCurrentUser(user);
-          if (user.token) saveToken(user.token);
-          localStorage.setItem('barberx_user', JSON.stringify(user));
           if (user.role === 'admin') {
             window.location.href = '/admin';
             return;

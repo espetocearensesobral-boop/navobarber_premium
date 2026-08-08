@@ -46,8 +46,6 @@ export function usePWA(): PWAState {
       setIsInstalled(true);
     }
 
-    // Auto register Service Worker
-    registerServiceWorker();
 
     return () => {
       window.removeEventListener('online', handleOnline);
@@ -57,17 +55,8 @@ export function usePWA(): PWAState {
     };
   }, []);
 
-  const registerServiceWorker = () => {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js')
-        .then((registration) => {
-          console.log('[PWA] Service Worker registrado com sucesso no escopo:', registration.scope);
-        })
-        .catch((error) => {
-          console.warn('[PWA] Falha no registro do Service Worker:', error);
-        });
-    }
-  };
+  // Mantido por compatibilidade com a interface, sem registrar armazenamento offline.
+  const registerServiceWorker = () => undefined;
 
   const installApp = async () => {
     if (!deferredPrompt) return;
@@ -81,19 +70,7 @@ export function usePWA(): PWAState {
     setDeferredPrompt(null);
   };
 
-  const syncOfflineData = async (): Promise<boolean> => {
-    if ('serviceWorker' in navigator && 'SyncManager' in window) {
-      try {
-        const registration: any = await navigator.serviceWorker.ready;
-        await registration.sync.register('sync-appointments');
-        return true;
-      } catch (err) {
-        console.log('[PWA] Background sync fallback:', err);
-        return false;
-      }
-    }
-    return false;
-  };
+  const syncOfflineData = async (): Promise<boolean> => false;
 
   return {
     isInstalled,

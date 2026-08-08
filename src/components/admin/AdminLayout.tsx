@@ -10,6 +10,7 @@ import { SettingsManagement } from './SettingsManagement';
 import { NavoRewardsAdmin } from './NavoRewardsAdmin';
 import { BarbershopProfileManagement } from './BarbershopProfileManagement';
 import { AdminMobileHub } from './AdminMobileHub';
+import { authFetch } from '../../lib/api';
 import { 
   Calendar,
   Clock,
@@ -53,31 +54,19 @@ export const AdminLayout: React.FC = () => {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [adminName, setAdminName] = useState('Admin');
 
-  // PROTEÇÃO DE AUTENTICAÇÃO
+  // A autorização vem exclusivamente da sessão HTTP e do perfil no banco.
   React.useEffect(() => {
-    const checkAuth = () => {
-      const token = localStorage.getItem('token');
-      const userStr = localStorage.getItem('barberx_user');
-      
-      if (!userStr) {
-        window.location.href = '/';
-        return;
-      }
-      
-      try {
-        const user = JSON.parse(userStr);
-        if (user.role !== 'admin') {
-          window.location.href = '/';
-        } else {
-          setIsAuthorized(true);
-          setAdminName(user.name || 'Admin');
-        }
-      } catch {
-        window.location.href = '/';
-      }
-    };
-    
-    checkAuth();
+    authFetch('/api/auth/me')
+      .then(async (res) => {
+        if (!res.ok) throw new Error('Sessão inválida');
+        return res.json();
+      })
+      .then((user) => {
+        if (user?.role !== 'admin') throw new Error('Acesso restrito');
+        setIsAuthorized(true);
+        setAdminName(user.name || 'Admin');
+      })
+      .catch(() => { window.location.href = '/'; });
   }, []);
 
   if (!isAuthorized) {
@@ -165,8 +154,6 @@ export const AdminLayout: React.FC = () => {
   ];
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('barberx_user');
     window.location.href = '/';
   };
 
